@@ -1,0 +1,29 @@
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
+
+    <modelVersion>4.0.0</modelVersion>
+
+    <parent>
+        <groupId>com.ovea</groupId>
+        <artifactId>ovea</artifactId>
+        <version>3</version>
+    </parent>
+
+    <artifactId>tajin</artifactId>
+    <version>1.0.b1-SNAPSHOT</version>
+    <packaging>jar</packaging>
+
+    <name>tajin</name>
+    <description>Tajin Web Framework</description>
+
+    <scm>
+        <connection>scm:git:git@github.com:Ovea/tajin.git</connection>
+        <developerConnection>scm:git:git@github.com:Ovea/tajin.git</developerConnection>
+        <url>http://github.com/Ovea/tajin</url>
+    </scm>
+
+    <dependencies>
+        
+    </dependencies>
+
+</project>
+
