@@ -1,0 +1,12 @@
+Gestion ressources
+
+ * compilation des .sas en .css en java
+ * compilation des .coffee en .js en java
+ * integration de http://code.google.com/p/wro4j/
+
+Refactor eventbus
+
+ * bus client
+ * support remote transparant
+ * support event server-side
+
