@@ -24,6 +24,11 @@
     <build>
         <plugins>
             <plugin>
+                <groupId>com.ovea.tajin</groupId>
+                <artifactId>tajin-maven-plugin</artifactId>
+                <version>${project.version}</version>
+            </plugin>
+            <plugin>
                 <groupId>org.eclipse.jetty</groupId>
                 <artifactId>jetty-maven-plugin</artifactId>
             </plugin>
