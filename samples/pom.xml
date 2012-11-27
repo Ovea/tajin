@@ -17,8 +17,8 @@
     <description>Tajin Web Framework Samples</description>
 
     <modules>
-        <module>markup</module>
         <module>resources</module>
+        <module>backend</module>
     </modules>
 
     <build>
@@ -33,11 +33,11 @@
                     <scanIntervalSeconds>10</scanIntervalSeconds>
                     <contextHandlers>
                         <contextHandler implementation="org.eclipse.jetty.webapp.WebAppContext">
-                            <war>${basedir}/markup/target/markup-${project.version}.war</war>
-                            <contextPath>/markup</contextPath>
+                            <war>${basedir}/backend/target/backend-${project.version}.war</war>
+                            <contextPath>/backend</contextPath>
                         </contextHandler>
                         <contextHandler implementation="org.eclipse.jetty.webapp.WebAppContext">
-                            <war>${basedir}/resources/target/resources-${project.version}.war</war>
+                            <war>${basedir}/resources/src/main/webapp</war>
                             <contextPath>/resources</contextPath>
                         </contextHandler>
                     </contextHandlers>

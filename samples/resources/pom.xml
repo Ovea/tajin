@@ -14,13 +14,6 @@
 
     <name>Tajin :: Samples :: Resources</name>
 
-    <dependencies>
-        <dependency>
-            <groupId>com.ovea.tajin</groupId>
-            <artifactId>tajin-framework</artifactId>
-        </dependency>
-    </dependencies>
-
     <build>
         <plugins>
             <plugin>
@@ -34,6 +27,18 @@
             </plugin>
         </plugins>
     </build>
+
+    <dependencies>
+        <dependency>
+            <groupId>com.ovea.tajin</groupId>
+            <artifactId>tajin-framework</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>org.testatoo.container</groupId>
+            <artifactId>testatoo-container-jetty9</artifactId>
+            <scope>test</scope>
+        </dependency>
+    </dependencies>
 
 </project>
 

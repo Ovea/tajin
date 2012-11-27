@@ -1,12 +1,48 @@
+Deploiement par convention
+ * war backend
+ * dossier exposé de ressources (jetty, apache ou autre, gzip & caching controllé autrement)
+
 Gestion ressources
 
- * compilation des .sas en .css en java
+ * compilation des .sass en .css en java
  * compilation des .coffee en .js en java
  * integration de http://code.google.com/p/wro4j/
+ * templates html dans le projet (http://handlebarsjs.com/)
+ * watchdog pour aggreger et minifer les ressources JS (trouver sur le NET), comme SASS => config par json
 
 Refactor eventbus
 
  * bus client
  * support remote transparant
- * support event server-side
 
+Refactor eventbus remote
+
+ * support event server-side & client transparent a travers comnetd ou autre
+
+Refactor dynamic form
+
+Integration
+
+ * i18n
+ * cors
+ * storage
+ * jquery mobile contrib
+ * util
+ * eventbus
+ * cometd
+ * crypto
+
+Security
+
+ * shiro integration
+ * rememberme settings
+ * anti-replay
+ * owasp
+ * CSRF (https://github.com/esheri3/OWASP-CSRFGuard)
+ * Checking The Origin Header (https://www.owasp.org/index.php/Cross-Site_Request_Forgery_(CSRF)_Prevention_Cheat_Sheet)
+ * https://nealpoole.com/blog/2010/11/preventing-csrf-attacks-with-ajax-and-http-headers/
+
+Docs
+
+ * https://www.owasp.org/images/0/08/OWASP_SCP_Quick_Reference_Guide_v2.pdf
+ *
