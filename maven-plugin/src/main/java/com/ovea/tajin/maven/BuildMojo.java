@@ -13,9 +13,24 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-import org.testatoo.container.ContainerConfiguration
-import org.testatoo.container.TestatooContainer
+package com.ovea.tajin.maven;
 
-ContainerConfiguration.create()
-    .buildContainer(TestatooContainer.JETTY9)
-    .start()
+import com.ovea.tajin.TajinConfig;
+import com.ovea.tajin.resources.TajinResourceManager;
+
+/**
+ * Build resources
+ *
+ * @author Mathieu Carbou (mathieu.carbou@gmail.com)
+ * @date 2012-11-27
+ * @goal resources
+ * @phase generate-resources
+ * @threadSafe
+ */
+public final class BuildMojo extends TajinMavenPlugin {
+    @Override
+    void execute(TajinConfig config) {
+        TajinResourceManager manager = new TajinResourceManager(config, webapp);
+        manager.buid();
+    }
+}

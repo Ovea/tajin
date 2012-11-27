@@ -10,6 +10,10 @@ Gestion ressources
  * templates html dans le projet (http://handlebarsjs.com/)
  * watchdog pour aggreger et minifer les ressources JS (trouver sur le NET), comme SASS => config par json
 
+i18n
+
+ * script pour verifier l i18n rel localize vs bundles configures dans tajin.json
+
 Refactor eventbus
 
  * bus client

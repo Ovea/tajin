@@ -18,8 +18,7 @@
         <plugins>
             <plugin>
                 <groupId>com.ovea.tajin</groupId>
-                <artifactId>tajin-maven-plugin</artifactId>
-                <version>${project.version}</version>
+                <artifactId>maven-tajin-plugin</artifactId>
             </plugin>
             <plugin>
                 <groupId>org.eclipse.jetty</groupId>
@@ -41,4 +40,3 @@
     </dependencies>
 
 </project>
-

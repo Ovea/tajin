@@ -15,6 +15,15 @@
     <name>Tajin :: Framework</name>
     <description>Tajin Web Framework</description>
 
+    <build>
+        <plugins>
+            <plugin>
+                <groupId>org.codehaus.gmaven</groupId>
+                <artifactId>gmaven-plugin</artifactId>
+            </plugin>
+        </plugins>
+    </build>
+
     <dependencies>
         <dependency>
             <groupId>org.codehaus.groovy</groupId>
