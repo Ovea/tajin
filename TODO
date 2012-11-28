@@ -9,6 +9,8 @@ Gestion ressources
  * integration de http://code.google.com/p/wro4j/
  * templates html dans le projet (http://handlebarsjs.com/)
  * watchdog pour aggreger et minifer les ressources JS (trouver sur le NET), comme SASS => config par json
+ * lib cliente pour ressources
+ * notions de content, images, templates, cache client pour content
 
 i18n
 
@@ -27,6 +29,7 @@ Refactor dynamic form
 
 Integration
 
+ * preloading resources
  * i18n
  * cors
  * storage
