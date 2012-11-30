@@ -38,6 +38,13 @@
         <pluginManagement>
             <plugins>
                 <plugin>
+                    <artifactId>maven-war-plugin</artifactId>
+                    <version>2.3</version>
+                    <configuration>
+                        <failOnMissingWebXml>false</failOnMissingWebXml>
+                    </configuration>
+                </plugin>
+                <plugin>
                     <groupId>org.codehaus.mojo</groupId>
                     <artifactId>jslint-maven-plugin</artifactId>
                     <version>1.0.1</version>
@@ -155,14 +162,8 @@
                         <email>dev@ovea.com</email>
                     </properties>
                     <excludes>
-                        <exclude>README.md</exclude>
                         <exclude>src/main/resources/**</exclude>
-                        <exclude>tmp/**</exclude>
                         <exclude>**/.gitignore</exclude>
-                        <exclude>**/jndi.properties</exclude>
-                        <exclude>**/logging.properties</exclude>
-                        <exclude>**/*.js</exclude>
-                        <exclude>**/*.swf</exclude>
                         <exclude>.idea/**</exclude>
                         <exclude>**/*.md</exclude>
                         <exclude>**/pom.xml.releaseBackup</exclude>

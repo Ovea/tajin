@@ -37,44 +37,43 @@
                         </goals>
                         <configuration>
                             <nosuffix>true</nosuffix>
-                            <suffix>.min</suffix>
-                            <nomunge>true</nomunge>
+                            <nocompress>true</nocompress>
+                            <outputDirectory>${project.build.directory}/${project.build.finalName}</outputDirectory>
                             <aggregations>
                                 <aggregation>
-                                    <output>${project.build.directory}/${project.build.finalName}/tajin.js</output>
+                                    <output>${project.build.directory}/${project.build.finalName}/tajin/tajin.js</output>
                                     <insertNewLine>true</insertNewLine>
-                                    <removeIncluded>true</removeIncluded>
+                                    <removeIncluded>false</removeIncluded>
                                     <includes>
-                                        <include>tajin.core.js</include>
-                                        <include>tajin.logging.js</include>
+                                        <include>${project.build.directory}/${project.build.finalName}/tajin/tajin.core.js</include>
+                                        <include>${project.build.directory}/${project.build.finalName}/tajin/tajin.logging.js</include>
                                     </includes>
                                 </aggregation>
                             </aggregations>
                         </configuration>
                     </execution>
-                    <!--<execution>
+                    <execution>
                         <id>min</id>
                         <goals>
                             <goal>compress</goal>
                         </goals>
                         <configuration>
                             <sourceDirectory>${project.build.directory}/${project.build.finalName}</sourceDirectory>
-                            <includes>
-                                <include>tajin.js</include>
-                            </includes>
+                            <outputDirectory>${project.build.directory}/${project.build.finalName}</outputDirectory>
                             <nosuffix>false</nosuffix>
-                            <suffix>.min</suffix>
-                            <nomunge>true</nomunge>
+                            <nocompress>false</nocompress>
                         </configuration>
-                    </execution>-->
+                    </execution>
                 </executions>
                 <configuration>
-                    <!--<excludeWarSourceDirectory>true</excludeWarSourceDirectory>
-                    <excludeResources>true</excludeResources>-->
+                    <nomunge>true</nomunge>
+                    <suffix>.min</suffix>
                     <failOnWarning>true</failOnWarning>
                     <statistics>true</statistics>
                     <disableOptimizations>true</disableOptimizations>
                     <jswarn>true</jswarn>
+                    <excludeResources>true</excludeResources>
+                    <excludeWarSourceDirectory>true</excludeWarSourceDirectory>
                 </configuration>
             </plugin>
         </plugins>
