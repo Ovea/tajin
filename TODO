@@ -38,9 +38,6 @@ Tajin
     * cli: utils
     * cli: logger
 
-    * container
-        * import de testatoo
-
     * tools
         * script pour verifier l i18n rel localize vs bundles configures dans tajin.json
 

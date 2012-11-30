@@ -11,9 +11,7 @@
 
     <artifactId>tajin-client</artifactId>
     <packaging>war</packaging>
-
     <name>Tajin :: Client</name>
-    <description>Tajin Client Library</description>
 
     <build>
         <plugins>

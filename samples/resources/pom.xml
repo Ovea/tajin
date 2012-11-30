@@ -29,8 +29,8 @@
 
     <dependencies>
         <dependency>
-            <groupId>org.testatoo.container</groupId>
-            <artifactId>testatoo-container-jetty9</artifactId>
+            <groupId>com.ovea.tajin.server</groupId>
+            <artifactId>tajin-server-jetty9</artifactId>
             <scope>test</scope>
         </dependency>
         <dependency>

@@ -12,9 +12,7 @@
     <groupId>com.ovea.tajin.samples</groupId>
     <artifactId>samples</artifactId>
     <packaging>pom</packaging>
-
     <name>Tajin :: Samples</name>
-    <description>Tajin Web Framework Samples</description>
 
     <modules>
         <module>resources</module>

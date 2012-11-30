@@ -12,9 +12,7 @@
     <artifactId>tajin</artifactId>
     <version>1.0.b1-SNAPSHOT</version>
     <packaging>pom</packaging>
-
     <name>Tajin</name>
-    <description>Tajin</description>
 
     <scm>
         <connection>scm:git:git@github.com:Ovea/tajin.git</connection>
@@ -27,6 +25,7 @@
     </properties>
 
     <modules>
+        <module>server</module>
         <module>client</module>
         <module>framework</module>
         <module>maven-plugin</module>
@@ -182,9 +181,19 @@
                 <version>${project.version}</version>
             </dependency>
             <dependency>
-                <groupId>org.testatoo.container</groupId>
-                <artifactId>testatoo-container-jetty9</artifactId>
-                <version>2.1.ga</version>
+                <groupId>com.ovea.tajin.server</groupId>
+                <artifactId>tajin-server-core</artifactId>
+                <version>${project.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>com.ovea.tajin.server</groupId>
+                <artifactId>tajin-server-jetty9</artifactId>
+                <version>${project.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>com.ovea.tajin.server</groupId>
+                <artifactId>tajin-server-core</artifactId>
+                <version>${project.version}</version>
             </dependency>
             <!-- apis -->
             <dependency>
@@ -293,6 +302,11 @@
                         <artifactId>tomcat-api</artifactId>
                     </exclusion>
                 </exclusions>
+            </dependency>
+            <dependency>
+                <groupId>commons-cli</groupId>
+                <artifactId>commons-cli</artifactId>
+                <version>1.1</version>
             </dependency>
         </dependencies>
     </dependencyManagement>

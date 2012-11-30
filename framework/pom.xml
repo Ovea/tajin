@@ -11,9 +11,7 @@
 
     <artifactId>tajin-framework</artifactId>
     <packaging>jar</packaging>
-
     <name>Tajin :: Framework</name>
-    <description>Tajin Web Framework</description>
 
     <build>
         <plugins>

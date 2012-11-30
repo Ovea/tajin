@@ -1,0 +1,41 @@
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
+
+    <modelVersion>4.0.0</modelVersion>
+
+    <parent>
+        <groupId>com.ovea.tajin</groupId>
+        <artifactId>tajin</artifactId>
+        <version>1.0.b1-SNAPSHOT</version>
+        <relativePath>..</relativePath>
+    </parent>
+
+    <groupId>com.ovea.tajin.server</groupId>
+    <artifactId>server</artifactId>
+    <packaging>pom</packaging>
+    <name>Tajin :: Servers</name>
+
+    <modules>
+        <module>core</module>
+        <module>jetty8</module>
+        <module>jetty9</module>
+        <module>tomcat6</module>
+        <module>tomcat7</module>
+    </modules>
+
+    <build>
+        <pluginManagement>
+            <plugins>
+                <plugin>
+                    <artifactId>maven-shade-plugin</artifactId>
+                    <configuration>
+                        <shadedArtifactAttached>false</shadedArtifactAttached>
+                        <createSourcesJar>true</createSourcesJar>
+                        <createDependencyReducedPom>true</createDependencyReducedPom>
+                        <keepDependenciesWithProvidedScope>true</keepDependenciesWithProvidedScope>
+                    </configuration>
+                </plugin>
+            </plugins>
+        </pluginManagement>
+    </build>
+
+</project>

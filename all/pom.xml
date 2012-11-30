@@ -11,9 +11,7 @@
 
     <artifactId>tajin-all</artifactId>
     <packaging>jar</packaging>
-
     <name>Tajin :: All</name>
-    <description>Tajin All</description>
 
     <build>
         <plugins>

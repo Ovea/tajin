@@ -13,9 +13,10 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-import org.testatoo.container.ContainerConfiguration
-import org.testatoo.container.TestatooContainer
+
+import com.ovea.tajin.server.ContainerConfiguration
+import com.ovea.tajin.server.Server
 
 ContainerConfiguration.create()
-    .buildContainer(TestatooContainer.JETTY9)
+    .buildContainer(Server.JETTY9)
     .start()
