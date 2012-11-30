@@ -17,8 +17,19 @@
     <build>
         <plugins>
             <plugin>
-                <groupId>com.ovea.tajin</groupId>
-                <artifactId>maven-tajin-plugin</artifactId>
+                <artifactId>maven-war-plugin</artifactId>
+                <configuration>
+                    <overlays>
+                        <overlay>
+                            <groupId>com.ovea.tajin</groupId>
+                            <artifactId>tajin-client</artifactId>
+                            <excludes>
+                                <exclude>META-INF/**</exclude>
+                                <exclude>WEB-INF/web.xml</exclude>
+                            </excludes>
+                        </overlay>
+                    </overlays>
+                </configuration>
             </plugin>
             <plugin>
                 <groupId>org.eclipse.jetty</groupId>
@@ -28,6 +39,18 @@
     </build>
 
     <dependencies>
+        <dependency>
+            <groupId>com.ovea.tajin</groupId>
+            <artifactId>tajin-client</artifactId>
+            <version>${project.version}</version>
+            <type>war</type>
+        </dependency>
+
+        <dependency>
+            <groupId>org.codehaus.groovy</groupId>
+            <artifactId>groovy-all</artifactId>
+            <scope>test</scope>
+        </dependency>
         <dependency>
             <groupId>com.ovea.tajin.server</groupId>
             <artifactId>tajin-server-jetty9</artifactId>

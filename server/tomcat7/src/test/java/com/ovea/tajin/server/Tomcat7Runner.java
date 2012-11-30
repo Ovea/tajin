@@ -15,7 +15,7 @@
  */
 package com.ovea.tajin.server;
 
-final class TomcatRunner {
+final class Tomcat7Runner {
     public static void main(String[] args) throws Exception {
         ContainerRunner.main("-help");
 

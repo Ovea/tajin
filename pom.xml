@@ -39,9 +39,6 @@
                 <plugin>
                     <artifactId>maven-war-plugin</artifactId>
                     <version>2.3</version>
-                    <configuration>
-                        <failOnMissingWebXml>false</failOnMissingWebXml>
-                    </configuration>
                 </plugin>
                 <plugin>
                     <groupId>org.codehaus.mojo</groupId>
@@ -194,6 +191,12 @@
                 <groupId>com.ovea.tajin.server</groupId>
                 <artifactId>tajin-server-core</artifactId>
                 <version>${project.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>com.ovea.tajin</groupId>
+                <artifactId>tajin-client</artifactId>
+                <version>${project.version}</version>
+                <type>war</type>
             </dependency>
             <!-- apis -->
             <dependency>

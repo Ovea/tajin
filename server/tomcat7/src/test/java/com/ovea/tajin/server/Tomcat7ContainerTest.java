@@ -17,101 +17,107 @@ package com.ovea.tajin.server;
 
 import com.meterware.httpunit.WebConversation;
 import com.meterware.httpunit.WebResponse;
+import org.junit.Before;
 import org.junit.Ignore;
 import org.junit.Test;
 
 import javax.net.ServerSocketFactory;
+import java.util.Random;
 
 import static org.hamcrest.Matchers.containsString;
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertFalse;
-import static org.junit.Assert.assertThat;
-import static org.junit.Assert.assertTrue;
+import static org.junit.Assert.*;
 
-public final class TomcatContainerTest {
+public final class Tomcat7ContainerTest {
+
+    int PORT;
+
+    @Before
+    public void getPort() throws Exception {
+        PORT = 1024 + new Random().nextInt(60000);
+    }
 
     @Test
     @Ignore
     public void test_restart() throws Exception {
         Container container = ContainerConfiguration.create()
-                .port(9999)
-                .webappRoot("../core/src/test/webapp")
-                .context("superApp")
-                .buildContainer(Server.TOMCAT7);
+            .port(PORT)
+            .webappRoot("../core/src/test/webapp")
+            .context("superApp")
+            .buildContainer(Server.TOMCAT7);
         assertFalse(container.isRunning());
-        assertTrue(isPortFree(9999));
+        assertTrue(isPortFree(PORT));
         container.start();
-        assertFalse(isPortFree(9999));
+        assertFalse(isPortFree(PORT));
         assertTrue(container.isRunning());
         container.stop();
-        assertTrue(isPortFree(9999));
+        assertTrue(isPortFree(PORT));
         assertFalse(container.isRunning());
         container.start();
-        assertFalse(isPortFree(9999));
+        assertFalse(isPortFree(PORT));
         assertTrue(container.isRunning());
     }
 
     @Test
     public void test_html() throws Exception {
-        assertTrue(isPortFree(9999));
+        assertTrue(isPortFree(PORT));
         Container container = ContainerConfiguration.create()
-                .port(9999)
-                .webappRoot("../core/src/test/webapp")
-                .context("superApp")
-                .buildContainer(Server.TOMCAT7);
+            .port(PORT)
+            .webappRoot("../core/src/test/webapp")
+            .context("superApp")
+            .buildContainer(Server.TOMCAT7);
         assertFalse(container.isRunning());
-        assertTrue(isPortFree(9999));
+        assertTrue(isPortFree(PORT));
         container.start();
-        assertFalse(isPortFree(9999));
+        assertFalse(isPortFree(PORT));
         assertTrue(container.isRunning());
         WebConversation wc = new WebConversation();
-        WebResponse resp = wc.getResponse("http://127.0.0.1:9999/superApp/index.xhtml");
+        WebResponse resp = wc.getResponse("http://127.0.0.1:" + PORT + "/superApp/index.xhtml");
         assertEquals(resp.getTitle(), "HTML file");
         assertThat(resp.getText(), containsString("HTML file"));
         container.stop();
-        assertTrue(isPortFree(9999));
+        assertTrue(isPortFree(PORT));
         assertFalse(container.isRunning());
     }
 
     @Test
     public void test_jsp() throws Exception {
-        assertTrue(isPortFree(9989));
+        assertTrue(isPortFree(PORT));
         Container container = ContainerConfiguration.create()
-                .port(9989)
-                .webappRoot("../core/src/test/webapp")
-                .context("superApp")
-                .buildContainer(Server.TOMCAT7);
+            .port(PORT)
+            .webappRoot("../core/src/test/webapp")
+            .context("superApp")
+            .buildContainer(Server.TOMCAT7);
         assertFalse(container.isRunning());
-        assertTrue(isPortFree(9989));
+        assertTrue(isPortFree(PORT));
         container.start();
-        assertFalse(isPortFree(9989));
+        assertFalse(isPortFree(PORT));
         assertTrue(container.isRunning());
         WebConversation wc = new WebConversation();
-        WebResponse resp = wc.getResponse("http://127.0.0.1:9989/superApp/index.jsp");
+        WebResponse resp = wc.getResponse("http://127.0.0.1:" + PORT + "/superApp/index.jsp");
         assertEquals(resp.getTitle(), "JSP Test");
         assertThat(resp.getText(), containsString("Languages"));
         container.stop();
-        assertTrue(isPortFree(9989));
+        assertTrue(isPortFree(PORT));
         assertFalse(container.isRunning());
     }
 
     @Test
     public void test_jndi() throws Exception {
-        assertTrue(isPortFree(3999));
+        assertTrue(isPortFree(PORT));
         Container container = ContainerConfiguration.create()
-                .port(3999)
-                .webappRoot("../core/src/test/webapp")
-                .context("superApp")
-                .buildContainer(Server.TOMCAT7);
-        assertTrue(isPortFree(3999));
+            .port(PORT)
+            .webappRoot("../core/src/test/webapp")
+            .context("superApp")
+            .buildContainer(Server.TOMCAT7);
+        assertTrue(isPortFree(PORT));
         container.start();
-        assertFalse(isPortFree(3999));
+        assertFalse(isPortFree(PORT));
         WebConversation wc = new WebConversation();
-        WebResponse resp = wc.getResponse("http://127.0.0.1:3999/superApp/jndi.jsp");
+        WebResponse resp = wc.getResponse("http://127.0.0.1:" + PORT + "/superApp/jndi.jsp");
         assertEquals(resp.getTitle(), "JNDI Test");
         assertThat(resp.getText(), containsString("OK"));
         container.stop();
-        assertTrue(isPortFree(3999));
+        assertTrue(isPortFree(PORT));
     }
 
     private boolean isPortFree(int port) {
