@@ -72,6 +72,9 @@
                     <jswarn>true</jswarn>
                     <excludeResources>true</excludeResources>
                     <excludeWarSourceDirectory>true</excludeWarSourceDirectory>
+                    <excludes>
+                        <exclude>${basedir}/src/main/webapp/**</exclude>
+                    </excludes>
                 </configuration>
             </plugin>
         </plugins>

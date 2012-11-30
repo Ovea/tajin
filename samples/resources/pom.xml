@@ -11,7 +11,6 @@
 
     <artifactId>resources</artifactId>
     <packaging>war</packaging>
-
     <name>Tajin :: Samples :: Resources</name>
 
     <build>
@@ -20,6 +19,7 @@
                 <artifactId>maven-war-plugin</artifactId>
                 <configuration>
                     <overlays>
+                        <overlay/>
                         <overlay>
                             <groupId>com.ovea.tajin</groupId>
                             <artifactId>tajin-client</artifactId>
@@ -54,11 +54,6 @@
         <dependency>
             <groupId>com.ovea.tajin.server</groupId>
             <artifactId>tajin-server-jetty9</artifactId>
-            <scope>test</scope>
-        </dependency>
-        <dependency>
-            <groupId>org.apache.tomcat</groupId>
-            <artifactId>tomcat-catalina</artifactId>
             <scope>test</scope>
         </dependency>
     </dependencies>
