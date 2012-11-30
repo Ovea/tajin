@@ -1,0 +1,84 @@
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
+
+    <modelVersion>4.0.0</modelVersion>
+
+    <parent>
+        <groupId>com.ovea.tajin</groupId>
+        <artifactId>tajin</artifactId>
+        <version>1.0.b1-SNAPSHOT</version>
+        <relativePath>..</relativePath>
+    </parent>
+
+    <artifactId>tajin-client</artifactId>
+    <packaging>war</packaging>
+
+    <name>Tajin :: Client</name>
+    <description>Tajin Client Library</description>
+
+    <build>
+        <plugins>
+            <plugin>
+                <groupId>org.codehaus.mojo</groupId>
+                <artifactId>jslint-maven-plugin</artifactId>
+                <configuration>
+                    <encoding>UTF-8</encoding>
+                    <indentSize>4</indentSize>
+                    <strictWhiteSpaceIndentation>4</strictWhiteSpaceIndentation>
+                </configuration>
+            </plugin>
+            <plugin>
+                <groupId>net.alchim31.maven</groupId>
+                <artifactId>yuicompressor-maven-plugin</artifactId>
+                <executions>
+                    <execution>
+                        <id>aggregate</id>
+                        <goals>
+                            <goal>compress</goal>
+                        </goals>
+                        <configuration>
+                            <nosuffix>true</nosuffix>
+                            <suffix>.min</suffix>
+                            <nomunge>true</nomunge>
+                            <aggregations>
+                                <aggregation>
+                                    <output>${project.build.directory}/${project.build.finalName}/tajin.js</output>
+                                    <insertNewLine>true</insertNewLine>
+                                    <removeIncluded>true</removeIncluded>
+                                    <includes>
+                                        <include>tajin.core.js</include>
+                                        <include>tajin.logging.js</include>
+                                    </includes>
+                                </aggregation>
+                            </aggregations>
+                        </configuration>
+                    </execution>
+                    <!--<execution>
+                        <id>min</id>
+                        <goals>
+                            <goal>compress</goal>
+                        </goals>
+                        <configuration>
+                            <sourceDirectory>${project.build.directory}/${project.build.finalName}</sourceDirectory>
+                            <includes>
+                                <include>tajin.js</include>
+                            </includes>
+                            <nosuffix>false</nosuffix>
+                            <suffix>.min</suffix>
+                            <nomunge>true</nomunge>
+                        </configuration>
+                    </execution>-->
+                </executions>
+                <configuration>
+                    <!--<excludeWarSourceDirectory>true</excludeWarSourceDirectory>
+                    <excludeResources>true</excludeResources>-->
+                    <failOnWarning>true</failOnWarning>
+                    <statistics>true</statistics>
+                    <disableOptimizations>true</disableOptimizations>
+                    <jswarn>true</jswarn>
+                </configuration>
+            </plugin>
+        </plugins>
+    </build>
+
+</project>
+

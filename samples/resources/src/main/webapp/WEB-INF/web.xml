@@ -22,9 +22,47 @@
          xsi:schemaLocation="http://java.sun.com/xml/ns/javaee http://java.sun.com/xml/ns/javaee/web-app_3_0.xsd"
          version="3.0">
 
+    <!-- do not browse dirs-->
     <context-param>
         <param-name>org.eclipse.jetty.servlet.Default.dirAllowed</param-name>
         <param-value>false</param-value>
     </context-param>
     
+    <welcome-file-list>
+        <welcome-file>index.html</welcome-file>
+    </welcome-file-list>
+
+    <!-- SSI => https://blogs.oracle.com/swchan/entry/server_side_include_in_glassfish-->
+    <servlet>
+        <servlet-name>ssi</servlet-name>
+        <servlet-class>org.apache.catalina.ssi.SSIServlet</servlet-class>
+        <init-param>
+            <param-name>inputEncoding</param-name>
+            <param-value>UTF-8</param-value>
+        </init-param>
+        <init-param>
+            <param-name>outputEncoding</param-name>
+            <param-value>UTF-8</param-value>
+        </init-param>
+        <init-param>
+            <param-name>buffered</param-name>
+            <!--<param-value>true</param-value>-->
+            <param-value>false</param-value>
+        </init-param>
+        <init-param>
+            <param-name>expires</param-name>
+            <!-- 1 month, in seconds -->
+            <!--<param-value>2592000</param-value>-->
+            <param-value>0</param-value>
+        </init-param>
+    </servlet>
+    <servlet-mapping>
+        <servlet-name>ssi</servlet-name>
+        <url-pattern>*.html</url-pattern>
+    </servlet-mapping>
+    <mime-mapping>
+        <extension>shtml</extension>
+        <mime-type>text/html</mime-type>
+    </mime-mapping>
+
 </web-app>
