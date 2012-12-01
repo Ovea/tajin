@@ -18,11 +18,6 @@
             <plugin>
                 <groupId>org.codehaus.mojo</groupId>
                 <artifactId>jslint-maven-plugin</artifactId>
-                <configuration>
-                    <encoding>UTF-8</encoding>
-                    <indentSize>4</indentSize>
-                    <strictWhiteSpaceIndentation>4</strictWhiteSpaceIndentation>
-                </configuration>
             </plugin>
             <plugin>
                 <groupId>net.alchim31.maven</groupId>
