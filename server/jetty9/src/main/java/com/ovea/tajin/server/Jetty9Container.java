@@ -25,6 +25,7 @@ import org.eclipse.jetty.server.handler.ContextHandlerCollection;
 import org.eclipse.jetty.server.handler.DefaultHandler;
 import org.eclipse.jetty.server.handler.HandlerCollection;
 import org.eclipse.jetty.server.handler.RequestLogHandler;
+import org.eclipse.jetty.util.resource.ResourceCollection;
 import org.eclipse.jetty.webapp.WebAppContext;
 import org.eclipse.jetty.xml.XmlConfiguration;
 
@@ -120,6 +121,13 @@ public final class Jetty9Container extends ContainerSkeleton<org.eclipse.jetty.s
 
         // Create the web app modules:
         WebAppContext webapp = new WebAppContext(webappRoot().getAbsolutePath(), contextPath());
+        String[] overlays = overlays();
+        if (overlays.length > 0) {
+            String[] resources = new String[overlays.length + 1];
+            resources[0] = webappRoot().getAbsolutePath();
+            System.arraycopy(overlays, 0, resources, 1, overlays.length);
+            webapp.setBaseResource(new ResourceCollection(resources));
+        }
         contexts.addHandler(webapp);
 
         // Configure the web app with a config file if given

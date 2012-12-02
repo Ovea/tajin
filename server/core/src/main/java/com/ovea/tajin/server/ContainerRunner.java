@@ -80,6 +80,11 @@ public final class ContainerRunner {
                 .withDescription("Optional. Set the additional classpath entries to add to the server, separated by ',', ':' or ';'")
                 .create(Properties.SERVER_CLASSPATH.getName());
 
+        Option overlays = withArgName(Properties.OVERLAYS.getName())
+                .hasArg()
+                .withDescription("Optional. Set the additional webapp roots to merge as overlays, separated by ',', ':' or ';'")
+                .create(Properties.OVERLAYS.getName());
+
         Option help =
                 withDescription("Display this help")
                         .create("help");
@@ -90,6 +95,7 @@ public final class ContainerRunner {
                 .addOption(webappRoot)
                 .addOption(webappcp)
                 .addOption(servercp)
+                .addOption(overlays)
                 .addOption(help);
     }
 

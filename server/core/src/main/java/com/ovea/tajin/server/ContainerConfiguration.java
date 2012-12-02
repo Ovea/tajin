@@ -73,7 +73,7 @@ public final class ContainerConfiguration {
 
     public ContainerConfiguration serverClassPath(File... paths) {
         notNull(paths, "Server classpath");
-        List<URL> urls = new ArrayList<URL>(paths.length);
+        List<URL> urls = new ArrayList<>(paths.length);
         for (File path : paths) urls.add(pathAsURL(path.getAbsolutePath()));
         return serverClassPath(urls.toArray(new URL[urls.size()]));
     }
@@ -100,7 +100,7 @@ public final class ContainerConfiguration {
 
     public ContainerConfiguration webappClassPath(File... paths) {
         notNull(paths, "Webapp classpath");
-        List<URL> urls = new ArrayList<URL>(paths.length);
+        List<URL> urls = new ArrayList<>(paths.length);
         for (File path : paths) urls.add(pathAsURL(path.getAbsolutePath()));
         return webappClassPath(urls.toArray(new URL[urls.size()]));
     }
@@ -153,6 +153,20 @@ public final class ContainerConfiguration {
 
     public int port() {
         return (Integer) properties.get(Properties.PORT);
+    }
+
+    public ContainerConfiguration overlays(String... paths) {
+        properties.put(Properties.OVERLAYS, paths);
+        return this;
+    }
+
+    public ContainerConfiguration overlays(String paths) {
+        return overlays(paths.split(",|;|:"));
+    }
+
+    public String[] overlays() {
+        String[] locations = (String[]) properties.get(Properties.OVERLAYS);
+        return locations == null ? new String[0] : locations;
     }
 
     @Override
@@ -212,6 +226,8 @@ public final class ContainerConfiguration {
                 return webappClassPath(value);
             case WEBAPP_ROOT:
                 return webappRoot(value);
+            case OVERLAYS:
+                return overlays(value);
         }
         return this;
     }

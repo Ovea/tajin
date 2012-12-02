@@ -225,7 +225,7 @@
     <!--   Please see the "Using Jikes" section of the Jasper-HowTo           -->
     <!--   page in the Tomcat documentation.                                  -->
 
-    <servlet>
+    <!--<servlet>
         <servlet-name>jsp</servlet-name>
         <servlet-class>org.apache.jasper.servlet.JspServlet</servlet-class>
         <init-param>
@@ -237,7 +237,7 @@
             <param-value>false</param-value>
         </init-param>
         <load-on-startup>3</load-on-startup>
-    </servlet>
+    </servlet>-->
 
 
     <!-- NOTE: An SSI Filter is also available as an alternative SSI          -->
@@ -362,15 +362,15 @@
     -->
 
     <!-- The mapping for the JSP servlet -->
-    <servlet-mapping>
-        <servlet-name>jsp</servlet-name>
-        <url-pattern>*.jsp</url-pattern>
-    </servlet-mapping>
+    <!--<servlet-mapping>-->
+        <!--<servlet-name>jsp</servlet-name>-->
+        <!--<url-pattern>*.jsp</url-pattern>-->
+    <!--</servlet-mapping>-->
 
-    <servlet-mapping>
-        <servlet-name>jsp</servlet-name>
-        <url-pattern>*.jspx</url-pattern>
-    </servlet-mapping>
+    <!--<servlet-mapping>-->
+        <!--<servlet-name>jsp</servlet-name>-->
+        <!--<url-pattern>*.jspx</url-pattern>-->
+    <!--</servlet-mapping>-->
 
     <!-- The mapping for the SSI servlet -->
     <!--
@@ -567,10 +567,10 @@
         <extension>dib</extension>
         <mime-type>image/bmp</mime-type>
     </mime-mapping>
-    <mime-mapping>
+    <!--<mime-mapping>
         <extension>doc</extension>
         <mime-type>application/msword</mime-type>
-    </mime-mapping>
+    </mime-mapping>-->
     <mime-mapping>
         <extension>dtd</extension>
         <mime-type>application/xml-dtd</mime-type>
@@ -611,10 +611,10 @@
         <extension>hdf</extension>
         <mime-type>application/x-hdf</mime-type>
     </mime-mapping>
-    <mime-mapping>
+    <!--<mime-mapping>
         <extension>hqx</extension>
         <mime-type>application/mac-binhex40</mime-type>
-    </mime-mapping>
+    </mime-mapping>-->
     <mime-mapping>
         <extension>htc</extension>
         <mime-type>text/x-component</mime-type>
@@ -893,10 +893,10 @@
         <extension>ppm</extension>
         <mime-type>image/x-portable-pixmap</mime-type>
     </mime-mapping>
-    <mime-mapping>
+    <!--<mime-mapping>
         <extension>ppt</extension>
         <mime-type>application/powerpoint</mime-type>
-    </mime-mapping>
+    </mime-mapping>-->
     <mime-mapping>
         <extension>ps</extension>
         <mime-type>application/postscript</mime-type>

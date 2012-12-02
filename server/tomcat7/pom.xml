@@ -21,6 +21,21 @@
         <plugins>
             <plugin>
                 <artifactId>maven-shade-plugin</artifactId>
+                <configuration>
+                    <filters>
+                        <filter>
+                            <artifact>*:*</artifact>
+                            <excludes>
+                                <exclude>META-INF/*.SF</exclude>
+                                <exclude>META-INF/*.DSA</exclude>
+                                <exclude>META-INF/*.RSA</exclude>
+                                <exclude>org/apache/catalina/core/RestrictedFilters.properties</exclude>
+                                <exclude>org/apache/catalina/core/RestrictedServlets.properties</exclude>
+                                <exclude>org/apache/catalina/core/RestrictedListeners.properties</exclude>
+                            </excludes>
+                        </filter>
+                    </filters>
+                </configuration>
             </plugin>
         </plugins>
     </build>

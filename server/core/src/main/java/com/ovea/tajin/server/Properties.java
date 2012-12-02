@@ -23,6 +23,7 @@ public enum Properties {
     WEBAPP_CLASSPATH("webappcp"),
     SERVER_CLASSPATH("servercp"),
     CONTAINER("container"),
+    OVERLAYS("overlays"),
     UNKNOWN("UNKNOWN");
 
     private final String name;

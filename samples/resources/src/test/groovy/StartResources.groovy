@@ -18,5 +18,6 @@ import com.ovea.tajin.server.ContainerConfiguration
 import com.ovea.tajin.server.Server
 
 ContainerConfiguration.create()
-    .buildContainer(Server.JETTY9)
+    .overlays('../../client/target/tajin-client-1.0.b1-SNAPSHOT')
+    .buildContainer(Server.TOMCAT6)
     .start()

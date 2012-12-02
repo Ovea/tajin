@@ -85,7 +85,7 @@ public final class Tomcat6Container extends ContainerSkeleton<Embedded> {
                 try {
                     settings().port(service.findConnectors()[0].getPort());
                     break;
-                } catch (Exception e) {
+                } catch (Exception ignored) {
                 }
             }
             return server;
@@ -94,6 +94,7 @@ public final class Tomcat6Container extends ContainerSkeleton<Embedded> {
         // Otherwise create an embedded server
         // Create webapp loader with extra classpath of there are some
         WebappLoader loader = new WebappLoader();
+        loader.setDelegate(true);
         loader.setReloadable(true);
         if (settings().hasWebappClassPath()) {
             for (URL url : settings().webappClassPath()) {
@@ -105,6 +106,16 @@ public final class Tomcat6Container extends ContainerSkeleton<Embedded> {
         Context context = server.createContext(contextPath(), webappRoot().getAbsolutePath());
         context.setLoader(loader);
         context.setReloadable(true);
+        context.setPrivileged(true);
+        String[] overlays = overlays();
+        if (overlays.length > 0) {
+            String[] resources = new String[overlays.length + 1];
+            resources[0] = webappRoot().getAbsolutePath();
+            System.arraycopy(overlays, 0, resources, 1, overlays.length);
+            MultipleDirContext dirContext = new MultipleDirContext();
+            dirContext.setVirtualDocBase(resources);
+            context.setResources(dirContext);
+        }
 
         Host localHost = server.createHost("localHost", webappsDir.getAbsolutePath());
         localHost.addChild(context);
@@ -130,7 +141,9 @@ public final class Tomcat6Container extends ContainerSkeleton<Embedded> {
             context.setConfigFile(ctx.getAbsolutePath());
         } else {
             File ctx = new File(webappRoot(), "META-INF/context.xml");
-            context.setConfigFile(ctx.getAbsolutePath());
+            if(ctx.canRead()) {
+                context.setConfigFile(ctx.getAbsolutePath());
+            }
         }
 
         return server;

@@ -84,7 +84,7 @@ public final class Tomcat7Container extends ContainerSkeleton<Tomcat> {
                 try {
                     settings().port(service.findConnectors()[0].getPort());
                     break;
-                } catch (Exception e) {
+                } catch (Exception ignored) {
                 }
             }
             return server;
@@ -106,7 +106,8 @@ public final class Tomcat7Container extends ContainerSkeleton<Tomcat> {
         server.getService().addConnector(connector);
 
         // Create webapp loader with extra classpath of there are some
-        WebappLoader loader = new WebappLoader();
+        WebappLoader loader = new WebappLoader(Thread.currentThread().getContextClassLoader());
+        loader.setDelegate(false);
         if (settings().hasWebappClassPath()) {
             for (URL url : settings().webappClassPath()) {
                 loader.addRepository(url.toString());
@@ -115,7 +116,7 @@ public final class Tomcat7Container extends ContainerSkeleton<Tomcat> {
 
         // Create context
         //Context context = server.addContext(contextPath(), webappRoot().getAbsolutePath());
-        Context context = null;
+        Context context;
         try {
             context = server.addWebapp(contextPath(), webappRoot().getAbsolutePath());
         } catch (ServletException e) {
@@ -123,6 +124,16 @@ public final class Tomcat7Container extends ContainerSkeleton<Tomcat> {
         }
         context.setLoader(loader);
         context.setReloadable(true);
+        context.setPrivileged(true);
+        String[] overlays = overlays();
+        if (overlays.length > 0) {
+            String[] resources = new String[overlays.length + 1];
+            resources[0] = webappRoot().getAbsolutePath();
+            System.arraycopy(overlays, 0, resources, 1, overlays.length);
+            MultipleDirContext dirContext = new MultipleDirContext();
+            dirContext.setVirtualDocBase(resources);
+            context.setResources(dirContext);
+        }
 
         // Set optionnal context.xml file
         if (settings().has(PROPERTY_TOMCAT_ENV)) {
@@ -136,10 +147,12 @@ public final class Tomcat7Container extends ContainerSkeleton<Tomcat> {
             }
         } else {
             File ctx = new File(webappRoot(), "META-INF/context.xml");
-            try {
-                context.setConfigFile(new File(ctx.getAbsolutePath()).toURI().toURL());
-            } catch (MalformedURLException e) {
-                throw new RuntimeException(e.getMessage(), e);
+            if (ctx.canRead()) {
+                try {
+                    context.setConfigFile(new File(ctx.getAbsolutePath()).toURI().toURL());
+                } catch (MalformedURLException e) {
+                    throw new RuntimeException(e.getMessage(), e);
+                }
             }
         }
 

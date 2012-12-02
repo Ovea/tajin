@@ -77,6 +77,10 @@ public abstract class ContainerSkeleton<T> implements Container {
         return settings().port();
     }
 
+    public String[] overlays() {
+        return settings().overlays();
+    }
+
     public String contextPath() {
         return settings().context();
     }

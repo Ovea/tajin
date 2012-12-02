@@ -53,7 +53,7 @@
         </dependency>
         <dependency>
             <groupId>com.ovea.tajin.server</groupId>
-            <artifactId>tajin-server-jetty9</artifactId>
+            <artifactId>tajin-server-tomcat6</artifactId>
             <scope>test</scope>
         </dependency>
     </dependencies>
