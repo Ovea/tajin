@@ -25,7 +25,7 @@ Tajin
         * descripteur de site website.json genere via config
         * enabled true/false pour inclure ou pas selon env par exemple
 
-    * cli: i18n: lit mappings dans website.json
+    * cli: i18n: lit mappings dans website.json (aller chercher contenu images, text), call js messages
     * cli: templating: http://handlebarsjs.com/
     * cli: lib gestion resources
         i18n
