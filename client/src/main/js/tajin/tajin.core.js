@@ -13,5 +13,15 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-/*jslint browser: true, devel: true*/
-alert('Hello world !');
+/*jslint white: true, browser: true, devel: false, indent: 4 */
+/*global $, jQuery, window*/
+(function (w) {
+    "use strict";
+    var t = w.tajin = w.tajin || {
+
+        init:function (opts) {
+
+        }
+
+    };
+}(window));
