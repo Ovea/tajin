@@ -13,11 +13,45 @@
     <packaging>war</packaging>
     <name>Tajin :: Client</name>
 
+    <properties>
+        <src>src/main/js</src>
+    </properties>
+
     <build>
         <plugins>
             <plugin>
-                <groupId>org.codehaus.mojo</groupId>
-                <artifactId>jslint-maven-plugin</artifactId>
+                <artifactId>maven-surefire-plugin</artifactId>
+                <configuration>
+                    <skip>true</skip>
+                </configuration>
+            </plugin>
+            <plugin>
+                <artifactId>maven-compiler-plugin</artifactId>
+                <configuration>
+                    <skip>true</skip>
+                </configuration>
+            </plugin>
+            <plugin>
+                <groupId>com.mycila.maven-license-plugin</groupId>
+                <artifactId>maven-license-plugin</artifactId>
+                <configuration>
+                    <excludes>
+                        <exclude>lib/**</exclude>
+                    </excludes>
+                </configuration>
+            </plugin>
+            <plugin>
+                <groupId>com.googlecode.jslint4java</groupId>
+                <artifactId>jslint4java-maven-plugin</artifactId>
+            </plugin>
+            <plugin>
+                <groupId>com.github.searls</groupId>
+                <artifactId>jasmine-maven-plugin</artifactId>
+                <configuration>
+                    <sourceIncludes>
+                        <sourceInclude>lib/*.js</sourceInclude>
+                    </sourceIncludes>
+                </configuration>
             </plugin>
             <plugin>
                 <groupId>net.alchim31.maven</groupId>
@@ -31,7 +65,6 @@
                         <configuration>
                             <nosuffix>true</nosuffix>
                             <nocompress>true</nocompress>
-                            <outputDirectory>${project.build.directory}/${project.build.finalName}</outputDirectory>
                             <aggregations>
                                 <aggregation>
                                     <output>${project.build.directory}/${project.build.finalName}/tajin/tajin.js</output>
@@ -39,7 +72,7 @@
                                     <removeIncluded>false</removeIncluded>
                                     <includes>
                                         <include>${project.build.directory}/${project.build.finalName}/tajin/tajin.core.js</include>
-                                        <include>${project.build.directory}/${project.build.finalName}/tajin/tajin.logging.js</include>
+                                        <include>${project.build.directory}/${project.build.finalName}/tajin/tajin.init.js</include>
                                     </includes>
                                 </aggregation>
                             </aggregations>
@@ -52,25 +85,11 @@
                         </goals>
                         <configuration>
                             <sourceDirectory>${project.build.directory}/${project.build.finalName}</sourceDirectory>
-                            <outputDirectory>${project.build.directory}/${project.build.finalName}</outputDirectory>
                             <nosuffix>false</nosuffix>
                             <nocompress>false</nocompress>
                         </configuration>
                     </execution>
                 </executions>
-                <configuration>
-                    <nomunge>true</nomunge>
-                    <suffix>.min</suffix>
-                    <failOnWarning>true</failOnWarning>
-                    <statistics>true</statistics>
-                    <disableOptimizations>true</disableOptimizations>
-                    <jswarn>true</jswarn>
-                    <excludeResources>true</excludeResources>
-                    <excludeWarSourceDirectory>true</excludeWarSourceDirectory>
-                    <excludes>
-                        <exclude>${basedir}/src/main/webapp/**</exclude>
-                    </excludes>
-                </configuration>
             </plugin>
         </plugins>
     </build>
