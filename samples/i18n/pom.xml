@@ -1,0 +1,61 @@
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
+
+    <modelVersion>4.0.0</modelVersion>
+
+    <parent>
+        <groupId>com.ovea.tajin.samples</groupId>
+        <artifactId>samples</artifactId>
+        <version>1.0.b1-SNAPSHOT</version>
+        <relativePath>..</relativePath>
+    </parent>
+
+    <artifactId>i18n</artifactId>
+    <packaging>war</packaging>
+    <name>Tajin :: Samples :: I18N</name>
+
+    <build>
+        <plugins>
+            <plugin>
+                <artifactId>maven-war-plugin</artifactId>
+                <configuration>
+                    <overlays>
+                        <overlay/>
+                        <overlay>
+                            <groupId>com.ovea.tajin</groupId>
+                            <artifactId>tajin-client</artifactId>
+                            <excludes>
+                                <exclude>META-INF/**</exclude>
+                                <exclude>WEB-INF/web.xml</exclude>
+                            </excludes>
+                        </overlay>
+                    </overlays>
+                </configuration>
+            </plugin>
+            <plugin>
+                <groupId>org.eclipse.jetty</groupId>
+                <artifactId>jetty-maven-plugin</artifactId>
+            </plugin>
+        </plugins>
+    </build>
+
+    <dependencies>
+        <dependency>
+            <groupId>com.ovea.tajin</groupId>
+            <artifactId>tajin-client</artifactId>
+            <version>${project.version}</version>
+            <type>war</type>
+        </dependency>
+
+        <dependency>
+            <groupId>org.codehaus.groovy</groupId>
+            <artifactId>groovy-all</artifactId>
+            <scope>provided</scope>
+        </dependency>
+        <dependency>
+            <groupId>com.ovea.tajin.server</groupId>
+            <artifactId>tajin-server-jetty9</artifactId>
+            <scope>provided</scope>
+        </dependency>
+    </dependencies>
+
+</project>

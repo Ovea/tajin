@@ -17,6 +17,11 @@
 import com.ovea.tajin.server.ContainerConfiguration
 import com.ovea.tajin.server.Server
 
+def version = new XmlSlurper().parse('pom.xml' as File).parent.version as String
+
+println "Version: ${version}"
+
 ContainerConfiguration.create()
+    .overlays("../../client/target/tajin-client-${version}")
     .buildContainer(Server.JETTY9)
     .start()

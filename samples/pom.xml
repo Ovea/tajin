@@ -15,8 +15,8 @@
     <name>Tajin :: Samples</name>
 
     <modules>
-        <module>resources</module>
-        <module>backend</module>
+        <module>i18n</module>
+        <module>aggregation</module>
     </modules>
 
 </project>
