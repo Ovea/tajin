@@ -6,8 +6,7 @@ $.mockjax({
     }
 });
 
-test( "hello test", function() {
-
+test( "User test", function() {
     stop();
     $.getJSON("/api/user", function(data) {
         ok(data, "data is returned from the server");
