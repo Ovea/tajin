@@ -1,0 +1,41 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN"
+    "http://www.w3.org/TR/html4/loose.dtd">
+<html>
+<head>
+    <title></title>
+    <script type="text/javascript" src="../../lib/jquery-1.8.3.js"></script>
+
+    <script type="text/javascript" src="../../../main/js/tajin/tajin.core.js"></script>
+    <script type="text/javascript" src="../../../main/js/tajin/tajin.log.js"></script>
+    <script type="text/javascript">
+        tajin.init({
+            debug:true,
+            onready:function () {
+                console.info('onready: ' + tajin);
+
+                tajin.log.debug('a debug message', 'with param', 1);
+                tajin.log.info('a info message', 'with param', 1);
+                tajin.log.warn('a warn message', 'with param', 1);
+                tajin.log.error('a error message', 'with param', 1);
+
+                var logger1 = tajin.log.logger('my logger 1');
+                logger1.debug('debug message');
+                logger1.info('info message');
+                logger1.warn('warn message');
+
+                var logger2 = tajin.log.logger('my logger 2', 'warn');
+                logger2.debug('debug message');
+                logger2.info('info message');
+                logger2.warn('warn message');
+            },
+            log:{
+                level:'info' // all, none, debug, info, warn, error
+            }
+        })
+    </script>
+
+</head>
+<body>
+
+</body>
+</html>
