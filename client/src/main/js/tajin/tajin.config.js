@@ -28,7 +28,7 @@
                     opts.url = opts.url.substring(0, opts.url.lastIndexOf('/')) + '/tajin-client.json';
                 }
                 $.getJSON(opts.url, function (cfg) {
-                    $.extend(tajin.config, cfg);
+                    tajin.options = $.extend(cfg || {}, tajin.options);
                     next();
                 });
             }

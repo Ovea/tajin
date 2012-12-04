@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 /*jslint white: true, browser: true, devel: false, indent: 4, plusplus: true */
-/*global $, jQuery, window*/
+/*global $, jQuery, window, console*/
 (function (w) {
     "use strict";
     var ready, modules = [
@@ -60,7 +60,7 @@
                 }, w.tajin_init || {}, opts || {});
                 var n, i = -1,
                     inits = $.grep(modules, function (m) {
-                        return m.exports && $.isFunction(m.exports.init)
+                        return m.exports && $.isFunction(m.exports.init);
                     }),
                     next = function () {
                         i++;
