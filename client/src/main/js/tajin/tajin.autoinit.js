@@ -13,17 +13,13 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-/*jslint white: true, browser: true, devel: false, indent: 4 */
+/*jslint white: true, browser: true, devel: false, indent: 4, plusplus: true */
 /*global $, jQuery, window*/
 (function (w) {
     "use strict";
     if ($.isFunction(w.tajin_init)) {
-        w.tajin_init();
+        w.tajin_init(w.tajin);
     } else {
-        var loc = document.location.origin + document.location.pathname;
-        w.tajin.init($.extend({
-            config:loc.substring(0, loc.lastIndexOf('/')) + '/tajin-client.json',
-            debug:false
-        }, w.tajin_init || {}));
+        w.tajin.init();
     }
 }(window));

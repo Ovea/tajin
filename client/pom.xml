@@ -13,11 +13,17 @@
     <packaging>war</packaging>
     <name>Tajin :: Client</name>
 
-    <properties>
-        <src>src/main/js</src>
-    </properties>
-
     <build>
+        <outputDirectory>${project.build.directory}/${project.build.finalName}</outputDirectory>
+        <resources>
+            <resource>
+                <directory>src/main/js</directory>
+                <filtering>true</filtering>
+                <includes>
+                    <include>**/*.js</include>
+                </includes>
+            </resource>
+        </resources>
         <plugins>
             <plugin>
                 <artifactId>maven-surefire-plugin</artifactId>
@@ -45,15 +51,6 @@
                 <artifactId>jslint4java-maven-plugin</artifactId>
             </plugin>
             <plugin>
-                <groupId>com.github.searls</groupId>
-                <artifactId>jasmine-maven-plugin</artifactId>
-                <configuration>
-                    <sourceIncludes>
-                        <sourceInclude>lib/*.js</sourceInclude>
-                    </sourceIncludes>
-                </configuration>
-            </plugin>
-            <plugin>
                 <groupId>net.alchim31.maven</groupId>
                 <artifactId>yuicompressor-maven-plugin</artifactId>
                 <executions>
@@ -67,12 +64,13 @@
                             <nocompress>true</nocompress>
                             <aggregations>
                                 <aggregation>
-                                    <output>${project.build.directory}/${project.build.finalName}/tajin/tajin.js</output>
+                                    <output>${project.build.outputDirectory}/tajin/tajin.js</output>
                                     <insertNewLine>true</insertNewLine>
                                     <removeIncluded>false</removeIncluded>
                                     <includes>
-                                        <include>${project.build.directory}/${project.build.finalName}/tajin/tajin.core.js</include>
-                                        <include>${project.build.directory}/${project.build.finalName}/tajin/tajin.init.js</include>
+                                        <include>${project.build.outputDirectory}/tajin/tajin.core.js</include>
+                                        <include>${project.build.outputDirectory}/tajin/tajin.config.js</include>
+                                        <include>${project.build.outputDirectory}/tajin/tajin.autoinit.js</include>
                                     </includes>
                                 </aggregation>
                             </aggregations>
@@ -84,7 +82,6 @@
                             <goal>compress</goal>
                         </goals>
                         <configuration>
-                            <sourceDirectory>${project.build.directory}/${project.build.finalName}</sourceDirectory>
                             <nosuffix>false</nosuffix>
                             <nocompress>false</nocompress>
                         </configuration>
