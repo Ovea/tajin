@@ -13,5 +13,4 @@ test( "User test", function() {
         equal(data.fullname, "Mr. Foo Bar", "no user specified, status should be Mr. Foo Bar");
         start();
     });
-
 });
