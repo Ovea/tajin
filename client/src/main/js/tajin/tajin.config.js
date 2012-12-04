@@ -21,10 +21,10 @@
         name:'config',
         requires:'core',
         exports:{
-            init:function (opts) {
+            init:function (opts, next) {
                 var loc = document.location.origin + document.location.pathname;
                 loc = loc.substring(0, loc.lastIndexOf('/')) + '/tajin-client.json';
-
+                next();
             }
         }
     });

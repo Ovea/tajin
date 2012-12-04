@@ -54,15 +54,20 @@
         init:function (opts) {
             if (!ready) {
                 ready = true;
-                var i;
-                opts = $.extend({
-                    debug:false
-                }, opts || w.tajin_init || {});
+                var i = 0,
+                    options = opts || w.tajin_init || {},
+                    inits = $.grep(modules, function (m) {
+                        return m.exports && $.isFunction(m.exports.init)
+                    }),
+                    next = function () {
+                        if (i < inits.length) {
+                            inits[i].exports.init.call(w.tajin, options, next);
+                            i++;
+                        }
+                    };
                 delete w.tajin_init;
-                for (i = 0; i < modules.length; i++) {
-                    if (modules[i].exports && $.isFunction(modules[i].exports.init)) {
-                        modules[i].exports.init.call(w.tajin, opts);
-                    }
+                if (inits.length) {
+                    next();
                 }
             }
 
