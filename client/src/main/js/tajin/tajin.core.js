@@ -54,21 +54,24 @@
         init:function (opts) {
             if (!ready) {
                 ready = true;
-                var i = 0,
-                    options = opts || w.tajin_init || {},
+                var i = -1,
+                    options = $.extend({
+                        debug:false,
+                        oninit:$.noop
+                    }, w.tajin_init || {}, opts || {}),
                     inits = $.grep(modules, function (m) {
                         return m.exports && $.isFunction(m.exports.init)
                     }),
                     next = function () {
+                        i++;
                         if (i < inits.length) {
                             inits[i].exports.init.call(w.tajin, options, next);
-                            i++;
+                        } else if (i === inits.length && $.isFunction(options.oninit)) {
+                            options.oninit(w.tajin);
                         }
                     };
                 delete w.tajin_init;
-                if (inits.length) {
-                    next();
-                }
+                next();
             }
 
         },
