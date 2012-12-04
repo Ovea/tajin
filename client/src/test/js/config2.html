@@ -10,10 +10,15 @@
             debug:true,
             onready:function (tajin) {
                 console.info('onready: ' + tajin);
+                console.info('option2: ' + tajin.config.option2);
+            },
+            config: {
+                url: 'custom-config.json'
             }
         };
     </script>
     <script type="text/javascript" src="../../main/js/tajin/tajin.core.js"></script>
+    <script type="text/javascript" src="../../main/js/tajin/tajin.config.js"></script>
     <script type="text/javascript" src="../../main/js/tajin/tajin.autoinit.js"></script>
 
 </head>

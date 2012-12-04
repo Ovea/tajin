@@ -54,20 +54,28 @@
         init:function (opts) {
             if (!ready) {
                 ready = true;
-                var i = -1,
-                    options = $.extend({
-                        debug:false,
-                        oninit:$.noop
-                    }, w.tajin_init || {}, opts || {}),
+                w.tajin.options = $.extend({
+                    debug:false,
+                    onready:$.noop
+                }, w.tajin_init || {}, opts || {});
+                var n, i = -1,
                     inits = $.grep(modules, function (m) {
                         return m.exports && $.isFunction(m.exports.init)
                     }),
                     next = function () {
                         i++;
                         if (i < inits.length) {
-                            inits[i].exports.init.call(w.tajin, options, next);
-                        } else if (i === inits.length && $.isFunction(options.oninit)) {
-                            options.oninit(w.tajin);
+                            n = inits[i].name;
+                            w.tajin.options[n] = w.tajin.options[n] || {};
+                            if (w.tajin.options.debug) {
+                                console.log('[tajin.core] init module with options', n, w.tajin.options[n]);
+                            }
+                            inits[i].exports.init.call(w.tajin, next, w.tajin.options[n], inits[i].exports);
+                        } else if (i === inits.length && $.isFunction(w.tajin.options.onready)) {
+                            if (w.tajin.options.debug) {
+                                console.log('[tajin.core] onready - init completed with options', w.tajin.options);
+                            }
+                            w.tajin.options.onready(w.tajin);
                         }
                     };
                 delete w.tajin_init;
