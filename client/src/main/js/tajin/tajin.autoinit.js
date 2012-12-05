@@ -14,12 +14,12 @@
  * limitations under the License.
  */
 /*jslint white: true, browser: true, devel: false, indent: 4, plusplus: true */
-/*global $, jQuery, window*/
-(function (w) {
+/*global window, jQuery*/
+(function (w, $) {
     "use strict";
     if ($.isFunction(w.tajin_init)) {
         w.tajin_init(w.tajin);
     } else {
         w.tajin.init();
     }
-}(window));
+}(window, jQuery));

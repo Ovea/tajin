@@ -14,24 +14,23 @@
  * limitations under the License.
  */
 /*jslint white: true, browser: true, devel: false, indent: 4, plusplus: true */
-/*global $, jQuery, window*/
-(function (w) {
+/*global jQuery, window*/
+(function (w, $) {
     "use strict";
     w.tajin.install({
         name:'config',
-        requires:'core',
+        requires:'core,util',
         exports:{
             init:function (next, opts) {
-                var tajin = this;
-                if (!opts.url) {
-                    opts.url = document.location.origin + document.location.pathname;
-                    opts.url = opts.url.substring(0, opts.url.lastIndexOf('/')) + '/tajin-client.json';
+                var tajin = this, url = opts.url;
+                if (!url) {
+                    url = tajin.util.path('tajin-client.json');
                 }
-                $.getJSON(opts.url, function (cfg) {
+                $.getJSON(url, function (cfg) {
                     tajin.options = $.extend(cfg || {}, tajin.options);
                     next();
                 });
             }
         }
     });
-}(window));
+}(window, jQuery));

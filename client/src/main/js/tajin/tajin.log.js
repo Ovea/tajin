@@ -14,8 +14,8 @@
  * limitations under the License.
  */
 /*jslint white: true, browser: true, devel: false, indent: 4, plusplus: true */
-/*global $, jQuery, window, console*/
-(function (w) {
+/*global jQuery, window, console*/
+(function (w, $) {
     "use strict";
 
     var root_level = 'none',
@@ -110,4 +110,5 @@
             }
         }
     });
-}(window));
+
+}(window, jQuery));

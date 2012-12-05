@@ -14,10 +14,10 @@
  * limitations under the License.
  */
 /*jslint white: true, browser: true, devel: false, indent: 4, plusplus: true */
-/*global $, jQuery, window, console*/
-(function (w) {
+/*global jQuery, window, console*/
+(function (w, $) {
     "use strict";
-    var ready, modules = [
+    var ready, resolved = true, modules = [
         {
             name:'core'
         }
@@ -33,9 +33,12 @@
             }
         },
         install:function (module) {
+            if (!resolved) {
+                throw new Error('Unable to init Tajin: previous modules have not been resolved correctly');
+            }
             w.tajin.uninstall(module.name);
             if (module.requires) {
-                var missing = $.isArray(module.requires) ? module.requires.slice(0) : [module.requires], p, i;
+                var missing = $.isArray(module.requires) ? module.requires.slice(0) : module.requires.split(','), p, i;
                 for (i = 0; i < modules.length; i++) {
                     p = $.inArray(modules[i].name, missing);
                     if (p >= 0) {
@@ -43,15 +46,20 @@
                     }
                 }
                 if (missing.length) {
-                    throw new Error("Required modules " + missing + " are missing for module '" + module.name + "'");
+                    resolved = false;
+                    throw new Error("error loading module '" + module.name + "': missing module " + missing);
                 }
             }
             modules.push(module);
             if (module.exports) {
                 w.tajin[module.name] = module.exports;
             }
+            resolved = true;
         },
         init:function (opts) {
+            if (!resolved) {
+                throw new Error('Unable to init Tajin: modules have not been resolved correctly');
+            }
             if (!ready) {
                 ready = true;
                 w.tajin.options = $.extend({
@@ -89,4 +97,4 @@
             });
         }
     };
-}(window));
+}(window, jQuery));

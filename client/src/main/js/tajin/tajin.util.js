@@ -1,4 +1,4 @@
-/**
+/*
  * Copyright (C) 2011 Ovea <dev@ovea.com>
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
@@ -13,15 +13,22 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-
-import com.ovea.tajin.server.ContainerConfiguration
-import com.ovea.tajin.server.Server
-
-def version = new XmlSlurper().parse('pom.xml' as File).parent.version as String
-
-println "Version: ${version}"
-
-ContainerConfiguration.create()
-    .overlays("../../client/target/tajin-client-${version}")
-    .buildContainer(Server.JETTY9)
-    .start()
+/*jslint white: true, browser: true, devel: false, indent: 4, plusplus: true */
+/*global window*/
+(function (w) {
+    "use strict";
+    w.tajin.install({
+        name:'util',
+        requires:'core',
+        exports:{
+            path:function (loc) {
+                var p = document.location.origin + document.location.pathname;
+                p = p.substring(0, p.lastIndexOf('/'));
+                if (loc) {
+                    p += loc.charAt(0) === '/' ? loc : ('/' + loc);
+                }
+                return p;
+            }
+        }
+    });
+}(window));

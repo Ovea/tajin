@@ -24,7 +24,7 @@ if (window.I18N == undefined) {
                 url:undefined,
                 versionning:undefined,
                 variants:[],
-                defaultLocale:navigator.language ? navigator.language : navigator.userLanguage,
+                defaultLocale:navigator.language || navigator.userLanguage,
                 onKeyNotFound:function (key, locale) {
                     return '[' + key + ']';
                 },

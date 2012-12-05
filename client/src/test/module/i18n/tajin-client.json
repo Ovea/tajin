@@ -1,0 +1,11 @@
+{
+    "i18n":{
+        "debug":true,
+        "lang":["en", "fr", "fr_CA"],
+        "default":"en"
+    },
+
+    "log":{
+        "level":"all"
+    }
+}

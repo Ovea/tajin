@@ -15,7 +15,6 @@
     <name>Tajin :: Samples</name>
 
     <modules>
-        <module>i18n</module>
         <module>aggregation</module>
     </modules>
 
