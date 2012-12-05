@@ -92,7 +92,10 @@
 
         },
         toString:function () {
-            return "Tajin Framework, version ${project.version}, modules: " + $.map(modules, function (e) {
+            return "Tajin Framework, version ${project.version}, modules: " + w.tajin.modules();
+        },
+        modules:function () {
+            return $.map(modules, function (e) {
                 return e.name;
             });
         }
