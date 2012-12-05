@@ -69,30 +69,41 @@
             }
             cb(bundle, locale, false, cache[bundle][locale]);
         } else {
-            var path = w.tajin.util.path(options.bundles[bundle].location + '/' + bundle);
-            if (tries[index].length > 0) {
-                path += '_' + tries[index];
+            if (!cache[bundle]) {
+                cache[bundle] = {};
             }
-            path += '.json';
-            $.ajax({
-                    url:path,
-                    dataType:'json',
-                    cache:false,
-                    success:function (data) {
-                        if (!cache[bundle]) {
-                            cache[bundle] = {};
-                            cache[bundle][locale] = {};
-                        } else if (!cache[bundle][locale]) {
-                            cache[bundle][locale] = {};
-                        }
-                        $.extend(true, cache[bundle][locale], data);
-                        load_bundle(bundle, locale, cb, tries, index + 1);
-                    },
-                    error:function () {
-                        load_bundle(bundle, locale, cb, tries, index + 1);
-                    }
+            if (cache[bundle][tries[index]]) {
+                if (options.debug) {
+                    console.log('[tajin.i18n] load_bundle found in cache', bundle, tries[index], cache);
                 }
-            );
+                load_bundle(bundle, locale, cb, tries, index + 1);
+            } else {
+                var path = w.tajin.util.path(options.bundles[bundle].location + '/' + bundle);
+                if (tries[index].length > 0) {
+                    path += '_' + tries[index];
+                }
+                path += '.json';
+                $.ajax({
+                        url:path,
+                        dataType:'json',
+                        cache:false,
+                        success:function (data) {
+                            cache[bundle][tries[index]] = {};
+                            for (var i = 0; i < index; i++) {
+                                $.extend(true, cache[bundle][tries[index]], cache[bundle][tries[i]]);
+                            }
+                            $.extend(true, cache[bundle][tries[index]], data);
+                            if (options.debug) {
+                                console.log('[tajin.i18n] load_bundle put in cache', bundle, tries[index], cache);
+                            }
+                            load_bundle(bundle, locale, cb, tries, index);
+                        },
+                        error:function () {
+                            load_bundle(bundle, locale, cb, tries, index + 1);
+                        }
+                    }
+                );
+            }
         }
     }
 
@@ -102,12 +113,36 @@
         exports:{
             init:function (next, opts) {
                 $.extend(options, opts);
-                next();
+                var b, v = 0, bnds = [], pre = function () {
+                    if (b >= bnds.length) {
+                        next();
+                    } else {
+                        var variants = options.bundles[bnds[b]].preload || [];
+                        if (v >= variants.length) {
+                            v = 0;
+                            b++;
+                            pre();
+                        } else {
+                            if (options.debug) {
+                                console.log('[tajin.i18n] preloading', bnds[b], variants[v]);
+                            }
+                            load_bundle(bnds[b], variants[v], function () {
+                                v++;
+                                pre();
+                            });
+                        }
+                    }
+                };
+                for (b in options.bundles) {
+                    if (options.bundles.hasOwnProperty(b)) {
+                        bnds.push(b);
+                    }
+                }
+                b = 0;
+                pre();
             },
             bundle:function (name, locale) {
-                load_bundle(name, locale, function () {
-                    console.log('LOADED !!!', arguments);
-                });
+
             }
         }
     });
