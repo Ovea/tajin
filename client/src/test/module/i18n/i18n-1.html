@@ -14,20 +14,20 @@
             debug:true,
             onready:function () {
                 console.info('onready: ' + tajin);
-                var bundle1 = tajin.i18n.bundle('app');
+                tajin.i18n.bundle('app', 'fr_CA');
+                tajin.i18n.bundle('app', 'fr');
+                tajin.i18n.bundle('app', 'en_US');
             },
             i18n:{
                 debug:true,
                 bundles:{
                     app:{
                         location:'/bundles',
-                        cache:true,
                         variants:["", "fr", "fr_CA"],
                         preload:['fr', 'en']
                     },
                     app2:{
                         location:'/bundles',
-                        cache:false,
                         variants:["", "fr_CA"],
                         preload:['fr', 'en']
                     }

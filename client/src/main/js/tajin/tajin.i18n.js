@@ -31,7 +31,7 @@
         var v = options.bundles[bundle].variants, tries = [], l;
         // load base
         if ($.inArray('', v) >= 0) {
-            tries.push('')
+            tries.push('');
         }
         // load per language (en, fr, es, ...)
         if (locale.length >= 2) {
@@ -44,7 +44,7 @@
         if (locale.length >= 5) {
             l = locale.substring(0, 5);
             if ($.inArray(l, v) >= 0) {
-                tries.push(v);
+                tries.push(l);
             }
         }
         if (options.debug) {
@@ -59,15 +59,15 @@
                 if (options.debug) {
                     console.log('[tajin.i18n] load_bundle from cache', bundle, locale, cache[bundle][locale]);
                 }
-                cb(bundle, locale, true, options);
+                cb(bundle, locale, true, cache[bundle][locale]);
             } else {
                 load_bundle(bundle, locale, cb || $.noop, extensions(bundle, locale), 0);
             }
-        } else if (inex >= tries.length) {
+        } else if (index >= tries.length) {
             if (options.debug) {
                 console.log('[tajin.i18n] load_bundle completed', bundle, locale, cache[bundle][locale]);
             }
-            cb(bundle, locale, false, options);
+            cb(bundle, locale, false, cache[bundle][locale]);
         } else {
             var path = w.tajin.util.path(options.bundles[bundle].location + '/' + bundle);
             if (tries[index].length > 0) {
@@ -77,7 +77,7 @@
             $.ajax({
                     url:path,
                     dataType:'json',
-                    cache:options.bundles[bundle].cache,
+                    cache:false,
                     success:function (data) {
                         if (!cache[bundle]) {
                             cache[bundle] = {};
@@ -89,7 +89,7 @@
                         load_bundle(bundle, locale, cb, tries, index + 1);
                     },
                     error:function () {
-                        load_bundle(bundle, locale, cb, tries, tries.length);
+                        load_bundle(bundle, locale, cb, tries, index + 1);
                     }
                 }
             );
@@ -102,9 +102,12 @@
         exports:{
             init:function (next, opts) {
                 $.extend(options, opts);
+                next();
             },
-            bundle:function (name) {
-
+            bundle:function (name, locale) {
+                load_bundle(name, locale, function () {
+                    console.log('LOADED !!!', arguments);
+                });
             }
         }
     });

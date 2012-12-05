@@ -76,7 +76,7 @@
                             n = inits[i].name;
                             w.tajin.options[n] = w.tajin.options[n] || {};
                             if (w.tajin.options.debug) {
-                                console.log('[tajin.core] init module with options', n, w.tajin.options[n]);
+                                console.log('[tajin.core] init', n, w.tajin.options[n]);
                             }
                             inits[i].exports.init.call(w.tajin, next, w.tajin.options[n], inits[i].exports);
                         } else if (i === inits.length && $.isFunction(w.tajin.options.onready)) {
