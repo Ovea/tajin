@@ -18,12 +18,61 @@
 (function (w, $) {
     "use strict";
 
-    var cache = {}, options = {
-        bundles:{}
+    var cache = {},
+        options = {
+            debug:false,
+            bundles:{},
+            attributes:['href'],
+            onlocalize:function (bundle, locale, elem, key, value) {
+                if (value === undefined) {
+                    value = '[' + key + ']';
+                }
+                if (options.debug) {
+                    console.log('[tajin.i18n] onlocalize', bundle, locale, key, value);
+                }
+                elem.html(value);
+            }
+        },
+        Bundle = function (name, locale, b, l) {
+            this.name = name;
+            this.locale = locale;
+            this.bundle = b;
+            this.resolved = l;
+        };
+
+    Bundle.prototype = {
+        toString:function () {
+            return 'Bundle ' + this.name + ' for locale ' + this.locale + " (resolved as '" + (this.resolved || 'default') + "')";
+        },
+        localize:function (expr) {
+            if (options.debug) {
+                console.log('[tajin.i18n] localize', this.name, this.locale);
+            }
+            var i, attr, self = this, e = (e instanceof jQuery) ? expr : $(expr);
+            e.find('[rel*="localize"]').each(function () {
+                var elem = $(this), key = elem.attr("rel").match(/localize\[(.*?)\]/)[1];
+                options.onlocalize(self.name, self.locale, elem, key, self.value(key));
+            });
+            for (i = 0; i < options.attributes.length; i++) {
+                attr = options.attributes[i];
+                e.find('[' + attr + '*="localize"]').each(function () {
+                    var elem = $(this), key = elem.attr(attr).match(/localize\[(.*?)\]/)[1];
+                    elem.attr(attr, self.value(key));
+                });
+            }
+        },
+        value:function (key) {
+            var value = this.bundle;
+            var keys = key.split(/\./);
+            while (keys.length && $.isPlainObject(value)) {
+                value = value[keys.shift()];
+            }
+            return value;
+        }
     };
 
     function fix_locale(locale) {
-        locale = (locale || '').replace(/-/, '_').toLowerCase();
+        locale = (locale || navigator.language || navigator.userLanguage).replace(/-/, '_').toLowerCase();
         return locale.length > 3 ? locale.substring(0, 3) + locale.substring(3).toUpperCase() : locale;
     }
 
@@ -54,20 +103,27 @@
     }
 
     function load_bundle(bundle, locale, cb, tries, index) {
+        var b, path, l;
         if (arguments.length <= 3) {
             if (cache[bundle] && cache[bundle][locale]) {
                 if (options.debug) {
                     console.log('[tajin.i18n] load_bundle from cache', bundle, locale, cache[bundle][locale]);
                 }
-                cb(bundle, locale, true, cache[bundle][locale]);
+                cb(bundle, locale, true, cache[bundle][locale], locale);
             } else {
                 load_bundle(bundle, locale, cb || $.noop, extensions(bundle, locale), 0);
             }
         } else if (index >= tries.length) {
-            if (options.debug) {
-                console.log('[tajin.i18n] load_bundle completed', bundle, locale, cache[bundle][locale]);
+            b = cache[bundle][locale];
+            l = locale;
+            if (!b) {
+                l = tries[tries.length - 1];
+                b = cache[bundle][l];
             }
-            cb(bundle, locale, false, cache[bundle][locale]);
+            if (options.debug) {
+                console.log('[tajin.i18n] load_bundle completed', bundle, locale, b, l);
+            }
+            cb(bundle, locale, false, b, l);
         } else {
             if (!cache[bundle]) {
                 cache[bundle] = {};
@@ -78,7 +134,7 @@
                 }
                 load_bundle(bundle, locale, cb, tries, index + 1);
             } else {
-                var path = w.tajin.util.path(options.bundles[bundle].location + '/' + bundle);
+                path = w.tajin.util.path(options.bundles[bundle].location + '/' + bundle);
                 if (tries[index].length > 0) {
                     path += '_' + tries[index];
                 }
@@ -88,8 +144,9 @@
                         dataType:'json',
                         cache:false,
                         success:function (data) {
+                            var i;
                             cache[bundle][tries[index]] = {};
-                            for (var i = 0; i < index; i++) {
+                            for (i = 0; i < index; i++) {
                                 $.extend(true, cache[bundle][tries[index]], cache[bundle][tries[i]]);
                             }
                             $.extend(true, cache[bundle][tries[index]], data);
@@ -113,6 +170,9 @@
         exports:{
             init:function (next, opts) {
                 $.extend(options, opts);
+                if (!$.isFunction(options.onlocalize)) {
+                    options.onlocalize = $.noop;
+                }
                 var b, v = 0, bnds = [], pre = function () {
                     if (b >= bnds.length) {
                         next();
@@ -141,8 +201,16 @@
                 b = 0;
                 pre();
             },
-            bundle:function (name, locale) {
-
+            load:function (name, locale, cb) {
+                if (!options.bundles[name]) {
+                    throw new Error('Inexisting bundle: ' + name);
+                }
+                locale = fix_locale(locale);
+                load_bundle(name, locale, function (name, locale, incache, b, l) {
+                    if ($.isFunction(cb)) {
+                        cb(new Bundle(name, locale, b, l));
+                    }
+                });
             }
         }
     });
