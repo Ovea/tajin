@@ -20,15 +20,12 @@
 
     var cache = {},
         options = {
-            debug:false,
-            bundles:{},
-            attributes:['href'],
-            onlocalize:function (bundle, locale, elem, key, value) {
+            debug: false,
+            bundles: {},
+            attributes: ['href', 'src'],
+            onlocalize: function (bundle, locale, elem, key, value) {
                 if (value === undefined) {
                     value = '[' + key + ']';
-                }
-                if (options.debug) {
-                    console.log('[tajin.i18n] onlocalize', bundle, locale, key, value);
                 }
                 elem.html(value);
             }
@@ -41,29 +38,33 @@
         };
 
     Bundle.prototype = {
-        toString:function () {
+        toString: function () {
             return 'Bundle ' + this.name + ' for locale ' + this.locale + " (resolved as '" + (this.resolved || 'default') + "')";
         },
-        localize:function (expr) {
+        localize: function (expr) {
             if (options.debug) {
                 console.log('[tajin.i18n] localize', this.name, this.locale);
             }
-            var i, attr, self = this, e = (e instanceof jQuery) ? expr : $(expr);
+            var i, attr, self = this, e = (expr instanceof jQuery) ? expr : $(expr);
             e.find('[rel*="localize"]').each(function () {
-                var elem = $(this), key = elem.attr("rel").match(/localize\[(.*?)\]/)[1];
-                options.onlocalize(self.name, self.locale, elem, key, self.value(key));
+                var elem = $(this), key = elem.attr("rel").match(/localize\[([\.\w]+)\]/)[1], v = self.value(key);
+                if (options.debug) {
+                    console.log('[tajin.i18n] localize', self.name, self.locale, key, v, elem);
+                }
+                options.onlocalize(self.name, self.locale, elem, key, v);
             });
-            for (i = 0; i < options.attributes.length; i++) {
-                attr = options.attributes[i];
+            $.each(options.attributes, function (i, attr) {
                 e.find('[' + attr + '*="localize"]').each(function () {
-                    var elem = $(this), key = elem.attr(attr).match(/localize\[(.*?)\]/)[1];
-                    elem.attr(attr, self.value(key));
+                    var elem = $(this), key = elem.attr(attr).match(/localize\[([\.\w]+)\]/)[1], v = self.value(key);
+                    if (options.debug) {
+                        console.log('[tajin.i18n] localize', self.name, self.locale, key, v, elem);
+                    }
+                    elem.attr(attr, v);
                 });
-            }
+            });
         },
-        value:function (key) {
-            var value = this.bundle;
-            var keys = key.split(/\./);
+        value: function (key) {
+            var value = this.bundle, keys = key.split(/\./);
             while (keys.length && $.isPlainObject(value)) {
                 value = value[keys.shift()];
             }
@@ -140,10 +141,10 @@
                 }
                 path += '.json';
                 $.ajax({
-                        url:path,
-                        dataType:'json',
-                        cache:false,
-                        success:function (data) {
+                        url: path,
+                        dataType: 'json',
+                        cache: false,
+                        success: function (data) {
                             var i;
                             cache[bundle][tries[index]] = {};
                             for (i = 0; i < index; i++) {
@@ -155,7 +156,7 @@
                             }
                             load_bundle(bundle, locale, cb, tries, index);
                         },
-                        error:function () {
+                        error: function () {
                             load_bundle(bundle, locale, cb, tries, index + 1);
                         }
                     }
@@ -165,10 +166,10 @@
     }
 
     w.tajin.install({
-        name:'i18n',
-        requires:'core,util',
-        exports:{
-            init:function (next, opts) {
+        name: 'i18n',
+        requires: 'core,util',
+        exports: {
+            init: function (next, opts) {
                 $.extend(options, opts);
                 if (!$.isFunction(options.onlocalize)) {
                     options.onlocalize = $.noop;
@@ -201,7 +202,7 @@
                 b = 0;
                 pre();
             },
-            load:function (name, locale, cb) {
+            load: function (name, locale, cb) {
                 if (!options.bundles[name]) {
                     throw new Error('Inexisting bundle: ' + name);
                 }
