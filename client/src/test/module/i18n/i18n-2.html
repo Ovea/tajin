@@ -7,10 +7,37 @@
 
     <script type="text/javascript">
         tajin_init = {
-            debug:true,
+            debug:false,
             onready:function () {
-                console.info('onready: ' + tajin);
 
+                // i18n samples
+                tajin.i18n.load('app', 'fr_CA', function (bundle) {
+                    console.info('1: ' + bundle);
+                    console.info('1: msg3', bundle.value('msg3'));
+                    $(function () {
+                        bundle.localize(document);
+                    });
+                });
+                tajin.i18n.load('app', 'fr', function (bundle) {
+                    console.info('2: ' + bundle);
+                });
+                tajin.i18n.load('app', 'en', function (bundle) {
+                    console.info('3: ' + bundle);
+                });
+                tajin.i18n.load('app', 'en_US', function (bundle) {
+                    console.info('4: ' + bundle);
+                    console.info('4: inner.msg', bundle.value('inner.msg'));
+                });
+                tajin.i18n.load('app2', 'fr', function (bundle) {
+                    console.info('5: ' + bundle);
+                });
+                tajin.i18n.load('app2', 'fr_CA', function (bundle) {
+                    console.info('6: ' + bundle);
+                });
+                tajin.i18n.load('app3', 'fr_CA', function (bundle) {
+                    console.info('7: ' + bundle);
+                    console.info('7: msg1', bundle.value('msg1'));
+                });
 
             }
         };
@@ -25,6 +52,6 @@
 
 </head>
 <body>
-
+<span rel="localize[msg3]"></span>
 </body>
 </html>
