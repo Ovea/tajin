@@ -106,6 +106,9 @@
                 doLog('tajin.log', 'error', arguments);
             },
             logger:function (name, level) {
+                if(!name) {
+                    throw new Error('Missing logger name');
+                }
                 return new Logger(name, level);
             }
         }

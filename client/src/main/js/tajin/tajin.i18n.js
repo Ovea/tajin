@@ -22,6 +22,7 @@
         options = {
             debug: false,
             bundles: {},
+            resources: [],
             attributes: ['href', 'src'],
             onlocalize: function (bundle, locale, elem, key, value) {
                 if (value === undefined) {
@@ -35,7 +36,28 @@
             this.locale = locale;
             this.bundle = b;
             this.resolved = l;
+        },
+        Resources = function (locale) {
+            this.locale = locale;
         };
+
+    Resources.prototype = {
+        toString: function () {
+            return 'Resources for locale ' + this.locale;
+        },
+        url: function (res) {
+            var ext, found = $.grep(options.resources, function (e) {
+                var p = e.path.indexOf(res);
+                return p !== -1 && e.path.length === p + res.length;
+            });
+            if (found.length) {
+                ext = extensions(this.locale, found.variants || []);
+                if(ext.pop()) {
+
+                }
+            }
+        }
+    };
 
     Bundle.prototype = {
         toString: function () {
@@ -73,16 +95,14 @@
     };
 
     function fix_locale(locale) {
-        locale = (locale || navigator.language || navigator.userLanguage).replace(/-/, '_').toLowerCase();
+        locale = (locale || navigator.language || navigator.userLanguage || '').replace(/-/, '_').toLowerCase();
         return locale.length > 3 ? locale.substring(0, 3) + locale.substring(3).toUpperCase() : locale;
     }
 
-    function extensions(bundle, locale, variants) {
+    function extensions(locale, variants) {
         var tries = [], l;
         // load base
-        if ($.inArray('', variants) >= 0) {
-            tries.push('');
-        }
+        tries.push('');
         // load per language (en, fr, es, ...)
         if (locale.length >= 2) {
             l = locale.substring(0, 2);
@@ -98,7 +118,7 @@
             }
         }
         if (options.debug) {
-            console.log('[tajin.i18n] extensions', bundle, locale, tries);
+            console.log('[tajin.i18n] extensions computed', tries, locale, variants);
         }
         return tries;
     }
@@ -112,7 +132,7 @@
                 }
                 cb(bundle, locale, true, cache[bundle][locale], locale);
             } else {
-                load_bundle(bundle, locale, cb || $.noop, extensions(bundle, locale, options.bundles[bundle].variants), 0);
+                load_bundle(bundle, locale, cb || $.noop, extensions(locale, options.bundles[bundle].variants || []), 0);
             }
         } else if (index >= tries.length) {
             b = cache[bundle][locale];
@@ -212,6 +232,10 @@
                         cb(new Bundle(name, locale, b, l));
                     }
                 });
+            },
+            resources: function (locale) {
+                locale = fix_locale(locale);
+                return new Resources(locale);
             }
         }
     });
