@@ -5,7 +5,7 @@ describe("Default Logger", function () {
     });
 
     it("is at 'none' level by default", function () {
-        expect(tajin['log'].logger().level).toBe("none");
+        expect(tajin.log.level).toBe("none");
     });
 
     it("and nothing can be logged", function () {
@@ -17,22 +17,13 @@ describe("Default Logger", function () {
         tajin.log.error('a message', 'with param', 1);
 
         expect(console.log).not.toHaveBeenCalled();
-        expect(console.debug).not.toHaveBeenCalled();
-
     });
-
-
-    // Ca create my own logger
-    // can set a level
-    // can log
-
 
     // when using config its visible in  tajin.options.<module name>.level
 
 });
 
 describe("Personal logger", function () {
-
     var debug_logger = tajin.log.logger('Debug Logger', 'debug');
 
     it("can create debug level logger", function () {

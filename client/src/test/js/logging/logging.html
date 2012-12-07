@@ -15,36 +15,39 @@
     <script type="text/javascript" src="../../../main/js/tajin/tajin.core.js"></script>
     <script type="text/javascript" src="../../../main/js/tajin/tajin.log.js"></script>
 
-    <!-- include spec files here... -->
-    <script type="text/javascript" src="logging_unit.js"></script>
-
     <script type="text/javascript">
-        (function() {
-            var jasmineEnv = jasmine.getEnv();
-            jasmineEnv.updateInterval = 1000;
+        tajin.init({
+            onready: function () {
+                $.getScript('logging_unit.js');
 
-            var htmlReporter = new jasmine.HtmlReporter();
+                var jasmineEnv = jasmine.getEnv();
+                jasmineEnv.updateInterval = 1000;
 
-            jasmineEnv.addReporter(htmlReporter);
+                var htmlReporter = new jasmine.HtmlReporter();
 
-            jasmineEnv.specFilter = function(spec) {
-                return htmlReporter.specFilter(spec);
-            };
+                jasmineEnv.addReporter(htmlReporter);
 
-            var currentWindowOnload = window.onload;
+                jasmineEnv.specFilter = function (spec) {
+                    return htmlReporter.specFilter(spec);
+                };
 
-            window.onload = function() {
-                if (currentWindowOnload) {
-                    currentWindowOnload();
+                var currentWindowOnload = window.onload;
+
+                window.onload = function () {
+                    if (currentWindowOnload) {
+                        currentWindowOnload();
+                    }
+                    execJasmine();
+                };
+
+                function execJasmine() {
+                    jasmineEnv.execute();
                 }
-                execJasmine();
-            };
 
-            function execJasmine() {
-                jasmineEnv.execute();
             }
+        });
 
-        })();
+
     </script>
 
 </head>
