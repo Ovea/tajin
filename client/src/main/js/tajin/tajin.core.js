@@ -89,7 +89,6 @@
                 delete w.tajin_init;
                 next();
             }
-
         },
         toString:function () {
             return "Tajin Framework, version ${project.version}, modules: " + w.tajin.modules();
