@@ -42,6 +42,32 @@
             this.locale = locale;
         };
 
+    function fix_locale(locale) {
+        locale = (locale || navigator.language || navigator.userLanguage || '').replace(/-/, '_').toLowerCase();
+        return locale.length > 3 ? locale.substring(0, 3) + locale.substring(3).toUpperCase() : locale;
+    }
+
+    function extensions(locale, variants) {
+        var tries = [], l;
+        // load base
+        tries.push('');
+        // load per language (en, fr, es, ...)
+        if (locale.length >= 2) {
+            l = locale.substring(0, 2);
+            if ($.inArray(l, variants) >= 0) {
+                tries.push(l);
+            }
+        }
+        // load per region (CA, US, ...)
+        if (locale.length >= 5) {
+            l = locale.substring(0, 5);
+            if ($.inArray(l, variants) >= 0) {
+                tries.push(l);
+            }
+        }
+        return tries;
+    }
+
     Resources.prototype = {
         toString: function () {
             return 'Resources for locale ' + this.locale;
@@ -62,13 +88,13 @@
                     }
                 }
             }
-            return tajin.util.path(res);
+            return w.tajin.util.path(res);
         },
         image: function (res, cb) {
             var u = this.url(res), img = $("<img/>");
             cb = cb || $.noop;
             img.load(function () {
-                if (!this.complete || typeof this.naturalWidth == "undefined" || this.naturalWidth == 0) {
+                if (!this.complete || typeof this.naturalWidth === "undefined" || this.naturalWidth === 0) {
                     cb.call(img, u, true);
                 } else {
                     cb.call(img, u, false);
@@ -129,32 +155,6 @@
             return value;
         }
     };
-
-    function fix_locale(locale) {
-        locale = (locale || navigator.language || navigator.userLanguage || '').replace(/-/, '_').toLowerCase();
-        return locale.length > 3 ? locale.substring(0, 3) + locale.substring(3).toUpperCase() : locale;
-    }
-
-    function extensions(locale, variants) {
-        var tries = [], l;
-        // load base
-        tries.push('');
-        // load per language (en, fr, es, ...)
-        if (locale.length >= 2) {
-            l = locale.substring(0, 2);
-            if ($.inArray(l, variants) >= 0) {
-                tries.push(l);
-            }
-        }
-        // load per region (CA, US, ...)
-        if (locale.length >= 5) {
-            l = locale.substring(0, 5);
-            if ($.inArray(l, variants) >= 0) {
-                tries.push(l);
-            }
-        }
-        return tries;
-    }
 
     function load_bundle(bundle, locale, cb, tries, index) {
         var b, path, l;

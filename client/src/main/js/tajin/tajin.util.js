@@ -14,13 +14,27 @@
  * limitations under the License.
  */
 /*jslint white: true, browser: true, devel: false, indent: 4, plusplus: true */
-/*global window*/
-(function (w) {
+/*global window, jQuery, console*/
+(function (w, $) {
     "use strict";
     w.tajin.install({
         name: 'util',
         requires: 'core',
         exports: {
+            init: function (next, opts) {
+                if (opts.check_ids !== false) {
+                    $(function () {
+                        if (opts.debug) {
+                            console.log('[tajin.util] checking for duplicate ids');
+                        }
+                        var dups = w.tajin.util.find_duplicate_ids(document);
+                        if (dups) {
+                            throw new Error('Duplicate IDS found: ' + JSON.stringify(dups));
+                        }
+                    });
+                }
+                next();
+            },
             path: function (loc) {
                 loc = loc || '';
                 if (loc.indexOf('http') !== -1) {
@@ -31,7 +45,23 @@
                 }
                 var p = document.location.origin + document.location.pathname;
                 return p.substring(0, p.lastIndexOf('/') + 1) + loc;
+            },
+            find_duplicate_ids: function (el) {
+                var ids = {}, total = 0, deleted = 0, id;
+                $(el).find('[id]').each(function () {
+                    ids[this.id] = ids[this.id] ? ids[this.id] + 1 : 1;
+                });
+                for (id in ids) {
+                    if (ids.hasOwnProperty(id)) {
+                        total++;
+                        if (ids[id] === 1) {
+                            deleted++;
+                            delete ids[id];
+                        }
+                    }
+                }
+                return total !== deleted ? ids : undefined;
             }
         }
     });
-}(window));
+}(window, jQuery));
