@@ -1,11 +1,11 @@
 describe("Default Logger", function () {
 
     it("is installed", function () {
-        expect(tajin.modules()).toContain("log");
+        expect(tajin.modules()).toContain('log');
     });
 
     it("is at 'none' level by default", function () {
-        expect(tajin.options.log.level).toBe("none");
+        expect(tajin.options.log.level).toBe('none');
     });
 
     it("and nothing can be logged", function () {
