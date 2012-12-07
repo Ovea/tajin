@@ -1,0 +1,63 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN"
+        "http://www.w3.org/TR/html4/loose.dtd">
+<html>
+<head>
+    <meta http-equiv="Content-Type" content="text/html; charset=UTF-8"/>
+    <title>Jasmine Spec Runner</title>
+
+    <script type="text/javascript" src="../../lib/jquery-1.8.3.js"></script>
+    <script type="text/javascript" src="../../../main/js/tajin/tajin.core.js"></script>
+    <script type="text/javascript" src="../../../main/js/tajin/tajin.timer.js"></script>
+
+    <script type="text/javascript">
+        tajin.init({
+            onready: function () {
+                var t1 = tajin.timer.schedule('ok', 1000, true, function () {
+                    $('body').append('<div>ok 1 @ ' + (new Date().getSeconds()) + ' </div>');
+                });
+
+                tajin.timer.schedule(null, 4000, false, function () {
+                    console.log('stopping timer OK');
+                    t1.stop();
+
+                    tajin.timer.schedule('error', 1000, true, function () {
+                        $('body').append('<div>error 1 @ ' + (new Date().getSeconds()) + ' </div>');
+                    });
+                });
+
+                tajin.timer.schedule(null, 8000, false, function () {
+                    console.log('replacing timer ERROR');
+                    tajin.timer.schedule('error', 3000, true, function () {
+                        $('body').append('<div>error 3 @ ' + (new Date().getSeconds()) + ' </div>');
+                    });
+                });
+
+                tajin.timer.schedule(null, 16000, false, function () {
+                    console.log('stopping timer ERROR');
+                    tajin.timer.stop('error');
+                });
+
+                tajin.timer.schedule('debug', 1000, true, function () {
+                    console.log('TIMERS:');
+                    for (var id in tajin.timer.timers) {
+                        console.log('  - ' + tajin.timer.timers[id].toString());
+                    }
+                });
+
+                tajin.timer.schedule(null, 20000, false, function () {
+                    console.log('stopping all timers');
+                    tajin.timer.stop('debug');
+                    console.log('TIMERS:');
+                    for (var id in tajin.timer.timers) {
+                        console.log('  - ' + tajin.timer.timers[id].toString());
+                    }
+                });
+            }
+        });
+    </script>
+
+</head>
+
+<body>
+</body>
+</html>

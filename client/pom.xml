@@ -70,8 +70,11 @@
                                     <removeIncluded>false</removeIncluded>
                                     <includes>
                                         <include>${project.build.outputDirectory}/tajin/tajin.core.js</include>
+                                        <include>${project.build.outputDirectory}/tajin/tajin.util.js</include>
                                         <include>${project.build.outputDirectory}/tajin/tajin.config.js</include>
                                         <include>${project.build.outputDirectory}/tajin/tajin.log.js</include>
+                                        <include>${project.build.outputDirectory}/tajin/tajin.i18n.js</include>
+                                        <include>${project.build.outputDirectory}/tajin/tajin.timer.js</include>
                                         <include>${project.build.outputDirectory}/tajin/tajin.autoinit.js</include>
                                     </includes>
                                 </aggregation>
