@@ -40,15 +40,11 @@
     <!-- include source files here... -->
     <script type="text/javascript" src="../../lib/jquery-1.8.3.js"></script>
     <script type="text/javascript" src="../../../main/js/tajin/tajin.core.js"></script>
-    <script type="text/javascript" src="../../../main/js/tajin/tajin.log.js"></script>
 
     <script type="text/javascript">
         tajin.init({
-            log:{
-                level:'warn'
-            },
             onready: function () {
-                $(document).append('<script type="text/javascript" src="logging_config.unit.js"/>');
+                $(document).append('<script type="text/javascript" src="core.unit.js"/>');
             }
         });
     </script>
