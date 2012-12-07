@@ -5,7 +5,7 @@ describe("Default Logger", function () {
     });
 
     it("is at 'none' level by default", function () {
-        expect(tajin.log.level).toBe("none");
+        expect(tajin.options.log.level).toBe("none");
     });
 
     it("and nothing can be logged", function () {
