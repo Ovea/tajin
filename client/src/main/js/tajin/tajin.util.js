@@ -18,19 +18,19 @@
 (function (w) {
     "use strict";
     w.tajin.install({
-        name:'util',
-        requires:'core',
-        exports:{
-            path:function (loc) {
-                if(loc.indexOf('http') !== -1) {
+        name: 'util',
+        requires: 'core',
+        exports: {
+            path: function (loc) {
+                loc = loc || '';
+                if (loc.indexOf('http') !== -1) {
                     return loc;
                 }
-                var p = document.location.origin + document.location.pathname;
-                p = p.substring(0, p.lastIndexOf('/'));
-                if (loc) {
-                    p += loc.charAt(0) === '/' ? loc : ('/' + loc);
+                if (loc.charAt(0) === '/') {
+                    return document.location.origin + loc;
                 }
-                return p;
+                var p = document.location.origin + document.location.pathname;
+                return p.substring(0, p.lastIndexOf('/') + 1) + loc;
             }
         }
     });

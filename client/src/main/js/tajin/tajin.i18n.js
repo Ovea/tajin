@@ -19,6 +19,7 @@
     "use strict";
 
     var cache = {},
+        rescache = {},
         options = {
             debug: false,
             bundles: {},
@@ -46,16 +47,51 @@
             return 'Resources for locale ' + this.locale;
         },
         url: function (res) {
-            var ext, found = $.grep(options.resources, function (e) {
+            var i, ext, found = $.grep(options.resources, function (e) {
                 var p = e.path.indexOf(res);
                 return p !== -1 && e.path.length === p + res.length;
             });
             if (found.length) {
-                ext = extensions(this.locale, found.variants || []);
-                if(ext.pop()) {
-
+                ext = extensions(this.locale, found[0].variants || []);
+                if (ext.length) {
+                    if (ext[ext.length - 1]) {
+                        i = found[0].path.lastIndexOf('.');
+                        res = found[0].path.substring(0, i) + '_' + ext[ext.length - 1] + found[0].path.substring(i);
+                    } else {
+                        res = found[0].path;
+                    }
                 }
             }
+            return tajin.util.path(res);
+        },
+        image: function (res, cb) {
+            var u = this.url(res), img = $("<img/>");
+            cb = cb || $.noop;
+            img.load(function () {
+                if (!this.complete || typeof this.naturalWidth == "undefined" || this.naturalWidth == 0) {
+                    cb.call(img, u, true);
+                } else {
+                    cb.call(img, u, false);
+                }
+            }).attr('src', u);
+        },
+        html: function (res, cb) {
+            var u = this.url(res);
+            cb = cb || $.noop;
+            if (rescache[u]) {
+                cb.call(rescache[u], u, false);
+            }
+            $.ajax({
+                cache: false,
+                url: u,
+                success: function (html) {
+                    rescache[u] = html;
+                    cb.call(rescache[u], u, false);
+                },
+                error: function () {
+                    cb.call('', u, true);
+                }
+            });
         }
     };
 
@@ -116,9 +152,6 @@
             if ($.inArray(l, variants) >= 0) {
                 tries.push(l);
             }
-        }
-        if (options.debug) {
-            console.log('[tajin.i18n] extensions computed', tries, locale, variants);
         }
         return tries;
     }
