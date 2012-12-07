@@ -18,13 +18,14 @@
 (function (w, $) {
     "use strict";
     w.tajin.install({
-        name:'config',
-        requires:'core,util',
-        exports:{
-            init:function (next, opts) {
+        name: 'config',
+        requires: 'core,util',
+        exports: {
+            init: function (next, opts) {
                 var tajin = this, url = opts.url;
                 if (!url) {
                     url = tajin.util.path('tajin-client.json');
+                    opts.url = url;
                 }
                 $.getJSON(url, function (cfg) {
                     tajin.options = $.extend(cfg || {}, tajin.options);

@@ -91,6 +91,7 @@
             init:function (next, opts) {
                 var tajin = this, l = (opts.level || root_level).toLowerCase();
                 root_level = loggers[l] ? l : root_level;
+                opts.level = root_level;
                 next();
             },
             debug:function () {
