@@ -42,7 +42,8 @@
                 <artifactId>maven-license-plugin</artifactId>
                 <configuration>
                     <excludes>
-                        <exclude>lib/**</exclude>
+                        <exclude>src/test/**</exclude>
+                        <exclude>todo/**</exclude>
                     </excludes>
                 </configuration>
             </plugin>
