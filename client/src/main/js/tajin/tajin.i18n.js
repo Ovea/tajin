@@ -77,23 +77,23 @@
         return locale.length > 3 ? locale.substring(0, 3) + locale.substring(3).toUpperCase() : locale;
     }
 
-    function extensions(bundle, locale) {
-        var v = options.bundles[bundle].variants, tries = [], l;
+    function extensions(bundle, locale, variants) {
+        var tries = [], l;
         // load base
-        if ($.inArray('', v) >= 0) {
+        if ($.inArray('', variants) >= 0) {
             tries.push('');
         }
         // load per language (en, fr, es, ...)
         if (locale.length >= 2) {
             l = locale.substring(0, 2);
-            if ($.inArray(l, v) >= 0) {
+            if ($.inArray(l, variants) >= 0) {
                 tries.push(l);
             }
         }
         // load per region (CA, US, ...)
         if (locale.length >= 5) {
             l = locale.substring(0, 5);
-            if ($.inArray(l, v) >= 0) {
+            if ($.inArray(l, variants) >= 0) {
                 tries.push(l);
             }
         }
@@ -112,7 +112,7 @@
                 }
                 cb(bundle, locale, true, cache[bundle][locale], locale);
             } else {
-                load_bundle(bundle, locale, cb || $.noop, extensions(bundle, locale), 0);
+                load_bundle(bundle, locale, cb || $.noop, extensions(bundle, locale, options.bundles[bundle].variants), 0);
             }
         } else if (index >= tries.length) {
             b = cache[bundle][locale];

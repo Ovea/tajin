@@ -22,6 +22,9 @@
         requires:'core',
         exports:{
             path:function (loc) {
+                if(loc.indexOf('http') !== -1) {
+                    return loc;
+                }
                 var p = document.location.origin + document.location.pathname;
                 p = p.substring(0, p.lastIndexOf('/'));
                 if (loc) {
