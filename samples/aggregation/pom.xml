@@ -43,6 +43,7 @@
             <artifactId>tajin-client</artifactId>
             <version>${project.version}</version>
             <type>war</type>
+            <scope>runtime</scope>
         </dependency>
 
         <dependency>
