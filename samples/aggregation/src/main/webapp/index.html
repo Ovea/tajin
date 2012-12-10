@@ -19,6 +19,15 @@
 <html>
 <head>
     <title>Tajin sample</title>
+    <script type="text/javascript" src="js/jquery-1.8.3.js"></script>
+    <script type="text/javascript">
+        tajin_init = {
+            debug: true,
+            onready: function (tajin) {
+                console.info('onready: ' + tajin);
+            }
+        };
+    </script>
     <script type="text/javascript" src="tajin/tajin.js"></script>
 </head>
 <body>

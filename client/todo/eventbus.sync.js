@@ -15,12 +15,23 @@
  */
 if (window.EventBus != undefined && window.SyncAsync != undefined) {
 
-    window.EventBus.prototype.sync = function(topics, func) {
-        var sync = new SyncAsync();
+    window.EventBus.prototype.syncOnce = function (topics, func, opts) {
+        var sync = new SyncAsync({
+            trigger:'once'
+        });
+        for (var i = 0; i < topics.length; i++) {
+            this.topic(topics[i]).subscribe(sync.newCallback());
+        }
+        sync.sync(func);
+    };
+
+    window.EventBus.prototype.sync = function (topics, func, opts) {
+        var sync = new SyncAsync({
+            trigger:'each'
+        });
         for (var i = 0; i < topics.length; i++) {
             this.topic(topics[i]).subscribe(sync.newCallback());
         }
         sync.sync(func);
     }
-
 }
