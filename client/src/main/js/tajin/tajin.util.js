@@ -46,6 +46,10 @@
                 var p = document.location.origin + document.location.pathname;
                 return p.substring(0, p.lastIndexOf('/') + 1) + loc;
             },
+            filename: function () {
+                var f = document.location.pathname || '/';
+                return f.substring(f.lastIndexOf('/') + 1) || '';
+            },
             find_duplicate_ids: function (el) {
                 var ids = {}, total = 0, deleted = 0, id;
                 $(el).find('[id]').each(function () {
