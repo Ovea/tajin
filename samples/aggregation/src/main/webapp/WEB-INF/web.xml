@@ -27,7 +27,12 @@
         <param-name>org.eclipse.jetty.servlet.Default.dirAllowed</param-name>
         <param-value>false</param-value>
     </context-param>
-    
+    <!-- do not cache files -->
+    <context-param>
+        <param-name>org.eclipse.jetty.servlet.Default.useFileMappedBuffer</param-name>
+        <param-value>false</param-value>
+    </context-param>
+
     <welcome-file-list>
         <welcome-file>index.html</welcome-file>
     </welcome-file-list>
@@ -60,9 +65,15 @@
         <servlet-name>ssi</servlet-name>
         <url-pattern>*.html</url-pattern>
     </servlet-mapping>
+
     <mime-mapping>
         <extension>shtml</extension>
         <mime-type>text/html</mime-type>
+    </mime-mapping>
+
+    <mime-mapping>
+        <extension>json</extension>
+        <mime-type>application/json</mime-type>
     </mime-mapping>
 
 </web-app>

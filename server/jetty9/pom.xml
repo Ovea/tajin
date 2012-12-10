@@ -13,6 +13,10 @@
     <packaging>jar</packaging>
     <name>Tajin :: Servers :: Jetty 9</name>
 
+    <properties>
+        <jettyVersion>9.0.0.M3</jettyVersion>
+    </properties>
+
     <build>
         <plugins>
             <plugin>
@@ -30,22 +34,22 @@
         <dependency>
             <groupId>org.eclipse.jetty</groupId>
             <artifactId>jetty-client</artifactId>
-            <version>9.0.0.M3</version>
+            <version>${jettyVersion}</version>
         </dependency>
         <dependency>
             <groupId>org.eclipse.jetty</groupId>
             <artifactId>jetty-deploy</artifactId>
-            <version>9.0.0.M3</version>
+            <version>${jettyVersion}</version>
         </dependency>
         <dependency>
             <groupId>org.eclipse.jetty</groupId>
             <artifactId>jetty-jmx</artifactId>
-            <version>9.0.0.M3</version>
+            <version>${jettyVersion}</version>
         </dependency>
         <dependency>
             <groupId>org.eclipse.jetty</groupId>
             <artifactId>jetty-plus</artifactId>
-            <version>9.0.0.M3</version>
+            <version>${jettyVersion}</version>
             <exclusions>
                 <exclusion>
                     <groupId>org.eclipse.jetty.orbit</groupId>
@@ -56,7 +60,7 @@
         <dependency>
             <groupId>org.eclipse.jetty</groupId>
             <artifactId>jetty-annotations</artifactId>
-            <version>9.0.0.M3</version>
+            <version>${jettyVersion}</version>
             <exclusions>
                 <exclusion>
                     <groupId>org.eclipse.jetty.orbit</groupId>
@@ -71,7 +75,7 @@
         <dependency>
             <groupId>org.eclipse.jetty</groupId>
             <artifactId>jetty-jaspi</artifactId>
-            <version>9.0.0.M3</version>
+            <version>${jettyVersion}</version>
             <exclusions>
                 <exclusion>
                     <groupId>org.eclipse.jetty.orbit</groupId>
@@ -82,7 +86,7 @@
         <dependency>
             <groupId>org.eclipse.jetty</groupId>
             <artifactId>jetty-jndi</artifactId>
-            <version>9.0.0.M3</version>
+            <version>${jettyVersion}</version>
             <exclusions>
                 <exclusion>
                     <groupId>org.eclipse.jetty.orbit</groupId>
@@ -93,32 +97,32 @@
         <dependency>
             <groupId>org.eclipse.jetty</groupId>
             <artifactId>jetty-rewrite</artifactId>
-            <version>9.0.0.M3</version>
+            <version>${jettyVersion}</version>
         </dependency>
         <dependency>
             <groupId>org.eclipse.jetty</groupId>
             <artifactId>jetty-servlets</artifactId>
-            <version>9.0.0.M3</version>
+            <version>${jettyVersion}</version>
         </dependency>
         <dependency>
             <groupId>org.eclipse.jetty.websocket</groupId>
             <artifactId>websocket-client</artifactId>
-            <version>9.0.0.M3</version>
+            <version>${jettyVersion}</version>
         </dependency>
         <dependency>
             <groupId>org.eclipse.jetty.websocket</groupId>
             <artifactId>websocket-servlet</artifactId>
-            <version>9.0.0.M3</version>
+            <version>${jettyVersion}</version>
         </dependency>
         <dependency>
             <groupId>org.eclipse.jetty.websocket</groupId>
             <artifactId>websocket-server</artifactId>
-            <version>9.0.0.M3</version>
+            <version>${jettyVersion}</version>
         </dependency>
         <dependency>
             <groupId>org.eclipse.jetty.websocket</groupId>
             <artifactId>websocket-api</artifactId>
-            <version>9.0.0.M3</version>
+            <version>${jettyVersion}</version>
         </dependency>
         <dependency>
             <groupId>org.eclipse.jetty.drafts</groupId>
@@ -128,57 +132,57 @@
         <dependency>
             <groupId>org.eclipse.jetty.websocket</groupId>
             <artifactId>websocket-common</artifactId>
-            <version>9.0.0.M3</version>
+            <version>${jettyVersion}</version>
         </dependency>
         <dependency>
             <groupId>org.eclipse.jetty</groupId>
             <artifactId>jetty-http</artifactId>
-            <version>9.0.0.M3</version>
+            <version>${jettyVersion}</version>
         </dependency>
         <dependency>
             <groupId>org.eclipse.jetty</groupId>
             <artifactId>jetty-server</artifactId>
-            <version>9.0.0.M3</version>
+            <version>${jettyVersion}</version>
         </dependency>
         <dependency>
             <groupId>org.eclipse.jetty</groupId>
             <artifactId>jetty-servlet</artifactId>
-            <version>9.0.0.M3</version>
+            <version>${jettyVersion}</version>
         </dependency>
         <dependency>
             <groupId>org.eclipse.jetty</groupId>
             <artifactId>jetty-webapp</artifactId>
-            <version>9.0.0.M3</version>
+            <version>${jettyVersion}</version>
         </dependency>
         <dependency>
             <groupId>org.eclipse.jetty</groupId>
             <artifactId>jetty-xml</artifactId>
-            <version>9.0.0.M3</version>
+            <version>${jettyVersion}</version>
         </dependency>
         <dependency>
             <groupId>org.eclipse.jetty</groupId>
             <artifactId>jetty-security</artifactId>
-            <version>9.0.0.M3</version>
+            <version>${jettyVersion}</version>
         </dependency>
         <dependency>
             <groupId>org.eclipse.jetty</groupId>
             <artifactId>jetty-continuation</artifactId>
-            <version>9.0.0.M3</version>
+            <version>${jettyVersion}</version>
         </dependency>
         <dependency>
             <groupId>org.eclipse.jetty</groupId>
             <artifactId>jetty-util</artifactId>
-            <version>9.0.0.M3</version>
+            <version>${jettyVersion}</version>
         </dependency>
         <dependency>
             <groupId>org.eclipse.jetty</groupId>
             <artifactId>jetty-io</artifactId>
-            <version>9.0.0.M3</version>
+            <version>${jettyVersion}</version>
         </dependency>
         <!--<dependency>
             <groupId>org.eclipse.jetty</groupId>
             <artifactId>jetty-jsp</artifactId>
-            <version>9.0.0.M3</version>
+            <version>${jettyVersion}</version>
         </dependency>-->
 
         <!--SSI-->
