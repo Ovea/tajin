@@ -1,5 +1,5 @@
 {
     "log":{
-        "level":"all"
+        "level":"warn"
     }
 }

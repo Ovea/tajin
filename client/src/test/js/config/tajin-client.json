@@ -1,9 +1,9 @@
 {
-    "module1":{
-        "option1":"value1"
+    "module1": {
+        "option1": "value1"
     },
 
-    "log":{
-        "level":"all"
+    "log": {
+        "level": "error"
     }
 }

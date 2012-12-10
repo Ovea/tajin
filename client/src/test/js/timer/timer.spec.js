@@ -23,9 +23,10 @@ describe("Timer Module", function () {
     it("can override an existing timer by scheduling a new one with an existing name (previous timer is stopped)", function () {
         this.fail('TODO');
     });
+
 });
 
-describe("Timer", function () {
+describe("Timer instance", function () {
 
     it("has a toString() method exposing its name", function () {
         this.fail('TODO');
@@ -42,4 +43,5 @@ describe("Timer", function () {
     it("has an isActive() method", function () {
         this.fail('TODO');
     });
+
 });

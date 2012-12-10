@@ -1,0 +1,92 @@
+<html>
+<head>
+    <title>Tajin Test Suite</title>
+    <link rel="stylesheet" type="text/css" href="lib/jquery-ui-1.9.2.custom/css/ui-lightness/jquery-ui-1.9.2.custom.css"/>
+    <style type="text/css">
+        html, body {
+            height: 100%;
+            margin: 0;
+            padding: 0;
+        }
+
+        div#tabs {
+            height: 98%;
+        }
+
+        div.tab-content {
+            height: 100%;
+        }
+
+        div {
+            margin: 0;
+            padding: 0;
+        }
+
+        .ui-tabs .ui-tabs-nav li a {
+            padding: .3em;
+        }
+
+        .ui-tabs .ui-tabs-panel {
+            padding: .2em .3em .3em .3em;
+        }
+
+        iframe {
+            padding: 0;
+            margin: 0 auto;
+            width: 100%;
+            min-height: 80%;
+        }
+    </style>
+    <script type="text/javascript" src="lib/jquery-1.8.3.js"></script>
+    <script type="text/javascript" src="lib/jquery-ui-1.9.2.custom/js/jquery-ui-1.9.2.custom.js"></script>
+    <script type="text/javascript">
+        $(function () {
+            $('#tabs').tabs();
+        });
+    </script>
+</head>
+<body>
+
+<div id="tabs">
+    <ul>
+        <li><a href="#tab-1">core</a></li>
+        <li><a href="#tab-2">config</a></li>
+        <li><a href="#tab-22">custom config (1)</a></li>
+        <li><a href="#tab-23">custom config (2)</a></li>
+        <li><a href="#tab-3">log</a></li>
+        <li><a href="#tab-4">log+config</a></li>
+        <li><a href="#tab-5">timer</a></li>
+        <li><a href="#tab-6">i18n</a></li>
+        <li><a href="#tab-7">event</a></li>
+    </ul>
+    <div id="tab-1" class="tab-content">
+        <iframe src="js/core/core.spec.html"></iframe>
+    </div>
+    <div id="tab-2" class="tab-content">
+        <iframe src="js/config/config.spec.html"></iframe>
+    </div>
+    <div id="tab-22" class="tab-content">
+        <iframe src="js/config/config.spec.custom1.html"></iframe>
+    </div>
+    <div id="tab-23" class="tab-content">
+        <iframe src="js/config/config.spec.custom2.html"></iframe>
+    </div>
+    <div id="tab-3" class="tab-content">
+        <iframe src="js/logging/log.spec.html"></iframe>
+    </div>
+    <div id="tab-4" class="tab-content">
+        <iframe src="js/logging/log.config.spec.html"></iframe>
+    </div>
+    <div id="tab-5" class="tab-content">
+        <iframe src="js/timer/timer.spec.html"></iframe>
+    </div>
+    <div id="tab-6" class="tab-content">
+        <iframe src="js/i18n/i18n.spec.html"></iframe>
+    </div>
+    <div id="tab-7" class="tab-content">
+        <iframe src="js/event/event.spec.html"></iframe>
+    </div>
+</div>
+
+</body>
+</html>

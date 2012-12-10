@@ -16,6 +16,9 @@
             $(function () {
                 jasmineEnv.execute();
             });
+        },
+        log: {
+            level: 'all'
         }
     };
 

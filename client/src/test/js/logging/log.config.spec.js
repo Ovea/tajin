@@ -5,8 +5,8 @@ describe("Default Logger", function () {
         expect(tajin.modules()).toContain("config");
     });
 
-    it("is configured to ALL on initialization", function () {
-        expect(tajin.options.log.level).toBe("all");
+    it("is configured to WARN on initialization", function () {
+        expect(tajin.options.log.level).toBe("warn");
     });
 
     it("only 'warn' and 'error'  log messages are processed", function () {
