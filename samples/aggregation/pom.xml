@@ -19,7 +19,6 @@
                 <artifactId>maven-war-plugin</artifactId>
                 <configuration>
                     <overlays>
-                        <overlay/>
                         <overlay>
                             <groupId>com.ovea.tajin</groupId>
                             <artifactId>tajin-client</artifactId>
