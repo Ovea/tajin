@@ -1,29 +1,22 @@
 (function () {
-    var jasmineEnv = jasmine.getEnv();
+    var jasmineEnv = window.jasmineEnv = jasmine.getEnv(),
+        htmlReporter = new jasmine.HtmlReporter();
     jasmineEnv.updateInterval = 1000;
-    var htmlReporter = new jasmine.HtmlReporter();
     jasmineEnv.addReporter(htmlReporter);
     jasmineEnv.specFilter = function (spec) {
         return htmlReporter.specFilter(spec);
     };
-    var currentWindowOnload = window.onload;
-    window.onload = function () {
-        if (currentWindowOnload) {
-            currentWindowOnload();
+
+    window.tajin_init = {
+        debug: true,
+        onready: function () {
+            var f = document.location.pathname || '/';
+            f = f.substring(f.lastIndexOf('/') + 1) || '';
+            $(document).append('<script type="text/javascript" src="' + f.substring(0, f.length - 5) + '.js"/>');
+            $(function () {
+                jasmineEnv.execute();
+            });
         }
-        execJasmine();
     };
 
-    function execJasmine() {
-        jasmineEnv.execute();
-    }
-
 })();
-window.tajin_init = {
-    debug: true,
-    onready: function () {
-        var f = document.location.pathname || '/';
-        f = f.substring(f.lastIndexOf('/') + 1) || '';
-        $(document).append('<script type="text/javascript" src="' + f.substring(0, f.length - 5) + '.js"/>');
-    }
-};

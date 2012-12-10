@@ -3,7 +3,6 @@ describe("Default Logger", function () {
     it("is installed", function () {
         expect(tajin.modules()).toContain("log");
         expect(tajin.modules()).toContain("config");
-        alert('dsds');
     });
 
     it("is configured to ALL on initialization", function () {
