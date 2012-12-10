@@ -20,6 +20,7 @@
 
 })();
 window.tajin_init = {
+    debug: true,
     onready: function () {
         var f = document.location.pathname || '/';
         f = f.substring(f.lastIndexOf('/') + 1) || '';
