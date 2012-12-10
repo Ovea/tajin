@@ -35,4 +35,11 @@ describe("Timer", function () {
         this.fail('TODO');
     });
 
+    it("exposes its ID as a property", function () {
+        this.fail('TODO');
+    });
+
+    it("has an isActive() method", function () {
+        this.fail('TODO');
+    });
 });
