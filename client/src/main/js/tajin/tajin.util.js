@@ -17,6 +17,12 @@
 /*global window, jQuery, console*/
 (function (w, $) {
     "use strict";
+
+    var origin = document.location.origin || (document.location.protocol + '//' + document.location.host),
+        pathname = document.location.pathname || '/',
+        uri = origin + pathname,
+        filename = pathname.substring(pathname.lastIndexOf('/') + 1) || '';
+
     w.tajin.install({
         name: 'util',
         requires: 'core',
@@ -41,14 +47,12 @@
                     return loc;
                 }
                 if (loc.charAt(0) === '/') {
-                    return document.location.origin + loc;
+                    return origin + loc;
                 }
-                var p = document.location.origin + document.location.pathname;
-                return p.substring(0, p.lastIndexOf('/') + 1) + loc;
+                return uri.substring(0, uri.lastIndexOf('/') + 1) + loc;
             },
             filename: function () {
-                var f = document.location.pathname || '/';
-                return f.substring(f.lastIndexOf('/') + 1) || '';
+                return filename;
             },
             find_duplicate_ids: function (el) {
                 var ids = {}, total = 0, deleted = 0, id;
