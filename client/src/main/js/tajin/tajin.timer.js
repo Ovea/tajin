@@ -59,6 +59,9 @@
                         return (repeat ? 'Interval ' : 'Timer ') + id + ' ' + delay + 'ms';
                     },
                     id: id,
+                    isActive: function () {
+                        return running;
+                    },
                     stop: function () {
                         if (running) {
                             delete w.tajin.timer.timers[id];
