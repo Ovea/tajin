@@ -46,10 +46,11 @@ describe("Event module", function () {
         expect(e.id).toBe('my/event');
     });
 
-    it("cannot get inexisting event object", function () {
-        expect(function () {
-            tajin.event.get('inexisting');
-        }).toThrow(new Error("Event inexisting does not exist"));
+    it("can get an inexisting event and create it at once", function () {
+        tajin.event.get('inexisting', {
+            state: true
+        });
+        expect(tajin.event.has('inexisting')).toBe(true);
     });
 
     it("can reset a stateful event", function () {
@@ -84,6 +85,16 @@ describe("Event module", function () {
         tajin.event.destroyAll();
         expect(d1.destroy).toHaveBeenCalled();
         expect(d2.destroy).toHaveBeenCalled();
+    });
+
+    it("provides Tajin ready event", function () {
+        var obj = {
+            f: function () {
+            }
+        };
+        spyOn(obj, 'f');
+        tajin.event.get('tajin/ready').listen(obj.f);
+        expect(obj.f).toHaveBeenCalled();
     });
 
 });
@@ -212,6 +223,20 @@ describe("Event objet", function () {
         evt.fire();
         expect(c).toBe(1);
         evt.remove(obj.f1);
+        evt.fire();
+        expect(c).toBe(1);
+    });
+
+    it("can be listened once", function () {
+        var evt = tajin.event.add(), c = 0;
+        var obj = {
+            f1: function () {
+                c++;
+            }
+        };
+        evt.once(obj.f1);
+        evt.fire();
+        expect(c).toBe(1);
         evt.fire();
         expect(c).toBe(1);
     });

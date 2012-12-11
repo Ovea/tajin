@@ -17,7 +17,7 @@
 /*global jQuery, window, console*/
 (function (w, $) {
     "use strict";
-    var ready, resolved = true, modules = [
+    var ready, resolved = true, listeners = [], modules = [
         {
             name: 'core'
         }
@@ -80,11 +80,16 @@
                                 console.log('[tajin.core] init', n, w.tajin.options[n]);
                             }
                             inits[i].exports.init.call(w.tajin, next, w.tajin.options[n], inits[i].exports);
-                        } else if (i === inits.length && $.isFunction(w.tajin.options.onready)) {
+                        } else if (i === inits.length) {
                             if (w.tajin.options.debug) {
                                 console.log('[tajin.core] onready - init completed with options', w.tajin.options);
                             }
-                            w.tajin.options.onready(w.tajin);
+                            if ($.isFunction(w.tajin.options.onready)) {
+                                w.tajin.options.onready(w.tajin);
+                            }
+                            while (listeners.length) {
+                                listeners.shift()(w.tajin);
+                            }
                         }
                     };
                 delete w.tajin_init;
@@ -98,6 +103,15 @@
             return $.map(modules, function (e) {
                 return e.name;
             });
+        },
+        ready: function (fn) {
+            if ($.isFunction(fn)) {
+                if (ready) {
+                    fn(w.tajin);
+                } else {
+                    listeners.push(fn);
+                }
+            }
         }
     };
 }(window, jQuery));

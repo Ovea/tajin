@@ -17,6 +17,11 @@ describe("Core", function () {
         this.fail('TODO');
     });
 
+    it("call ready() callbacks when tajin ready or immedialty after", function () {
+        this.fail('TODO');
+        // tajin.ready(function() {});
+    });
+
     it("optional callback method 'onready' called when initialization finished", function () {
         this.fail('TODO');
     });
