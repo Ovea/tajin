@@ -1,11 +1,12 @@
 (function () {
     var jasmineEnv = window.jasmineEnv = jasmine.getEnv(),
         htmlReporter = new jasmine.HtmlReporter();
+
     jasmineEnv.updateInterval = 1000;
     jasmineEnv.addReporter(htmlReporter);
     jasmineEnv.specFilter = function (spec) {
-        return htmlReporter.specFilter(spec);
-    };
+     return htmlReporter.specFilter(spec);
+     };
 
     window.tajin_init = {
         debug: true,
