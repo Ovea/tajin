@@ -77,6 +77,8 @@
                                         <include>${project.build.outputDirectory}/tajin/tajin.timer.js</include>
                                         <include>${project.build.outputDirectory}/tajin/tajin.store.js</include>
                                         <include>${project.build.outputDirectory}/tajin/tajin.event.js</include>
+                                        <include>${project.build.outputDirectory}/tajin/tajin.dom.js</include>
+                                        <include>${project.build.outputDirectory}/tajin/tajin.jqm.js</include>
                                         <include>${project.build.outputDirectory}/tajin/tajin.autoinit.js</include>
                                     </includes>
                                 </aggregation>

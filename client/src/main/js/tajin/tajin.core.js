@@ -19,20 +19,21 @@
     "use strict";
     var ready, resolved = true, modules = [
         {
-            name:'core'
+            name: 'core'
         }
     ];
     w.tajin = {
-        uninstall:function (name) {
+        uninstall: function (name) {
             var i;
             for (i = 0; i < modules.length; i++) {
                 if (modules[i].name === name) {
                     modules.splice(i, 1);
                     delete w.tajin[name];
+                    break;
                 }
             }
         },
-        install:function (module) {
+        install: function (module) {
             if (!resolved) {
                 throw new Error('Unable to init Tajin: previous modules have not been resolved correctly');
             }
@@ -56,15 +57,15 @@
             }
             resolved = true;
         },
-        init:function (opts) {
+        init: function (opts) {
             if (!resolved) {
                 throw new Error('Unable to init Tajin: modules have not been resolved correctly');
             }
             if (!ready) {
                 ready = true;
                 w.tajin.options = $.extend({
-                    debug:false,
-                    onready:$.noop
+                    debug: false,
+                    onready: $.noop
                 }, w.tajin_init || {}, opts || {});
                 var n, i = -1,
                     inits = $.grep(modules, function (m) {
@@ -90,10 +91,10 @@
                 next();
             }
         },
-        toString:function () {
+        toString: function () {
             return "Tajin Framework, version ${project.version}, modules: " + w.tajin.modules();
         },
-        modules:function () {
+        modules: function () {
             return $.map(modules, function (e) {
                 return e.name;
             });

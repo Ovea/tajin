@@ -1,5 +1,9 @@
 describe("Timer Module", function () {
 
+    it("is installed", function () {
+        expect(tajin.modules()).toContain('timer');
+    });
+
     it("can schedule a timer with no name (anonymous timer)", function () {
         this.fail('TODO');
     });

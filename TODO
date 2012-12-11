@@ -4,6 +4,7 @@ Event
     * support remote transparant
     * support event server-side & client transparent a travers comnetd ou autre
     * https://github.com/millermedeiros/js-signals/wiki/Examples
+    * sync, once, ..
 
 Tajin
 
