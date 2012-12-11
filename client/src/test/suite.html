@@ -1,5 +1,8 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN"
+        "http://www.w3.org/TR/html4/loose.dtd">
 <html>
 <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=UTF-8"/>
     <title>Tajin Test Suite</title>
     <link rel="stylesheet" type="text/css" href="lib/jquery-ui-1.9.2.custom/css/ui-lightness/jquery-ui-1.9.2.custom.css"/>
     <style type="text/css">
@@ -52,15 +55,15 @@
             }
             for (i = 0; i < li.length; i++) {
                 a = $('a', li[i]);
-                id = encodeURIComponent(a.text().replace(/ /g, '_'));
+                id = a.text().replace(/ /g, '_');
                 a.attr('href', '#' + id);
                 $(div[i]).attr('id', id);
             }
 
             // prevent scroll
-            window.scroll();
+            window.scrollTo(0, 0);
             setTimeout(function () {
-                window.scroll();
+                window.scrollTo(0, 0);
             }, 100);
 
             // create tabls
@@ -68,9 +71,9 @@
                 activate: function (event, ui) {
                     document.location.hash = ui.newTab.find('a').attr('href');
                     // prevent scroll
-                    window.scroll();
+                    window.scrollTo(0, 0);
                     setTimeout(function () {
-                        window.scroll();
+                        window.scrollTo(0, 0);
                     }, 100);
                 }
             });
