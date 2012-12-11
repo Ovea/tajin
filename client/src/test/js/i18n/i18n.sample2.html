@@ -11,6 +11,14 @@
             onready: function () {
 
                 // i18n samples
+                tajin.i18n.load('app', '', function (bundle) {
+                    console.info('0: ' + bundle);
+                    console.info('0: msg3', bundle.value('msg3'));
+                    console.info('0: inexisting', bundle.value('inexisting'));
+                    $(function () {
+                        bundle.localize(document);
+                    });
+                });
                 tajin.i18n.load('app', 'fr_CA', function (bundle) {
                     console.info('1: ' + bundle);
                     console.info('1: msg3', bundle.value('msg3'));

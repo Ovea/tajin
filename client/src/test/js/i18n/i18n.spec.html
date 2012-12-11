@@ -15,6 +15,27 @@
     <script type="text/javascript" src="../../../main/js/tajin/tajin.util.js"></script>
     <script type="text/javascript" src="../../../main/js/tajin/tajin.config.js"></script>
     <script type="text/javascript" src="../../../main/js/tajin/tajin.i18n.js"></script>
+    <script type="text/javascript">
+        tajin_init.i18n = {
+            onlocalize: function (bundle, locale, elem, key, value) {
+                if (value === undefined) {
+                    value = '[' + key + ']';
+                }
+                console.info('onlocalize', bundle, locale, key, value);
+                var type = elem.get(0).tagName.toUpperCase();
+                if (type === 'INPUT') {
+                    if (elem.attr('placeholder') && value) {
+                        elem.attr('placeholder', value);
+                    } else {
+                        elem.val(value);
+                    }
+                }
+                else {
+                    elem.html(value);
+                }
+            }
+        }
+    </script>
     <script type="text/javascript" src="../../../main/js/tajin/tajin.autoinit.js"></script>
 </head>
 <body>

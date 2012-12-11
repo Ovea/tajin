@@ -1,6 +1,6 @@
 {
     "i18n": {
-        "debug": false,
+        "debug": true,
         "attributes": ["href", "src", "custom-attr"],
         "bundles": {
             "app": {
