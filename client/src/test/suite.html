@@ -23,7 +23,8 @@
         }
 
         .ui-tabs .ui-tabs-nav li a {
-            padding: .3em;
+            padding: 0 .3em;
+            font-size: 80%;
         }
 
         .ui-tabs .ui-tabs-panel {
@@ -41,7 +42,38 @@
     <script type="text/javascript" src="lib/jquery-ui-1.9.2.custom/js/jquery-ui-1.9.2.custom.js"></script>
     <script type="text/javascript">
         $(function () {
-            $('#tabs').tabs();
+
+            // assign IDs automatically
+            var li = $('#tabs li'),
+                    div = $('#tabs div'),
+                    i, a, id;
+            if (li.length !== div.length) {
+                throw new Error('Bad TAB count');
+            }
+            for (i = 0; i < li.length; i++) {
+                a = $('a', li[i]);
+                id = encodeURIComponent(a.text().replace(/ /g, '_'));
+                a.attr('href', '#' + id);
+                $(div[i]).attr('id', id);
+            }
+
+            // prevent scroll
+            window.scroll();
+            setTimeout(function () {
+                window.scroll();
+            }, 100);
+
+            // create tabls
+            $('#tabs').tabs({
+                activate: function (event, ui) {
+                    document.location.hash = ui.newTab.find('a').attr('href');
+                    // prevent scroll
+                    window.scroll();
+                    setTimeout(function () {
+                        window.scroll();
+                    }, 100);
+                }
+            });
         });
     </script>
 </head>
@@ -49,41 +81,41 @@
 
 <div id="tabs">
     <ul>
-        <li><a href="#tab-1">core</a></li>
-        <li><a href="#tab-2">config</a></li>
-        <li><a href="#tab-22">custom config (1)</a></li>
-        <li><a href="#tab-23">custom config (2)</a></li>
-        <li><a href="#tab-3">log</a></li>
-        <li><a href="#tab-4">log+config</a></li>
-        <li><a href="#tab-5">timer</a></li>
-        <li><a href="#tab-6">i18n</a></li>
-        <li><a href="#tab-7">event</a></li>
+        <li><a>core</a></li>
+        <li><a>config</a></li>
+        <li><a>custom config (1)</a></li>
+        <li><a>custom config (2)</a></li>
+        <li><a>log</a></li>
+        <li><a>log+config</a></li>
+        <li><a>timer</a></li>
+        <li><a>i18n</a></li>
+        <li><a>event</a></li>
     </ul>
-    <div id="tab-1" class="tab-content">
+    <div class="tab-content">
         <iframe src="js/core/core.spec.html"></iframe>
     </div>
-    <div id="tab-2" class="tab-content">
+    <div class="tab-content">
         <iframe src="js/config/config.spec.html"></iframe>
     </div>
-    <div id="tab-22" class="tab-content">
+    <div class="tab-content">
         <iframe src="js/config/config.spec.custom1.html"></iframe>
     </div>
-    <div id="tab-23" class="tab-content">
+    <div class="tab-content">
         <iframe src="js/config/config.spec.custom2.html"></iframe>
     </div>
-    <div id="tab-3" class="tab-content">
+    <div class="tab-content">
         <iframe src="js/logging/log.spec.html"></iframe>
     </div>
-    <div id="tab-4" class="tab-content">
+    <div class="tab-content">
         <iframe src="js/logging/log.config.spec.html"></iframe>
     </div>
-    <div id="tab-5" class="tab-content">
+    <div class="tab-content">
         <iframe src="js/timer/timer.spec.html"></iframe>
     </div>
-    <div id="tab-6" class="tab-content">
+    <div class="tab-content">
         <iframe src="js/i18n/i18n.spec.html"></iframe>
     </div>
-    <div id="tab-7" class="tab-content">
+    <div class="tab-content">
         <iframe src="js/event/event.spec.html"></iframe>
     </div>
 </div>
