@@ -86,18 +86,31 @@
                         }
                     },
                     listen: function (cb) {
+                        var added = false;
                         if ($.isFunction(cb)) {
                             if (!cb.tajin_cb_uid) {
                                 cb.tajin_cb_uid = e_cb_uid++;
                                 listeners.push(cb);
+                                added = true;
                             } else if (!$.grep(listeners,function (l) {
                                 return l.tajin_cb_uid === cb.tajin_cb_uid;
                             }).length) {
                                 listeners.push(cb);
+                                added = true;
                             }
-                            if (this.stateful && this.data !== undefined) {
+                            if (added && this.stateful && this.data !== undefined) {
                                 cb.call(this, this.data);
                             }
+                        }
+                        return added;
+                    },
+                    once: function (cb) {
+                        if ($.isFunction(cb)) {
+                            var self = this, f = function () {
+                                self.remove(f);
+                                cb.call(this, arguments);
+                            };
+                            self.listen(f);
                         }
                     },
                     remove: function (cb) {
@@ -106,10 +119,11 @@
                             for (i = 0; i < listeners.length; i++) {
                                 if (listeners[i].tajin_cb_uid === cb.tajin_cb_uid) {
                                     listeners.splice(i, 1);
-                                    break;
+                                    return true;
                                 }
                             }
                         }
+                        return false;
                     },
                     destroy: function () {
                         this.reset();
