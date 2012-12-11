@@ -1,8 +1,9 @@
-Deploiement:
+Event
 
-    * war explose ou dossier avec ressources
-    * servi par apache, mongosse ou autre, standard avec support SSI
-    * tajin watchdog lance soit via servlet soit via programme pour regenerer config
+    * bus client
+    * support remote transparant
+    * support event server-side & client transparent a travers comnetd ou autre
+    * https://github.com/millermedeiros/js-signals/wiki/Examples
 
 Tajin
 
@@ -11,19 +12,18 @@ Tajin
         * reloadable
         * generate tajin-client.json
 
-    * mini framework evenementiel pour plomberie
-
     * gestion des ressources
         * plugin maven (build, watch)
         * tool (build, watch)
         * servlet filter (watch, unwatch, build at init)
         * supports:
-            * sass, less => css
+            * sass, less, css => css
             * js, coffescript => js
             * minification + compilation (UglifyJs)
         * CF: http://code.google.com/p/wro4j/
         * descripteur de site website.json genere via config
         * enabled true/false pour inclure ou pas selon env par exemple
+        * config peut etre templatisée (i.e. expressions groovy)
 
     * cli: cors
     * cli: storage
@@ -32,13 +32,6 @@ Tajin
 
     * tools
         * script pour verifier l i18n rel localize vs bundles configures dans tajin.json
-
-EventBus
-
-    * bus client
-    * support remote transparant
-    * support event server-side & client transparent a travers comnetd ou autre
-    * https://github.com/millermedeiros/js-signals/wiki/Examples
 
 DynamicForm
 
