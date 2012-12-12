@@ -16,7 +16,10 @@ describe("Event module", function () {
 
 });
 
-describe("tajin.event.add()", function () {
+describe("add/addOnce", function () {
+
+
+describe("add with tajin.event.add()", function () {
 
     it("adds event with no name", function () {
         var evt = tajin.event.add();
@@ -49,6 +52,8 @@ describe("tajin.event.add()", function () {
             tajin.event.add('my/event');
         }).toThrow(new Error("Duplicate event: my/event"));
     });
+
+});
 
 });
 
