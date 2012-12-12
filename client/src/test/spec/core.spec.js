@@ -15,12 +15,20 @@ describe("tajin", function () {
 
     describe("tajin.init()", function () {
 
-        it("fails if there was module installation errors", function () {
-            this.fail('TODO');
-        });
-
         it("does nothing if called more than 1 time", function () {
-            this.fail('TODO');
+            var c = 0;
+            var m = {
+                name: 'test',
+                exports: {
+                    init: function () {
+                        c++;
+                    }
+                }
+            };
+            tajin.install(m);
+            expect(c).toBe(1);
+            tajin.init();
+            expect(c).toBe(1);
         });
 
         it("calls each module exported init() method", function () {
@@ -48,6 +56,20 @@ describe("tajin", function () {
             tajin.install({name: 'module1'});
             expect(tajin.modules()).toContain('core');
             expect(tajin.modules()).toContain('module1');
+        });
+
+        it("module init() method called at install time if tajin is initialized", function () {
+            var c = 0;
+            var m = {
+                name: 'test',
+                exports: {
+                    init: function () {
+                        c++;
+                    }
+                }
+            };
+            tajin.install(m);
+            expect(c).toBe(1);
         });
 
         it("check dependencies", function () {

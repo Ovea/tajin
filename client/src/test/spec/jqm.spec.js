@@ -7,23 +7,23 @@ describe("tajin.jqm", function () {
     });
 
     it("register event jqm/init", function () {
-        this.fail('TODO');
+        expect(tajin.event.has('jqm/init')).toBe(true);
     });
 
     it("register event jqm/beforeshow", function () {
-        this.fail('TODO');
+        expect(tajin.event.has('jqm/beforeshow')).toBe(true);
     });
 
     it("register event jqm/show", function () {
-        this.fail('TODO');
+        expect(tajin.event.has('jqm/show')).toBe(true);
     });
 
     it("register event jqm/beforehide", function () {
-        this.fail('TODO');
+        expect(tajin.event.has('jqm/beforehide')).toBe(true);
     });
 
     it("register event jqm/hide", function () {
-        this.fail('TODO');
+        expect(tajin.event.has('jqm/hide')).toBe(true);
     });
 
     describe("tajin.jqm.page()", function () {

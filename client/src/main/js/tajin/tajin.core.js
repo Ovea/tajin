@@ -37,6 +37,9 @@
             }
         },
         install: function (module) {
+            if (ready === 1) {
+                throw new Error('Initializing...');
+            }
             if (!resolved) {
                 throw new Error('Unable to init Tajin: previous modules have not been resolved correctly');
             }
@@ -62,6 +65,10 @@
                 w.tajin[module.name] = module.exports;
             }
             resolved = true;
+            if (ready === 2 && module.exports && $.isFunction(module.exports.init)) {
+                w.tajin.options[module.name] = w.tajin.options[module.name] || {};
+                module.exports.init.call(w.tajin, $.noop, w.tajin.options[module.name], module.exports);
+            }
         },
         init: function (opts) {
             if (!resolved) {
