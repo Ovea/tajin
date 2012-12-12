@@ -7,7 +7,8 @@ describe("tajin.timer", function () {
     describe("tajin.timer.timers", function () {
 
         it("exposes all current running timers", function () {
-            this.fail('TODO');
+            var t = tajin.timer.schedule('timer1', 500, false, $.noop);
+            expect(t).toBe(tajin.timer.timers['timer1']);
         });
 
     });
@@ -15,7 +16,10 @@ describe("tajin.timer", function () {
     describe("tajin.timer.stop()", function () {
 
         it("stops a named timer (tajin.timer.stop())", function () {
-            this.fail('TODO');
+            var t = tajin.timer.schedule('timer2', 1000, false, $.noop);
+            expect(t.isActive()).toBe(true);
+            tajin.timer.stop('timer2');
+            expect(t.isActive()).toBe(false);
         });
 
     });
@@ -23,19 +27,43 @@ describe("tajin.timer", function () {
     describe("tajin.timer.schedule()", function () {
 
         it("can schedule a timer with no name (anonymous timer)", function () {
-            this.fail('TODO');
+            var t = tajin.timer.schedule(null, 1000, false, $.noop);
+            expect(t.id).toBeDefined();
+            t.stop();
         });
 
         it("can schedule a timer with a name", function () {
-            this.fail('TODO');
+            var t = tajin.timer.schedule('timer3', 1000, false, $.noop);
+            expect(t.id).toBe('timer3');
         });
 
         it("can schedule a timer with a repeating interval", function () {
-            this.fail('TODO');
+            var c = 0;
+            var t = tajin.timer.schedule('timer4', 100, true, function () {
+                c++;
+                if (c === 4) {
+                    t.stop();
+                }
+            });
+            waitsFor(function () {
+                return c === 4;
+            }, 'too long', 600);
         });
 
         it("can override an existing timer by scheduling a new one with an existing name (previous timer is stopped)", function () {
-            this.fail('TODO');
+            var c1 = 0,
+                c2 = 0,
+                t1 = tajin.timer.schedule('timer5', 1000, false, function () {
+                    c1++;
+                });
+            expect(t1.isActive()).toBe(true);
+            var t2 = tajin.timer.schedule('timer5', 100, false, function () {
+                c2++;
+            });
+            expect(t1.isActive()).toBe(false);
+            waitsFor(function () {
+                return c2 === 1;
+            }, 'too long', 600);
         });
 
     });
@@ -45,7 +73,9 @@ describe("tajin.timer", function () {
         describe("t.toString()", function () {
 
             it("describes object", function () {
-                this.fail('TODO');
+                var t = tajin.timer.schedule('timer6', 1000, false, $.noop);
+                expect(t.toString).toBeDefined();
+                t.stop();
             });
 
         });
@@ -53,7 +83,10 @@ describe("tajin.timer", function () {
         describe("t.stop()", function () {
 
             it("stops this timer", function () {
-                this.fail('TODO');
+                var t = tajin.timer.schedule('timer7', 1000, false, $.noop);
+                expect(t.isActive()).toBe(true);
+                t.stop();
+                expect(t.isActive()).toBe(false);
             });
 
         });
@@ -61,7 +94,9 @@ describe("tajin.timer", function () {
         describe("t.id", function () {
 
             it("returns timer ID", function () {
-                this.fail('TODO');
+                var t = tajin.timer.schedule('timer8', 1000, false, $.noop);
+                expect(t.id).toBe('timer8');
+                t.stop();
             });
 
         });
@@ -69,7 +104,10 @@ describe("tajin.timer", function () {
         describe("t.isActive()", function () {
 
             it("returns if timer is till alive", function () {
-                this.fail('TODO');
+                var t = tajin.timer.schedule('timer9', 1000, false, $.noop);
+                expect(t.isActive()).toBe(true);
+                t.stop();
+                expect(t.isActive()).toBe(false);
             });
 
         });
