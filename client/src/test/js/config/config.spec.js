@@ -4,19 +4,15 @@ describe("Config Module", function () {
         expect(tajin.modules()).toContain('config');
     });
 
-    it("loaded default config", function () {
+    it("loads default config by default", function () {
         expect(tajin.options.config.url).toContain('tajin-client.json');
     });
 
-});
-
-describe("Config", function () {
-
-    it("loaded", function () {
+    it("exposes all module options", function () {
         expect(tajin.options.module1.option1).toBe('value1');
     });
 
-    it("overriden by settings defined in-page", function () {
+    it("overrides settings by those defined in-page", function () {
         expect(tajin.options.log.level).toBe('all');
     });
 

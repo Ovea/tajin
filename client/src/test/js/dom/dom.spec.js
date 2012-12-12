@@ -5,13 +5,9 @@ describe("DOM Module", function () {
         expect(tajin.modules()).toContain('dom');
     });
 
-    it("exports DOM Loaded event", function () {
-        expect(tajin.event.has('dom/loaded')).toBe(true);
-    });
-
 });
 
-describe("DOM Loaded Event", function () {
+describe("Event dom/loaded", function () {
 
     it("is fired", function () {
         var obj = {
@@ -21,6 +17,10 @@ describe("DOM Loaded Event", function () {
         spyOn(obj, 'cb');
         tajin.event.get('dom/loaded').listen(obj.cb);
         expect(obj.cb).toHaveBeenCalled();
+    });
+
+    it("is exported", function () {
+        expect(tajin.event.has('dom/loaded')).toBe(true);
     });
 
 });

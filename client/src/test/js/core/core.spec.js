@@ -1,23 +1,35 @@
-describe("Core", function () {
+describe("Core Module", function () {
 
     it("is installed", function () {
         expect(tajin).not.toBe(undefined);
     });
 
-    it("have one module (core)", function () {
+    it("exposes available modules with tajin.modules()", function () {
         expect(tajin.modules().length).toBe(1);
         expect(tajin.modules()).toContain('core');
     });
 
-    it("cannot be initialized (tajin.init()) if there was module installation errors", function () {
+});
+
+describe("tajin.init()", function () {
+
+    it("fails if there was module installation errors", function () {
         this.fail('TODO');
     });
 
-    it("cannot be initialized twice or more", function () {
+    it("does nothing if called more than 1 time", function () {
         this.fail('TODO');
     });
 
-    it("call ready() callbacks when tajin ready or immedialty after", function () {
+    it("calls each module exported init() method", function () {
+        this.fail('TODO');
+    });
+
+});
+
+describe("tajin.ready()", function () {
+
+    it("is called when initialization is finished, and keep state", function () {
         this.fail('TODO');
         // tajin.ready(function() {});
     });
@@ -28,17 +40,32 @@ describe("Core", function () {
 
 });
 
-describe("Module", function () {
+describe("tajin.install()", function () {
 
-    it("can add (install) a module", function () {
+    it("installs a module", function () {
         tajin.install({name: 'module1'});
-
         expect(tajin.modules().length).toBe(2);
         expect(tajin.modules()).toContain('core');
         expect(tajin.modules()).toContain('module1');
     });
 
-    it("can remove (uninstall) a module", function () {
+    it("check dependencies", function () {
+        this.fail('TODO');
+    });
+
+    it("overrides module previously installed with same name", function () {
+        this.fail('TODO');
+    });
+
+    it("fails if there was previously installation error", function () {
+        this.fail('TODO');
+    });
+
+});
+
+describe("tajin.uninstall()", function () {
+
+    it("uninstalls a module", function () {
         tajin.install({name: 'module1'});
         tajin.install({name: 'module2'});
 
@@ -52,22 +79,6 @@ describe("Module", function () {
         expect(tajin.modules().length).toBe(2);
         expect(tajin.modules()).toContain('core');
         expect(tajin.modules()).toContain('module2');
-    });
-
-    it("dependencies must be installed first", function () {
-        this.fail('TODO');
-    });
-
-    it("overrides module previously installed with same name", function () {
-        this.fail('TODO');
-    });
-
-    it("is initialized when Tajin is initialized", function () {
-        this.fail('TODO');
-    });
-
-    it("cannot be installed if there was previously installation errors", function () {
-        this.fail('TODO');
     });
 
 });

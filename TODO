@@ -3,7 +3,6 @@ Event
     * bus client
     * support remote transparant
     * support event server-side & client transparent a travers comnetd ou autre
-    * https://github.com/millermedeiros/js-signals/wiki/Examples
     * sync
     * batchs sur un event
     * navigation

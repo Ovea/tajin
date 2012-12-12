@@ -17,7 +17,7 @@
 /*global jQuery, window, console*/
 (function (w, $) {
     "use strict";
-    var ready, resolved = true, listeners = [], modules = [
+    var ready = 0, resolved = true, listeners = [], modules = [
         {
             name: 'core'
         }
@@ -61,8 +61,8 @@
             if (!resolved) {
                 throw new Error('Unable to init Tajin: modules have not been resolved correctly');
             }
-            if (!ready) {
-                ready = true;
+            if (ready === 0) {
+                ready = 1;
                 w.tajin.options = $.extend(true, {
                     debug: false,
                     onready: $.noop
@@ -84,6 +84,7 @@
                             if (w.tajin.options.debug) {
                                 console.log('[tajin.core] onready - init completed with options', w.tajin.options);
                             }
+                            ready = 2;
                             if ($.isFunction(w.tajin.options.onready)) {
                                 w.tajin.options.onready(w.tajin);
                             }
@@ -106,7 +107,7 @@
         },
         ready: function (fn) {
             if ($.isFunction(fn)) {
-                if (ready) {
+                if (ready === 2) {
                     fn(w.tajin);
                 } else {
                     listeners.push(fn);

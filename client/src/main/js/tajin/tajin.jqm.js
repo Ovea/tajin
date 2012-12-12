@@ -17,6 +17,7 @@
 /*global window, jQuery, console*/
 (function (w, $) {
     "use strict";
+    var current_page;
     if ($.mobile) {
         w.tajin.install({
             name: 'jqm',
@@ -39,6 +40,7 @@
                             }
                         };
                     $(document).on('pagebeforeshow',function (event) {
+                        current_page = $(event.target);
                         fire('beforeshow', event);
                     }).on('pagebeforehide',function (event) {
                             fire('beforehide', event);
@@ -50,6 +52,20 @@
                             fire('init', event);
                         });
                     next();
+                },
+                page: function () {
+                    var p = current_page || $('body div[data-role=page]:visible');
+                    return p.length ? p : null;
+                },
+                pageName: function () {
+                    var a, p = this.page();
+                    if (p) {
+                        a = p.attr('id');
+                        if (a) {
+                            return a;
+                        }
+                    }
+                    return null;
                 }
             }
         });

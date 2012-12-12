@@ -9,36 +9,45 @@ describe("I18N module", function () {
         // can define additional attributes for localization
     });
 
-    it("can preload specified bundles and locales", function () {
+    it("has preloaded specified bundles and locales", function () {
         this.fail('TODO');
         // see config "preload": ["fr_CA", "en", "fr", "en_US"]
     });
 
-    it("can be set with a custom onlocalize callback", function () {
+    it("can be configured with a custom 'onlocalize' callback", function () {
         this.fail('TODO');
     });
 
-    it("can load bundle using navigator locale", function () {
+});
+
+describe("tajin.i18n.load()", function () {
+
+    it("loads bundle using navigator locale if none specified", function () {
         this.fail('TODO');
         // tajin.i18n.load('app', '', function (bundle) {...});
     });
 
-    it("can load bundle using specified locale", function () {
+    it("loads bundle using specified locale", function () {
         this.fail('TODO');
         // tajin.i18n.load('app', 'fr_CA', function (bundle) {...});
     });
 
-    it("can load bundles and merge them", function () {
+    it("it load bundles and merge them", function () {
         this.fail('TODO');
         // tajin.i18n.load('app', 'fr_CA', function (bundle) {...});
     });
 
-    it("can degrade to less specific bundle", function () {
+    it("degrades to less specific bundle if specified one is missing", function () {
         this.fail('TODO');
         // tajin.i18n.load('app', 'fr_FR', function (bundle) { => fallback to fr
     });
 
-    it("fire event i18n/bundle/loaded when a bundle is loaded", function () {
+
+    it("calls provided callback when complete", function () {
+        this.fail('TODO');
+    });
+
+    it("fires event i18n/bundle/loaded when complete", function () {
         var obj = {
             f: function () {
             }
@@ -51,12 +60,16 @@ describe("I18N module", function () {
 
 });
 
-describe("I18N bundle", function () {
+describe("I18N bundle object", function () {
 
-    it("provides some properties", function () {
+    it("provides properties b.name, b.locale, b.resolved", function () {
         this.fail('TODO');
         // name of bundle, locale asked, locale resolved
     });
+
+});
+
+describe("bundle.value()", function () {
 
     it("returns translation for key", function () {
         this.fail('TODO');
@@ -68,58 +81,81 @@ describe("I18N bundle", function () {
         // bundle.value('inexisting')
     });
 
-    it("can localize HTML elements using rel attribute", function () {
+});
+
+describe("bundle.localize()", function () {
+
+    it("localizes HTML elements using rel attribute", function () {
         this.fail('TODO');
     });
 
-    it("can localize specific HTML attributes (href, src, ...)", function () {
+    it("localizes specific HTML attributes (href, src, ...)", function () {
         this.fail('TODO');
     });
 
-    it("can localize unattached DOM fragment", function () {
+    it("localizes unattached DOM fragment", function () {
         this.fail('TODO');
         // var html = $(template({ title: "My New Post", body: "This is my first post!", url: res_fr_CA.url('pub.jpg') })); bundle.localize(html);
     });
 
+    it("localizes to another locale same DOM fragment", function () {
+        this.fail('TODO');
+    });
+
 });
 
-describe("Resources bundle", function () {
+describe("tajin.i18n.resources()", function () {
 
     it("provides some properties", function () {
         this.fail('TODO');
         // locale asked
     });
 
-    it("can get real URL of an i18n-ized resource", function () {
+});
+
+describe("tajin.i18n.resources().url()", function () {
+
+    it("gets real URL of an i18n-ized resource", function () {
         this.fail('TODO');
         // var res_fr_CA = tajin.i18n.resources('fr-CA'); res_fr_CA.url('contents/pub.html')
     });
 
-    it("can load i18n-ized image", function () {
+});
+
+describe("tajin.i18n.resources().image()", function () {
+
+    it("loads i18n-ized image", function () {
         this.fail('TODO');
         // res_fr_CA.image('pub.jpg', function (url, error) {
     });
 
-    it("can load i18n-ized image", function () {
-        this.fail('TODO');
-        // res_fr_CA.image('pub.jpg', function (url, error) {
-    });
-
-    it("can load i18n-ized image and listen to event i18n/image/loaded", function () {
+    it("fires event i18n/image/loaded when load completes", function () {
         this.fail('TODO');
         // res_fr_CA.image('pub.jpg')
         // tajin.event.get('i18n/image/loaded').listen(obj.f);
     });
 
-    it("can load i18n-ized html template", function () {
+    it("call optional callback when load completes", function () {
+        this.fail('TODO');
+    });
+
+});
+
+describe("tajin.i18n.resources().html()", function () {
+
+    it("loads i18n-ized html template", function () {
         this.fail('TODO');
         // res_fr_CA.html('pub.html', function (url) {
     });
 
-    it("can load i18n-ized html template and listen to event i18n/html/loaded", function () {
+    it("fires event i18n/html/loaded when load completes", function () {
         this.fail('TODO');
         // res_fr_CA.html('pub.html')
         // tajin.event.get('i18n/html/loaded').listen(obj.f);
+    });
+
+    it("call optional callback when load completes", function () {
+        this.fail('TODO');
     });
 
 });
@@ -128,7 +164,7 @@ describe("Handlebars integration", function () {
 
     it("can load, process and localize i18n-ized template", function () {
         this.fail('TODO');
-        // full sample
+        // see full sample in other html pages
     });
 
 });
