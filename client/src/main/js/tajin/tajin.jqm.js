@@ -21,7 +21,7 @@
     if ($.mobile) {
         w.tajin.install({
             name: 'jqm',
-            requires: 'core,event,timer',
+            requires: 'core,event,timer,store',
             exports: {
                 init: function (next, opts) {
                     var tevent = this.event,
