@@ -24,6 +24,9 @@
     ];
     w.tajin = {
         uninstall: function (name) {
+            if (!name) {
+                throw new Error('Module name is missing');
+            }
             var i;
             for (i = 0; i < modules.length; i++) {
                 if (modules[i].name === name) {
@@ -36,6 +39,9 @@
         install: function (module) {
             if (!resolved) {
                 throw new Error('Unable to init Tajin: previous modules have not been resolved correctly');
+            }
+            if (!module.name) {
+                throw new Error('Module name is missing');
             }
             w.tajin.uninstall(module.name);
             if (module.requires) {

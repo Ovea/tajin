@@ -53,6 +53,10 @@ describe("tajin.install()", function () {
         this.fail('TODO');
     });
 
+    it("check for required module.name attribute", function () {
+        this.fail('TODO');
+    });
+
     it("overrides module previously installed with same name", function () {
         this.fail('TODO');
     });
@@ -79,6 +83,10 @@ describe("tajin.uninstall()", function () {
         expect(tajin.modules().length).toBe(2);
         expect(tajin.modules()).toContain('core');
         expect(tajin.modules()).toContain('module2');
+    });
+
+    it("check for required name parameter", function () {
+        this.fail('TODO');
     });
 
 });
