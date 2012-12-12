@@ -32,7 +32,7 @@ describe("tajin", function () {
         });
 
         it("calls each module exported init() method", function () {
-            this.fail('TODO');
+            expect(tajin.options['test-module'].init_called).toBe(true);
         });
 
     });
@@ -40,12 +40,15 @@ describe("tajin", function () {
     describe("tajin.ready()", function () {
 
         it("is called when initialization is finished, and keep state", function () {
-            this.fail('TODO');
-            // tajin.ready(function() {});
+            var obj = {f: function () {
+            }};
+            spyOn(obj, 'f');
+            tajin.ready(obj.f);
+            expect(obj.f).toHaveBeenCalled();
         });
 
         it("optional callback method 'onready' called when initialization finished", function () {
-            this.fail('TODO');
+            expect(window.onready_called).toBe(true);
         });
 
     });
@@ -72,12 +75,21 @@ describe("tajin", function () {
             expect(c).toBe(1);
         });
 
-        it("check dependencies", function () {
-            this.fail('TODO');
+        it("check dependencies at installation time", function () {
+            var m = {
+                name: 'testdep',
+                requires: 'inexisting'
+            };
+            expect(function () {
+                tajin.install(m);
+            }).toThrow(new Error("Error loading module 'testdep': missing modules: inexisting"));
         });
 
         it("check for required module.name attribute", function () {
-            this.fail('TODO');
+            var m = {};
+            expect(function () {
+                tajin.install(m);
+            }).toThrow(new Error("Module name is missing"));
         });
 
         it("overrides module previously installed with same name", function () {

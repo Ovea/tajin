@@ -17,7 +17,7 @@
 /*global jQuery, window, console*/
 (function (w, $) {
     "use strict";
-    var ready = 0, resolved = true, listeners = [], modules = [
+    var ready = 0, listeners = [], modules = [
         {
             name: 'core'
         }
@@ -40,9 +40,6 @@
             if (ready === 1) {
                 throw new Error('Initializing...');
             }
-            if (!resolved) {
-                throw new Error('Unable to init Tajin: previous modules have not been resolved correctly');
-            }
             if (!module.name) {
                 throw new Error('Module name is missing');
             }
@@ -56,24 +53,19 @@
                     }
                 }
                 if (missing.length) {
-                    resolved = false;
-                    throw new Error("error loading module '" + module.name + "': missing module " + missing);
+                    throw new Error("Error loading module '" + module.name + "': missing modules: " + missing);
                 }
             }
             modules.push(module);
             if (module.exports) {
                 w.tajin[module.name] = module.exports;
             }
-            resolved = true;
             if (ready === 2 && module.exports && $.isFunction(module.exports.init)) {
                 w.tajin.options[module.name] = w.tajin.options[module.name] || {};
                 module.exports.init.call(w.tajin, $.noop, w.tajin.options[module.name], module.exports);
             }
         },
         init: function (opts) {
-            if (!resolved) {
-                throw new Error('Unable to init Tajin: modules have not been resolved correctly');
-            }
             if (ready === 0) {
                 ready = 1;
                 w.tajin.options = $.extend(true, {

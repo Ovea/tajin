@@ -30,6 +30,7 @@
             window.tajin_init = {
                 debug: true,
                 onready: function () {
+                    window.onready_called = true;
                     $(function () {
                         jasmineEnv.execute();
                     });
@@ -71,6 +72,9 @@
     <script type="text/javascript" src="../main/js/tajin/tajin.i18n.js"></script>
     <script type="text/javascript" src="../main/js/tajin/tajin.dom.js"></script>
     <script type="text/javascript" src="../main/js/tajin/tajin.jqm.js"></script>
+
+    <script type="text/javascript" src="test.module.js"></script>
+
     <script type="text/javascript" src="../main/js/tajin/tajin.autoinit.js"></script>
 
     <script type="text/javascript" src="spec/core.spec.js"></script>
