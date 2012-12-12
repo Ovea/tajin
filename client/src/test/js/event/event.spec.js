@@ -19,7 +19,7 @@ describe("Event module", function () {
 describe("add/addOnce", function () {
 
 
-describe("add with tajin.event.add()", function () {
+    describe("add with tajin.event.add()", function () {
 
     it("adds event with no name", function () {
         var evt = tajin.event.add();
@@ -55,31 +55,32 @@ describe("add with tajin.event.add()", function () {
 
 });
 
-});
+    describe("tajin.event.addAll()", function () {
 
-describe("tajin.event.addAll()", function () {
-
-    it("adds multiple events with optional options at once", function () {
-        var all = tajin.event.addAll('my/evt1', {
-            id: 'my/evt2',
-            state: false
-        }, 'my/evt3', {
-            state: true,
-            remote: true,
-            context: this
+        it("adds multiple events with optional options at once", function () {
+            var all = tajin.event.addAll('my/evt1', {
+                id: 'my/evt2',
+                state: false
+            }, 'my/evt3', {
+                state: true,
+                remote: true,
+                context: this
+            });
+            expect(tajin.event.get('my/evt1')).toBe(all[0]);
+            expect(tajin.event.get('my/evt2')).toBe(all[1]);
+            expect(tajin.event.get('my/evt3')).toBe(all[2]);
+            expect(tajin.event.get('my/evt1').remote).toBe(true);
+            expect(tajin.event.get('my/evt2').remote).toBe(true);
+            expect(tajin.event.get('my/evt3').remote).toBe(true);
+            expect(tajin.event.get('my/evt1').stateful).toBe(true);
+            expect(tajin.event.get('my/evt2').stateful).toBe(false);
+            expect(tajin.event.get('my/evt3').stateful).toBe(true);
         });
-        expect(tajin.event.get('my/evt1')).toBe(all[0]);
-        expect(tajin.event.get('my/evt2')).toBe(all[1]);
-        expect(tajin.event.get('my/evt3')).toBe(all[2]);
-        expect(tajin.event.get('my/evt1').remote).toBe(true);
-        expect(tajin.event.get('my/evt2').remote).toBe(true);
-        expect(tajin.event.get('my/evt3').remote).toBe(true);
-        expect(tajin.event.get('my/evt1').stateful).toBe(true);
-        expect(tajin.event.get('my/evt2').stateful).toBe(false);
-        expect(tajin.event.get('my/evt3').stateful).toBe(true);
-    });
 
+    });
 });
+
+
 
 describe("tajin.event.has()", function () {
 
