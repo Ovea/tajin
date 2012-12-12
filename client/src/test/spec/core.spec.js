@@ -93,11 +93,29 @@ describe("tajin", function () {
         });
 
         it("overrides module previously installed with same name", function () {
-            this.fail('TODO');
-        });
-
-        it("fails if there was previously installation error", function () {
-            this.fail('TODO');
+            var c1 = 0, c2 = 0;
+            var m1 = {
+                    name: 'test-m1',
+                    exports: {
+                        init: function () {
+                            c1++;
+                        }
+                    }
+                },
+                m2 = {
+                    name: 'test-m1',
+                    exports: {
+                        init: function () {
+                            c2++;
+                        }
+                    }
+                };
+            tajin.install(m1);
+            expect(c1).toBe(1);
+            expect(c2).toBe(0);
+            tajin.install(m2);
+            expect(c1).toBe(1);
+            expect(c2).toBe(1);
         });
 
     });
@@ -119,7 +137,9 @@ describe("tajin", function () {
         });
 
         it("check for required name parameter", function () {
-            this.fail('TODO');
+            expect(function () {
+                tajin.uninstall();
+            }).toThrow(new Error("Module name is missing"));
         });
 
     });
