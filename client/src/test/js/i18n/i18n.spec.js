@@ -38,6 +38,17 @@ describe("I18N module", function () {
         // tajin.i18n.load('app', 'fr_FR', function (bundle) { => fallback to fr
     });
 
+    it("fire event i18n/bundle/loaded when a bundle is loaded", function () {
+        var obj = {
+            f: function () {
+            }
+        };
+        spyOn(obj, 'f');
+        tajin.event.get('i18n/bundle/loaded').listen(obj.f);
+        tajin.i18n.load('app', 'fr_FR');
+        expect(obj.f).toHaveBeenCalled();
+    });
+
 });
 
 describe("I18N bundle", function () {
@@ -84,14 +95,31 @@ describe("Resources bundle", function () {
         // var res_fr_CA = tajin.i18n.resources('fr-CA'); res_fr_CA.url('contents/pub.html')
     });
 
-    it("can preload i18n-ized image", function () {
+    it("can load i18n-ized image", function () {
         this.fail('TODO');
         // res_fr_CA.image('pub.jpg', function (url, error) {
     });
 
-    it("can preload i18n-ized html template", function () {
+    it("can load i18n-ized image", function () {
+        this.fail('TODO');
+        // res_fr_CA.image('pub.jpg', function (url, error) {
+    });
+
+    it("can load i18n-ized image and listen to event i18n/image/loaded", function () {
+        this.fail('TODO');
+        // res_fr_CA.image('pub.jpg')
+        // tajin.event.get('i18n/image/loaded').listen(obj.f);
+    });
+
+    it("can load i18n-ized html template", function () {
         this.fail('TODO');
         // res_fr_CA.html('pub.html', function (url) {
+    });
+
+    it("can load i18n-ized html template and listen to event i18n/html/loaded", function () {
+        this.fail('TODO');
+        // res_fr_CA.html('pub.html')
+        // tajin.event.get('i18n/html/loaded').listen(obj.f);
     });
 
 });

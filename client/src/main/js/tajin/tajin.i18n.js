@@ -18,7 +18,8 @@
 (function (w, $) {
     "use strict";
 
-    var cache = {},
+    var events,
+        cache = {},
         rescache = {},
         options = {
             debug: false,
@@ -98,6 +99,7 @@
                     cb.call(img, u, true);
                 } else {
                     cb.call(img, u, false);
+                    events.image.fire(img);
                 }
             }).attr('src', u);
         },
@@ -106,6 +108,7 @@
             cb = cb || $.noop;
             if (rescache[u]) {
                 cb.call(rescache[u], u, false);
+                events.html.fire(rescache[u]);
             }
             $.ajax({
                 cache: false,
@@ -113,6 +116,7 @@
                 success: function (html) {
                     rescache[u] = html;
                     cb.call(rescache[u], u, false);
+                    events.html.fire(rescache[u]);
                 },
                 error: function () {
                     cb.call('', u, true);
@@ -220,9 +224,14 @@
 
     w.tajin.install({
         name: 'i18n',
-        requires: 'core,util',
+        requires: 'core,util,event',
         exports: {
             init: function (next, opts) {
+                events = {
+                    bundle: this.event.add('i18n/bundle/loaded'),
+                    html: this.event.add('i18n/html/loaded'),
+                    image: this.event.add('i18n/image/loaded')
+                };
                 $.extend(options, opts);
                 if (!$.isFunction(options.onlocalize)) {
                     options.onlocalize = $.noop;
@@ -261,9 +270,11 @@
                 }
                 locale = fix_locale(locale);
                 load_bundle(name, locale, function (name, locale, incache, b, l) {
+                    var bnd = new Bundle(name, locale, b, l);
                     if ($.isFunction(cb)) {
-                        cb(new Bundle(name, locale, b, l));
+                        cb(bnd);
                     }
+                    events.bundle.fire(bnd);
                 });
             },
             resources: function (locale) {

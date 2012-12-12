@@ -122,6 +122,54 @@
                 }
             };
             return events[opts.id];
+        },
+        toEventList = function (events) {
+            $.extend(events, {
+                toString: function () {
+                    var s = 'EventList(', i;
+                    for (i = 0; i < events.length; i++) {
+                        s += events[i].id + (i === events.length - 1 ? '' : ',');
+                    }
+                    return s + ')';
+                },
+                fire: function (data) {
+                    var i;
+                    for (i = 0; i < events.length; i++) {
+                        events[i].fire(data);
+                    }
+                },
+                listen: function (cb) {
+                    var i;
+                    for (i = 0; i < events.length; i++) {
+                        events[i].listen(cb);
+                    }
+                },
+                once: function (cb) {
+                    var i;
+                    for (i = 0; i < events.length; i++) {
+                        events[i].once(cb);
+                    }
+                },
+                remove: function (cb) {
+                    var i;
+                    for (i = 0; i < events.length; i++) {
+                        events[i].remove(cb);
+                    }
+                },
+                destroy: function () {
+                    var i;
+                    for (i = 0; i < events.length; i++) {
+                        events[i].destroy();
+                    }
+                },
+                reset: function () {
+                    var i;
+                    for (i = 0; i < events.length; i++) {
+                        events[i].reset();
+                    }
+                }
+            });
+            return events;
         };
 
     w.tajin.install({
@@ -147,8 +195,37 @@
                 }
                 return events[id];
             },
+            getAll: function () {
+                var i, m, o, events = [], g_opts = arguments[arguments.length - 1];
+                if (!$.isPlainObject(g_opts)) {
+                    g_opts = undefined;
+                }
+                for (i = 0, m = g_opts ? arguments.length - 1 : arguments.length; i < m; i++) {
+                    events.push(this.get(arguments[i], g_opts));
+                }
+                return toEventList(events);
+            },
             has: function (id) {
                 return !!events[id];
+            },
+            addAll: function () {
+                if (arguments.length <= 1) {
+                    return t_add.apply(this, arguments);
+                }
+                var i, m, o, events = [], g_opts = arguments[arguments.length - 1];
+                if (!$.isPlainObject(g_opts)) {
+                    g_opts = undefined;
+                }
+                for (i = 0, m = g_opts ? arguments.length - 1 : arguments.length; i < m; i++) {
+                    o = arguments[i];
+                    if (typeof o === 'string') {
+                        o = {
+                            id: o
+                        };
+                    }
+                    events.push(t_add($.extend({}, g_opts || {}, o)));
+                }
+                return toEventList(events);
             },
             add: t_add,
             reset: function (id) {

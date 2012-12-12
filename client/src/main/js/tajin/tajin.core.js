@@ -63,7 +63,7 @@
             }
             if (!ready) {
                 ready = true;
-                w.tajin.options = $.extend({
+                w.tajin.options = $.extend(true, {
                     debug: false,
                     onready: $.noop
                 }, w.tajin_init || {}, opts || {});

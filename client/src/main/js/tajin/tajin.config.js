@@ -28,7 +28,7 @@
                     opts.url = url;
                 }
                 $.getJSON(url,function (cfg) {
-                    tajin.options = $.extend(cfg || {}, tajin.options);
+                    tajin.options = $.extend(true, cfg || {}, tajin.options);
                     next();
                 }).error(function () {
                         next();

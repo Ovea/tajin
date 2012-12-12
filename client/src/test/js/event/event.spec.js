@@ -30,6 +30,26 @@ describe("Event module", function () {
         expect(tajin.event.has('toto')).toBe(true);
     });
 
+    it("can add multiple events with options at once", function () {
+        var all = tajin.event.addAll('my/evt1', {
+            id: 'my/evt2',
+            state: false
+        }, 'my/evt3', {
+            state: true,
+            remote: true,
+            context: this
+        });
+        expect(tajin.event.get('my/evt1')).toBe(all[0]);
+        expect(tajin.event.get('my/evt2')).toBe(all[1]);
+        expect(tajin.event.get('my/evt3')).toBe(all[2]);
+        expect(tajin.event.get('my/evt1').remote).toBe(true);
+        expect(tajin.event.get('my/evt2').remote).toBe(true);
+        expect(tajin.event.get('my/evt3').remote).toBe(true);
+        expect(tajin.event.get('my/evt1').stateful).toBe(true);
+        expect(tajin.event.get('my/evt2').stateful).toBe(false);
+        expect(tajin.event.get('my/evt3').stateful).toBe(true);
+    });
+
     it("cannot add event with a duplicate name", function () {
         expect(function () {
             tajin.event.add('my/event');
@@ -44,6 +64,15 @@ describe("Event module", function () {
         var e = tajin.event.get('my/event');
         expect(e).toBeDefined();
         expect(e.id).toBe('my/event');
+    });
+
+    it("can get many event object at once", function () {
+        var all = tajin.event.getAll('my/evt1', 'my/evt2', 'my/evt3');
+        expect(all[0].stateful).toBe(true);
+        expect(all[1].stateful).toBe(false);
+        expect(all[2].stateful).toBe(true);
+        expect(all[2].listen).toBeDefined();
+        expect(all[2].fire).toBeDefined();
     });
 
     it("can get an inexisting event and create it at once", function () {
