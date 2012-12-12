@@ -4,19 +4,33 @@ describe("Event module", function () {
         expect(tajin.modules()).toContain('event');
     });
 
-    it("can add event with no name", function () {
+    it("exports event tajin/ready", function () {
+        var obj = {
+            f: function () {
+            }
+        };
+        spyOn(obj, 'f');
+        tajin.event.get('tajin/ready').listen(obj.f);
+        expect(obj.f).toHaveBeenCalled();
+    });
+
+});
+
+describe("tajin.event.add()", function () {
+
+    it("adds event with no name", function () {
         var evt = tajin.event.add();
         expect(evt.id).toBeDefined();
         expect(tajin.event.has(evt.id)).toBe(true);
     });
 
-    it("can add event with a name", function () {
+    it("adds event with a name", function () {
         var evt = tajin.event.add('my/event');
         expect(evt.id).toBe('my/event');
         expect(tajin.event.has('my/event')).toBe(true);
     });
 
-    it("can add event with options", function () {
+    it("adds event with options", function () {
         var evt = tajin.event.add({
             id: 'toto',
             state: true,
@@ -30,7 +44,17 @@ describe("Event module", function () {
         expect(tajin.event.has('toto')).toBe(true);
     });
 
-    it("can add multiple events with options at once", function () {
+    it("fails with a duplicate name", function () {
+        expect(function () {
+            tajin.event.add('my/event');
+        }).toThrow(new Error("Duplicate event: my/event"));
+    });
+
+});
+
+describe("tajin.event.addAll()", function () {
+
+    it("adds multiple events with optional options at once", function () {
         var all = tajin.event.addAll('my/evt1', {
             id: 'my/evt2',
             state: false
@@ -50,23 +74,36 @@ describe("Event module", function () {
         expect(tajin.event.get('my/evt3').stateful).toBe(true);
     });
 
-    it("cannot add event with a duplicate name", function () {
-        expect(function () {
-            tajin.event.add('my/event');
-        }).toThrow(new Error("Duplicate event: my/event"));
-    });
+});
+
+describe("tajin.event.has()", function () {
 
     it("can test event existance", function () {
         expect(tajin.event.has('my/event')).toBe(true);
     });
 
-    it("can get an event object", function () {
+});
+
+describe("tajin.event.get()", function () {
+
+    it("gets an event object", function () {
         var e = tajin.event.get('my/event');
         expect(e).toBeDefined();
         expect(e.id).toBe('my/event');
     });
 
-    it("can get many event object at once", function () {
+    it("gets an inexisting event and create it at once", function () {
+        tajin.event.get('inexisting', {
+            state: true
+        });
+        expect(tajin.event.has('inexisting')).toBe(true);
+    });
+
+});
+
+describe("tajin.event.getAll()", function () {
+
+    it("gets many event object at once", function () {
         var all = tajin.event.getAll('my/evt1', 'my/evt2', 'my/evt3');
         expect(all[0].stateful).toBe(true);
         expect(all[1].stateful).toBe(false);
@@ -75,12 +112,9 @@ describe("Event module", function () {
         expect(all[2].fire).toBeDefined();
     });
 
-    it("can get an inexisting event and create it at once", function () {
-        tajin.event.get('inexisting', {
-            state: true
-        });
-        expect(tajin.event.has('inexisting')).toBe(true);
-    });
+});
+
+describe("tajin.event.reset()", function () {
 
     it("can reset a stateful event", function () {
         var e = tajin.event.add('my/stateful');
@@ -89,12 +123,9 @@ describe("Event module", function () {
         expect(e.reset).toHaveBeenCalled();
     });
 
-    it("can destroy an event", function () {
-        var e = tajin.event.add('my/destroyable');
-        spyOn(e, 'destroy');
-        tajin.event.destroy('my/destroyable');
-        expect(e.destroy).toHaveBeenCalled();
-    });
+});
+
+describe("tajin.event.resetAll()", function () {
 
     it("can reset all event", function () {
         var e1 = tajin.event.add('my/e1'),
@@ -106,6 +137,21 @@ describe("Event module", function () {
         expect(e2.reset).toHaveBeenCalled();
     });
 
+});
+
+describe("tajin.event.destroy()", function () {
+
+    it("can destroy an event", function () {
+        var e = tajin.event.add('my/destroyable');
+        spyOn(e, 'destroy');
+        tajin.event.destroy('my/destroyable');
+        expect(e.destroy).toHaveBeenCalled();
+    });
+
+});
+
+describe("tajin.event.destroyAll()", function () {
+
     it("can destroy all event", function () {
         var d1 = tajin.event.add('my/d1'),
             d2 = tajin.event.add('my/d2');
@@ -116,21 +162,11 @@ describe("Event module", function () {
         expect(d2.destroy).toHaveBeenCalled();
     });
 
-    it("provides Tajin ready event", function () {
-        var obj = {
-            f: function () {
-            }
-        };
-        spyOn(obj, 'f');
-        tajin.event.get('tajin/ready').listen(obj.f);
-        expect(obj.f).toHaveBeenCalled();
-    });
-
 });
 
-describe("Event objet", function () {
+describe("Event objet e", function () {
 
-    it("exposes properties", function () {
+    it("exposes id, remote, stateful, context", function () {
         var evt = tajin.event.add({
             id: 'tata',
             state: true,
@@ -144,21 +180,29 @@ describe("Event objet", function () {
         expect(tajin.event.has('tata')).toBe(true);
     });
 
-    it("has time when fired", function () {
+});
+
+describe("e.time", function () {
+
+    it("set when fired", function () {
         var evt = tajin.event.add();
         expect(evt.time).toBeUndefined();
         evt.fire();
         expect(evt.time).toBeDefined();
     });
 
-    it("has no data when fired if stateless", function () {
+});
+
+describe("e.data", function () {
+
+    it("unset when fired if stateless", function () {
         var evt = tajin.event.add();
         expect(evt.data).toBeUndefined();
         evt.fire();
         expect(evt.data).toBeUndefined();
     });
 
-    it("has data set when fired if stateful", function () {
+    it("set when fired if stateful", function () {
         var evt = tajin.event.add({
             state: true
         });
@@ -172,13 +216,17 @@ describe("Event objet", function () {
         expect(evt.data).toBe('data');
     });
 
-    it("can be fired multiple times if stateless", function () {
+});
+
+describe("e.fire()", function () {
+
+    it("can be called multiple times if stateless", function () {
         var evt = tajin.event.add();
         evt.fire();
         evt.fire();
     });
 
-    it("can be fired only once if stateful", function () {
+    it("can be called only once if stateful", function () {
         var evt = tajin.event.add({
             state: true
         });
@@ -189,7 +237,19 @@ describe("Event objet", function () {
 
     });
 
-    it("can be resetted to be fired again if stateful", function () {
+    it("cannot be called with more than one parameters", function () {
+        var evt = tajin.event.add();
+        expect(function () {
+            evt.fire(1, 2);
+        }).toThrow(new Error("fire() only accept at most one argument"));
+
+    });
+
+});
+
+describe("e.reset()", function () {
+
+    it("can be called to reset a stateful event and be able to call fire() again", function () {
         var evt = tajin.event.add({
             state: true
         });
@@ -200,22 +260,22 @@ describe("Event objet", function () {
         expect(evt.data).toBe('data2');
     });
 
-    it("cannot be fired with more than one parameters", function () {
-        var evt = tajin.event.add();
-        expect(function () {
-            evt.fire(1, 2);
-        }).toThrow(new Error("fire() only accept at most one argument"));
+});
 
-    });
+describe("e.destroy()", function () {
 
-    it("can be destroyed", function () {
+    it("destroy the event", function () {
         var evt = tajin.event.add();
         expect(tajin.event.has(evt.id)).toBe(true);
         evt.destroy();
         expect(tajin.event.has(evt.id)).toBe(false);
     });
 
-    it("can be listened", function () {
+});
+
+describe("e.listen()", function () {
+
+    it("adds a listener", function () {
         var evt = tajin.event.add();
         var obj = {
             l: function () {
@@ -227,7 +287,7 @@ describe("Event objet", function () {
         expect(obj.l).toHaveBeenCalled();
     });
 
-    it("cannot be listened with same listener twice or more", function () {
+    it("checks for multiple registration errors", function () {
         var evt = tajin.event.add(), c = 0;
         var obj = {
             l: function () {
@@ -241,7 +301,29 @@ describe("Event objet", function () {
         expect(c).toBe(1);
     });
 
-    it("can remove listener", function () {
+});
+
+describe("e.once()", function () {
+
+    it("register a listener to be triggered only once then removed", function () {
+        var evt = tajin.event.add(), c = 0;
+        var obj = {
+            f1: function () {
+                c++;
+            }
+        };
+        evt.once(obj.f1);
+        evt.fire();
+        expect(c).toBe(1);
+        evt.fire();
+        expect(c).toBe(1);
+    });
+
+});
+
+describe("e.remove()", function () {
+
+    it("removes a listener", function () {
         var evt = tajin.event.add(), c = 0;
         var obj = {
             f1: function () {
@@ -252,20 +334,6 @@ describe("Event objet", function () {
         evt.fire();
         expect(c).toBe(1);
         evt.remove(obj.f1);
-        evt.fire();
-        expect(c).toBe(1);
-    });
-
-    it("can be listened once", function () {
-        var evt = tajin.event.add(), c = 0;
-        var obj = {
-            f1: function () {
-                c++;
-            }
-        };
-        evt.once(obj.f1);
-        evt.fire();
-        expect(c).toBe(1);
         evt.fire();
         expect(c).toBe(1);
     });
