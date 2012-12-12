@@ -137,14 +137,14 @@ describe("tajin.event", function () {
 
         });
 
-        describe("tajin.event.resetAll()", function () {
+        describe("group.reset()", function () {
 
-            it("can reset all event", function () {
+            it("can reset several events at once", function () {
                 var e1 = tajin.event.add('my/e1'),
                     e2 = tajin.event.add('my/e2');
                 spyOn(e1, 'reset');
                 spyOn(e2, 'reset');
-                tajin.event.resetAll();
+                tajin.event.getAll('my/e1', 'my/e2').reset();
                 expect(e1.reset).toHaveBeenCalled();
                 expect(e2.reset).toHaveBeenCalled();
             });
@@ -162,6 +162,20 @@ describe("tajin.event", function () {
                 spyOn(e, 'destroy');
                 tajin.event.destroy('my/destroyable');
                 expect(e.destroy).toHaveBeenCalled();
+            });
+
+        });
+
+        describe("group.destroy()", function () {
+
+            it("can delete several events at once", function () {
+                var e1 = tajin.event.add('my/e3'),
+                    e2 = tajin.event.add('my/e4');
+                spyOn(e1, 'destroy');
+                spyOn(e2, 'destroy');
+                tajin.event.getAll('my/e3', 'my/e4').destroy();
+                expect(e1.destroy).toHaveBeenCalled();
+                expect(e2.destroy).toHaveBeenCalled();
             });
 
         });

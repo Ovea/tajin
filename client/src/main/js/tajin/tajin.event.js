@@ -21,7 +21,6 @@
     var e_uid = 1,
         e_cb_uid = 1,
         events = {},
-        sys_events = ['tajin/ready'],
         t_add = function (opts) {
             if ($.type(opts) === 'string') {
                 opts = {
@@ -108,17 +107,13 @@
                     return false;
                 },
                 destroy: function () {
-                    if ($.inArray(this.id, sys_events) === -1) {
-                        this.reset();
-                        listeners = [];
-                        delete events[this.id];
-                    }
+                    this.reset();
+                    listeners = [];
+                    delete events[this.id];
                 },
                 reset: function () {
-                    if ($.inArray(this.id, sys_events) === -1) {
-                        this.data = undefined;
-                        this.time = undefined;
-                    }
+                    this.data = undefined;
+                    this.time = undefined;
                 }
             };
             return events[opts.id];
@@ -230,14 +225,6 @@
             add: t_add,
             reset: function (id) {
                 w.tajin.event.get(id).reset();
-            },
-            resetAll: function () {
-                var e;
-                for (e in events) {
-                    if (events.hasOwnProperty(e)) {
-                        events[e].reset();
-                    }
-                }
             },
             destroy: function (id) {
                 w.tajin.event.get(id).destroy();
