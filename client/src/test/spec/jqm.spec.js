@@ -1,4 +1,4 @@
-describe("jQuery Mobile Module", function () {
+describe("tajin.jqm", function () {
 
     it("is installed", function () {
         expect(tajin.modules()).toContain('event');
@@ -6,52 +6,53 @@ describe("jQuery Mobile Module", function () {
         expect(tajin.modules()).toContain('timer');
     });
 
-    it("export event jqm/init", function () {
+    it("register event jqm/init", function () {
         this.fail('TODO');
     });
 
-    it("export event jqm/beforeshow", function () {
+    it("register event jqm/beforeshow", function () {
         this.fail('TODO');
     });
 
-    it("export event jqm/show", function () {
+    it("register event jqm/show", function () {
         this.fail('TODO');
     });
 
-    it("export event jqm/beforehide", function () {
+    it("register event jqm/beforehide", function () {
         this.fail('TODO');
     });
 
-    it("export event jqm/hide", function () {
+    it("register event jqm/hide", function () {
         this.fail('TODO');
+    });
+
+    describe("tajin.jqm.page()", function () {
+
+        it("returns current JQM page", function () {
+            this.fail('TODO');
+        });
+
+        it("returns null if not found", function () {
+            this.fail('TODO');
+        });
+
+    });
+
+    describe("tajin.jqm.pageName()", function () {
+
+        it("returns current JQM page name", function () {
+            this.fail('TODO');
+        });
+
+        it("returns null if no current page or if page ID is missing", function () {
+            this.fail('TODO');
+        });
+
     });
 
 });
 
-describe("tajin.jqm.page()", function () {
-
-    it("returns current JQM page", function () {
-        this.fail('TODO');
-    });
-
-    it("returns null if not found", function () {
-        this.fail('TODO');
-    });
-
-});
-
-describe("tajin.jqm.pageName()", function () {
-
-    it("returns current JQM page name", function () {
-        this.fail('TODO');
-    });
-
-    it("returns null if no current page or if page ID is missing", function () {
-        this.fail('TODO');
-    });
-
-});
-
+/*
 // TODO david: complete for other events....
 tajin.ready(function () {
     tajin.event.get('jqm/init').listen(function (page) {
@@ -75,4 +76,4 @@ tajin.ready(function () {
     tajin.event.get('jqm/hide').listen(function (page) {
         console.log('hide', page.attr('id'));
     });
-});
+});*/

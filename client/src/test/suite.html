@@ -3,132 +3,95 @@
 <html>
 <head>
     <meta http-equiv="Content-Type" content="text/html; charset=UTF-8"/>
-    <title>Tajin Test Suite</title>
-    <link rel="stylesheet" type="text/css" href="lib/jquery-ui-1.9.2.custom/css/ui-lightness/jquery-ui-1.9.2.custom.css"/>
-    <style type="text/css">
-        html, body {
-            height: 100%;
-            margin: 0;
-            padding: 0;
-        }
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>Jasmine Spec Runner</title>
 
-        div#tabs {
-            height: 98%;
-        }
+    <link rel="stylesheet" type="text/css" href="lib/jasmine.css">
+    <link rel="stylesheet" href="lib/jquery.mobile.custom.structure.css"/>
+    <link rel="stylesheet" href="lib/jquery.mobile.custom.theme.css"/>
 
-        div.tab-content {
-            height: 100%;
-        }
-
-        div {
-            margin: 0;
-            padding: 0;
-        }
-
-        .ui-tabs .ui-tabs-nav li a {
-            padding: 0 .3em;
-            font-size: 80%;
-        }
-
-        .ui-tabs .ui-tabs-panel {
-            padding: .2em .3em .3em .3em;
-        }
-
-        iframe {
-            padding: 0;
-            margin: 0 auto;
-            width: 100%;
-            min-height: 80%;
-        }
-    </style>
     <script type="text/javascript" src="lib/jquery-1.8.3.js"></script>
-    <script type="text/javascript" src="lib/jquery-ui-1.9.2.custom/js/jquery-ui-1.9.2.custom.js"></script>
+    <script type="text/javascript" src="lib/jquery.mobile.custom.js"></script>
+
+    <script type="text/javascript" src="lib/jasmine.js"></script>
+    <script type="text/javascript" src="lib/jasmine-html.js"></script>
+
     <script type="text/javascript">
-        $(function () {
+        (function () {
+            var jasmineEnv = window.jasmineEnv = jasmine.getEnv(),
+                    htmlReporter = new jasmine.HtmlReporter();
 
-            // assign IDs automatically
-            var li = $('#tabs li'),
-                    div = $('#tabs div'),
-                    i, a, id;
-            if (li.length !== div.length) {
-                throw new Error('Bad TAB count');
-            }
-            for (i = 0; i < li.length; i++) {
-                a = $('a', li[i]);
-                id = a.text().replace(/ /g, '_');
-                a.attr('href', '#' + id);
-                $(div[i]).attr('id', id);
-            }
+            jasmineEnv.updateInterval = 1000;
+            jasmineEnv.addReporter(htmlReporter);
+            jasmineEnv.specFilter = function (spec) {
+                return htmlReporter.specFilter(spec);
+            };
 
-            // prevent scroll
-            window.scrollTo(0, 0);
-            setTimeout(function () {
-                window.scrollTo(0, 0);
-            }, 100);
-
-            // create tabls
-            $('#tabs').tabs({
-                activate: function (event, ui) {
-                    document.location.hash = ui.newTab.find('a').attr('href');
-                    // prevent scroll
-                    window.scrollTo(0, 0);
-                    setTimeout(function () {
-                        window.scrollTo(0, 0);
-                    }, 100);
+            window.tajin_init = {
+                debug: true,
+                onready: function () {
+                    $(function () {
+                        jasmineEnv.execute();
+                    });
+                },
+                log: {
+                    level: 'all'
+                },
+                i18n: {
+                    onlocalize: function (bundle, locale, elem, key, value) {
+                        if (value === undefined) {
+                            value = '[' + key + ']';
+                        }
+                        console.info('onlocalize', bundle, locale, key, value);
+                        var type = elem.get(0).tagName.toUpperCase();
+                        if (type === 'INPUT') {
+                            if (elem.attr('placeholder') && value) {
+                                elem.attr('placeholder', value);
+                            } else {
+                                elem.val(value);
+                            }
+                        }
+                        else {
+                            elem.html(value);
+                        }
+                    }
                 }
-            });
-        });
+            };
+
+        })();
     </script>
+
+    <script type="text/javascript" src="../main/js/tajin/tajin.core.js"></script>
+    <script type="text/javascript" src="../main/js/tajin/tajin.util.js"></script>
+    <script type="text/javascript" src="../main/js/tajin/tajin.config.js"></script>
+    <script type="text/javascript" src="../main/js/tajin/tajin.log.js"></script>
+    <script type="text/javascript" src="../main/js/tajin/tajin.event.js"></script>
+    <script type="text/javascript" src="../main/js/tajin/tajin.timer.js"></script>
+    <script type="text/javascript" src="../main/js/tajin/tajin.store.js"></script>
+    <script type="text/javascript" src="../main/js/tajin/tajin.i18n.js"></script>
+    <script type="text/javascript" src="../main/js/tajin/tajin.dom.js"></script>
+    <script type="text/javascript" src="../main/js/tajin/tajin.jqm.js"></script>
+    <script type="text/javascript" src="../main/js/tajin/tajin.autoinit.js"></script>
+
+    <script type="text/javascript" src="spec/core.spec.js"></script>
+    <script type="text/javascript" src="spec/config.spec.js"></script>
+    <script type="text/javascript" src="spec/log.spec.js"></script>
+    <script type="text/javascript" src="spec/event.spec.js"></script>
+    <script type="text/javascript" src="spec/timer.spec.js"></script>
+    <script type="text/javascript" src="spec/store.spec.js"></script>
+    <script type="text/javascript" src="spec/i18n.spec.js"></script>
+    <script type="text/javascript" src="spec/dom.spec.js"></script>
+    <script type="text/javascript" src="spec/jqm.spec.js"></script>
+
 </head>
 <body>
 
-<div id="tabs">
-    <ul>
-        <li><a>core</a></li>
-        <li><a>config</a></li>
-        <li><a>custom config</a></li>
-        <li><a>log</a></li>
-        <li><a>log+config</a></li>
-        <li><a>timer</a></li>
-        <li><a>i18n</a></li>
-        <li><a>event</a></li>
-        <li><a>dom</a></li>
-        <li><a>store</a></li>
-        <li><a>jqm</a></li>
-    </ul>
-    <div class="tab-content">
-        <iframe src="js/core/core.spec.html"></iframe>
+<div style="position: absolute;bottom: 0;left: 0;width: 0;height: 0;">
+    <div id="page_1" data-role="page">
+        <div data-role="content">page 1 <a href="#page_2" data-role="button">-> page 2</a></div>
     </div>
-    <div class="tab-content">
-        <iframe src="js/config/config.spec.html"></iframe>
-    </div>
-    <div class="tab-content">
-        <iframe src="js/config/config.spec.custom1.html"></iframe>
-        <iframe src="js/config/config.spec.custom2.html"></iframe>
-    </div>
-    <div class="tab-content">
-        <iframe src="js/logging/log.spec.html"></iframe>
-    </div>
-    <div class="tab-content">
-        <iframe src="js/logging/log.config.spec.html"></iframe>
-    </div>
-    <div class="tab-content">
-        <iframe src="js/timer/timer.spec.html"></iframe>
-    </div>
-    <div class="tab-content">
-        <iframe src="js/i18n/i18n.spec.html"></iframe>
-    </div>
-    <div class="tab-content">
-        <iframe src="js/event/event.spec.html"></iframe>
-    </div>
-    <div class="tab-content">
-        <iframe src="js/dom/dom.spec.html"></iframe>
-    </div>
-    <div class="tab-content">
-        <iframe src="js/store/store.spec.html"></iframe>
-    </div>
-    <div class="tab-content">
-        <iframe src="js/jqm/jqm.spec.html"></iframe>
+    <div id="page_2" data-role="page">
+        <div data-role="content">page 2 <a href="#page_1" data-role="button">-> page 1</a></div>
     </div>
 </div>
 

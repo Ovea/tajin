@@ -97,6 +97,15 @@
                     </execution>
                 </executions>
             </plugin>
+            <!--<plugin>
+                <groupId>com.github.searls</groupId>
+                <artifactId>jasmine-maven-plugin</artifactId>
+                <configuration>
+                    <sourceIncludes>
+                        <sourceInclude>lib/*.js</sourceInclude>
+                    </sourceIncludes>
+                </configuration>
+            </plugin>-->
         </plugins>
     </build>
 

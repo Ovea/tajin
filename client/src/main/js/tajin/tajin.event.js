@@ -241,14 +241,6 @@
             },
             destroy: function (id) {
                 w.tajin.event.get(id).destroy();
-            },
-            destroyAll: function () {
-                var e;
-                for (e in events) {
-                    if (events.hasOwnProperty(e)) {
-                        events[e].destroy();
-                    }
-                }
             }
         }
     });
