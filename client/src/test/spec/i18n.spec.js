@@ -7,8 +7,38 @@ describe("tajin.i18n", function () {
     describe("at initialization", function () {
 
         it("is configured", function () {
-            this.fail('TODO');
-            // can define additional attributes for localization
+            expect(tajin.options.i18n.debug).toBe(true);
+            expect(tajin.options.i18n.bundles.app).toBeDefined();
+            expect(tajin.options.i18n.bundles.app2).toBeDefined();
+            expect(tajin.options.i18n.bundles.app3).toBeDefined();
+
+            expect(tajin.options.i18n.attributes.length).toBe(3);
+            expect(tajin.options.i18n.attributes).toContain('href');
+            expect(tajin.options.i18n.attributes).toContain('src');
+            expect(tajin.options.i18n.attributes).toContain('custom-attr');
+
+            expect(tajin.options.i18n.bundles.app.location).toBe('spec/i18n/bundles');
+
+            expect(tajin.options.i18n.bundles.app.variants.length).toBe(3);
+            expect(tajin.options.i18n.bundles.app.variants).toContain('fr');
+            expect(tajin.options.i18n.bundles.app.variants).toContain('fr_CA');
+            expect(tajin.options.i18n.bundles.app.variants).toContain('en_US');
+
+            expect(tajin.options.i18n.bundles.app.preload).toContain('fr_CA');
+            expect(tajin.options.i18n.bundles.app.preload).toContain('en');
+            expect(tajin.options.i18n.bundles.app.preload).toContain('fr');
+            expect(tajin.options.i18n.bundles.app.preload).toContain('en_US');
+
+            expect(tajin.options.i18n.resources.length).toBe(2);
+            expect(tajin.options.i18n.resources[0].path).toBe('spec/i18n/contents/pub.html');
+            expect(tajin.options.i18n.resources[0].variants.length).toBe(2);
+            expect(tajin.options.i18n.resources[0].variants).toContain('fr');
+            expect(tajin.options.i18n.resources[0].variants).toContain('ko');
+
+            expect(tajin.options.i18n.resources[1].path).toBe('spec/i18n/images/pub.jpg');
+            expect(tajin.options.i18n.resources[1].variants.length).toBe(2);
+            expect(tajin.options.i18n.resources[1].variants).toContain('fr');
+            expect(tajin.options.i18n.resources[1].variants).toContain('ko');
         });
 
         it("has preloaded specified bundles and locales", function () {
@@ -25,8 +55,11 @@ describe("tajin.i18n", function () {
     describe("tajin.i18n.load()", function () {
 
         it("loads bundle using navigator locale if none specified", function () {
-            this.fail('TODO');
-            // tajin.i18n.load('app', '', function (bundle) {...});
+            tajin.i18n.load('app', '', function (bundle) {
+                expect(bundle.name).toBe('app');
+                expect(bundle.locale).toBe(browser_locale());
+                expect(bundle.resolved).toBe(browser_locale());
+            });
         });
 
         it("loads bundle using specified locale", function () {
@@ -58,27 +91,52 @@ describe("tajin.i18n", function () {
             tajin.event.get('i18n/bundle/loaded').listen(obj.f);
             tajin.i18n.load('app', 'fr_FR');
             expect(obj.f).toHaveBeenCalled();
+
+
         });
+
+//        it("fires event i18n/html/loaded when complete", function () {
+//            var obj = {
+//                f: function () {
+//                }
+//            };
+//            spyOn(obj, 'f');
+//            tajin.event.get('i18n/html/loaded').listen(obj.f);
+//            tajin.i18n.load('app', 'fr_FR');
+//            expect(obj.f).toHaveBeenCalled();
+//
+//
+//        });
+
+
+//            html: this.event.add('i18n/html/loaded'),
+//            image: this.event.add('i18n/image/loaded')
+
 
     });
 
     describe("I18N bundle object", function () {
 
         it("provides properties b.name, b.locale, b.resolved", function () {
-            this.fail('TODO');
-            // name of bundle, locale asked, locale resolved
+            tajin.i18n.load('app', 'fr', function (bundle) {
+                expect(bundle.name).toBe('app');
+                expect(bundle.locale).toBe('fr');
+                expect(bundle.resolved).toBe('fr');
+            });
         });
 
         describe("bundle.value()", function () {
 
             it("returns translation for key", function () {
-                this.fail('TODO');
-                // bundle.value('existing')
+                tajin.i18n.load('app3', 'fr_CA', function (bundle) {
+                    expect(bundle.value('msg1')).toBe('bundle 3 fr');
+                });
             });
 
             it("returns undefined when no key found", function () {
-                this.fail('TODO');
-                // bundle.value('inexisting')
+                tajin.i18n.load('app3', 'fr_CA', function (bundle) {
+                    expect(bundle.value('inexisting')).toBe(undefined);
+                });
             });
 
         });
@@ -176,3 +234,9 @@ describe("Handlebars integration", function () {
     });
 
 });
+
+function browser_locale() {
+    var locale = (navigator.language || navigator.userLanguage).replace(/-/, '_').toLowerCase();
+    return locale.length > 3 ? locale.substring(0, 3) + locale.substring(3).toUpperCase() : locale;
+}
+

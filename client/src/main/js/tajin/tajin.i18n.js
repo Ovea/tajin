@@ -133,7 +133,7 @@
             if (options.debug) {
                 console.log('[tajin.i18n] localize', this.name, this.locale);
             }
-            var i, attr, self = this, e = (expr instanceof jQuery) ? expr : $(expr);
+            var self = this, e = (expr instanceof jQuery) ? expr : $(expr);
             e.find('[rel*="localize"]').each(function () {
                 var elem = $(this), key = elem.attr("rel").match(/localize\[([\.\w]+)\]/)[1], v = self.value(key);
                 if (options.debug) {
