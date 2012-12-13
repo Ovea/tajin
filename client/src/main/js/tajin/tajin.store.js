@@ -18,14 +18,14 @@
 (function (w, $) {
     "use strict";
 
-    var uid = 1;
+    var exp = {};
+
+
 
     w.tajin.install({
         name: 'store',
         requires: 'core',
-        exports: {
-            
-        }
+        exports: exp
     });
 
 }(window, jQuery));
