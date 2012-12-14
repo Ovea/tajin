@@ -35,5 +35,9 @@
 
     "log": {
         "level": "error"
+    },
+
+    "module-2": {
+        "myopt": "myvalue"
     }
 }

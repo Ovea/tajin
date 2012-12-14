@@ -21,8 +21,8 @@
         name: 'config',
         requires: 'core,util',
         exports: {
-            init: function (next, opts) {
-                var tajin = this, url = opts.url;
+            init: function (next, opts, tajin) {
+                var url = opts.url;
                 if (!url) {
                     url = tajin.util.path('tajin-client.json');
                     opts.url = url;

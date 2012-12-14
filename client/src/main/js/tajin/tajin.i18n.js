@@ -226,11 +226,11 @@
         name: 'i18n',
         requires: 'core,util,event',
         exports: {
-            init: function (next, opts) {
+            init: function (next, opts, tajin) {
                 events = {
-                    bundle: this.event.add('i18n/bundle/loaded'),
-                    html: this.event.add('i18n/html/loaded'),
-                    image: this.event.add('i18n/image/loaded')
+                    bundle: tajin.event.add('i18n/bundle/loaded'),
+                    html: tajin.event.add('i18n/html/loaded'),
+                    image: tajin.event.add('i18n/image/loaded')
                 };
                 $.extend(options, opts);
                 if (!$.isFunction(options.onlocalize)) {

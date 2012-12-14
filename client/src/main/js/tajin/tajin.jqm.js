@@ -17,58 +17,59 @@
 /*global window, jQuery, console*/
 (function (w, $) {
     "use strict";
-    var current_page;
-    if ($.mobile) {
-        w.tajin.install({
-            name: 'jqm',
-            requires: 'core,event,timer,store',
-            exports: {
-                init: function (next, opts) {
-                    var tevent = this.event,
-                        events = {
-                            beforeshow: this.event.add('jqm/beforeshow'),
-                            show: this.event.add('jqm/show'),
-                            beforehide: this.event.add('jqm/beforehide'),
-                            hide: this.event.add('jqm/hide'),
-                            init: this.event.add('jqm/init')
-                        },
-                        fire = function (evt, event) {
-                            var page = $(event.target), name = page.attr('id');
-                            events[evt].fire(page);
-                            if (name) {
-                                tevent.get('jqm/' + evt + '/' + name).fire(page);
-                            }
-                        };
-                    $(document).on('pagebeforeshow',function (event) {
-                        current_page = $(event.target);
-                        fire('beforeshow', event);
-                    }).on('pagebeforehide',function (event) {
-                            fire('beforehide', event);
-                        }).on('pageshow',function (event) {
-                            fire('show', event);
-                        }).on('pagehide',function (event) {
-                            fire('hide', event);
-                        }).on('pageinit', function (event) {
-                            fire('init', event);
-                        });
-                    next();
-                },
-                page: function () {
-                    var p = current_page || $('body div[data-role=page]:visible');
-                    return p.length ? p : null;
-                },
-                pageName: function () {
-                    var a, p = this.page();
-                    if (p) {
-                        a = p.attr('id');
-                        if (a) {
-                            return a;
-                        }
-                    }
-                    return null;
-                }
-            }
-        });
-
+    if (!$.mobile) {
+        return;
     }
+    var current_page;
+    w.tajin.install({
+        name: 'jqm',
+        requires: 'core,event,timer,store',
+        exports: {
+            init: function (next, opts, tajin) {
+                var tevent = tajin.event,
+                    events = {
+                        beforeshow: tajin.event.add('jqm/beforeshow'),
+                        show: tajin.event.add('jqm/show'),
+                        beforehide: tajin.event.add('jqm/beforehide'),
+                        hide: tajin.event.add('jqm/hide'),
+                        init: tajin.event.add('jqm/init')
+                    },
+                    fire = function (evt, event) {
+                        var page = $(event.target), name = page.attr('id');
+                        events[evt].fire(page);
+                        if (name) {
+                            tevent.get('jqm/' + evt + '/' + name).fire(page);
+                        }
+                    };
+                $(document).on('pagebeforeshow',function (event) {
+                    current_page = $(event.target);
+                    fire('beforeshow', event);
+                }).on('pagebeforehide',function (event) {
+                        fire('beforehide', event);
+                    }).on('pageshow',function (event) {
+                        fire('show', event);
+                    }).on('pagehide',function (event) {
+                        fire('hide', event);
+                    }).on('pageinit', function (event) {
+                        fire('init', event);
+                    });
+                next();
+            },
+            page: function () {
+                var p = current_page || $('body div[data-role=page]:visible');
+                return p.length ? p : null;
+            },
+            pageName: function () {
+                var a, p = this.page();
+                if (p) {
+                    a = p.attr('id');
+                    if (a) {
+                        return a;
+                    }
+                }
+                return null;
+            }
+        }
+    });
+
 }(window, jQuery));

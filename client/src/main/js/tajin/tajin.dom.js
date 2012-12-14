@@ -21,8 +21,8 @@
         name: 'dom',
         requires: 'core,event',
         exports: {
-            init: function (next, opts) {
-                var evt = this.event.add({
+            init: function (next, opts, tajin) {
+                var evt = tajin.event.add({
                     id: 'dom/loaded',
                     state: true
                 });

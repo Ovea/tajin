@@ -35,6 +35,28 @@ describe("tajin", function () {
             expect(tajin.options['test-module'].init_called).toBe(true);
         });
 
+        it("exposes module exports, options and tajin to module's init functions", function () {
+            var passed = 0;
+            var m = {
+                name: 'module-2',
+                exports: {
+                    init: function (next, opts, tajin) {
+                        expect(typeof next).toBe('function');
+                        expect(typeof opts).toBe('object');
+                        expect(opts.myopt).toBe('myvalue');
+                        expect(window.tajin).toBe(tajin);
+                        expect(this.init).toBeDefined();
+                        expect(this.dummy).toBeDefined();
+                        passed = 1;
+                    },
+                    dummy: function () {
+                    }
+                }
+            };
+            tajin.install(m);
+            expect(passed).toBe(1);
+        });
+
     });
 
     describe("tajin.ready()", function () {

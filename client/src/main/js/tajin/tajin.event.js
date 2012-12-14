@@ -171,8 +171,8 @@
         name: 'event',
         requires: 'core',
         exports: {
-            init: function (next, opts) {
-                var tajin = this, ready = t_add({
+            init: function (next, opts, tajin) {
+                var ready = t_add({
                     id: 'tajin/ready',
                     state: true
                 });
