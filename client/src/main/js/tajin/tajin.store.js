@@ -73,7 +73,7 @@
         },
         exports: {
             get: function (k) {
-                if (k !== 'string') {
+                if (typeof k !== 'string') {
                     throw new Error('Key must be a string');
                 }
                 return impl.get(prefix + k);

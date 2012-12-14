@@ -81,7 +81,7 @@ describe("tajin.store", function () {
             }).toThrow(new Error('Key must be a string'));
         });
 
-        it("removed value associated to key k", function () {
+        it("removes value associated to key k", function () {
             tajin.store.put('k6', 'v1');
             expect(tajin.store.has('k6')).toBe(true);
             tajin.store.del('k6');
