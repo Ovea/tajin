@@ -22,15 +22,11 @@
 
     w.tajin.install({
         name: 'timer',
-        requires: 'core',
         exports: {
             timers: {},
-            init: function (next, opts) {
-                next();
-            },
             stop: function (id) {
-                if (w.tajin.timer.timers[id]) {
-                    w.tajin.timer.timers[id].stop();
+                if (this.timers[id]) {
+                    this.timers[id].stop();
                 }
             },
             schedule: function (id, delay, repeat, cb) {
@@ -41,8 +37,8 @@
                 if (!$.isFunction(cb)) {
                     throw new Error('Missing function');
                 }
-                w.tajin.timer.stop(id);
-                var running = true, tid = repeat ?
+                this.stop(id);
+                var self = this, running = true, tid = repeat ?
                     w.setInterval(function () {
                         if (running) {
                             cb.apply(this, arguments);
@@ -51,10 +47,10 @@
                     w.setTimeout(function () {
                         if (running) {
                             cb.apply(this, arguments);
-                            w.tajin.timer.stop(id);
+                            self.stop(id);
                         }
                     }, delay);
-                w.tajin.timer.timers[id] = {
+                this.timers[id] = {
                     toString: function () {
                         return (repeat ? 'Interval ' : 'Timer ') + id + ' ' + delay + 'ms';
                     },
@@ -64,7 +60,7 @@
                     },
                     stop: function () {
                         if (running) {
-                            delete w.tajin.timer.timers[id];
+                            delete self.timers[id];
                             running = false;
                             if (repeat) {
                                 clearInterval(tid);
@@ -74,7 +70,7 @@
                         }
                     }
                 };
-                return w.tajin.timer.timers[id];
+                return this.timers[id];
             }
         }
     });

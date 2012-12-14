@@ -19,19 +19,16 @@
     "use strict";
     w.tajin.install({
         name: 'dom',
-        requires: 'core,event',
-        exports: {
-            init: function (next, opts, tajin) {
-                var evt = tajin.event.add({
-                    id: 'dom/loaded',
-                    state: true
-                });
-                $(function () {
-                    evt.fire();
-                });
-                next();
-            }
+        requires: 'event',
+        init: function (next, opts, tajin) {
+            var evt = tajin.event.add({
+                id: 'dom/loaded',
+                state: true
+            });
+            $(function () {
+                evt.fire();
+            });
+            next();
         }
     });
-
 }(window, jQuery));

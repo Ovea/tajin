@@ -24,13 +24,15 @@ describe("tajin.log", function () {
     });
 
     describe("DEBUG Logger", function () {
-        var debug_logger = tajin.log.logger('Debug Logger', 'debug');
 
         it("can create debug level logger", function () {
+            var debug_logger = tajin.log.logger('Debug Logger', 'debug');
             expect(debug_logger.level).toBe('debug');
         });
 
         it("all log messages are processed", function () {
+            var debug_logger = tajin.log.logger('Debug Logger', 'debug');
+
             spyOn(console, 'debug');
             spyOn(console, 'info');
             spyOn(console, 'warn');
@@ -49,13 +51,15 @@ describe("tajin.log", function () {
     });
 
     describe("INFO Logger", function () {
-        var info_logger = tajin.log.logger('Info Logger', 'info');
 
         it("can create info level logger", function () {
+            var info_logger = tajin.log.logger('Info Logger', 'info');
             expect(info_logger.level).toBe('info');
         });
 
         it("only 'info', 'warn' and 'error'  log messages are processed", function () {
+            var info_logger = tajin.log.logger('Info Logger', 'info');
+
             spyOn(console, 'debug');
             spyOn(console, 'info');
             spyOn(console, 'warn');
@@ -74,13 +78,15 @@ describe("tajin.log", function () {
     });
 
     describe("WARN Logger", function () {
-        var warn_logger = tajin.log.logger('Warn Logger', 'warn');
 
         it("can create warn level logger", function () {
+            var warn_logger = tajin.log.logger('Warn Logger', 'warn');
             expect(warn_logger.level).toBe('warn');
         });
 
         it("only 'warn' and 'error'  log messages are processed", function () {
+            var warn_logger = tajin.log.logger('Warn Logger', 'warn');
+
             spyOn(console, 'debug');
             spyOn(console, 'info');
             spyOn(console, 'warn');
@@ -99,13 +105,15 @@ describe("tajin.log", function () {
     });
 
     describe("ERROR Logger", function () {
-        var error_logger = tajin.log.logger('Error Logger', 'error');
 
         it("can create error level logger", function () {
+            var error_logger = tajin.log.logger('Error Logger', 'error');
             expect(error_logger.level).toBe('error');
         });
 
         it("only 'error'  log messages are processed", function () {
+            var error_logger = tajin.log.logger('Error Logger', 'error');
+
             spyOn(console, 'debug');
             spyOn(console, 'info');
             spyOn(console, 'warn');

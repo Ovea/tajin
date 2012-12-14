@@ -18,7 +18,8 @@
 (function (w, $) {
     "use strict";
 
-    var events,
+    var tajin,
+        events,
         cache = {},
         rescache = {},
         options = {
@@ -89,7 +90,7 @@
                     }
                 }
             }
-            return w.tajin.util.path(res);
+            return tajin.util.path(res);
         },
         image: function (res, cb) {
             var u = this.url(res), img = $("<img/>");
@@ -192,7 +193,7 @@
                 }
                 load_bundle(bundle, locale, cb, tries, index + 1);
             } else {
-                path = w.tajin.util.path(options.bundles[bundle].location + '/' + bundle);
+                path = tajin.util.path(options.bundles[bundle].location + '/' + bundle);
                 if (tries[index].length > 0) {
                     path += '_' + tries[index];
                 }
@@ -224,46 +225,47 @@
 
     w.tajin.install({
         name: 'i18n',
-        requires: 'core,util,event',
-        exports: {
-            init: function (next, opts, tajin) {
-                events = {
-                    bundle: tajin.event.add('i18n/bundle/loaded'),
-                    html: tajin.event.add('i18n/html/loaded'),
-                    image: tajin.event.add('i18n/image/loaded')
-                };
-                $.extend(options, opts);
-                if (!$.isFunction(options.onlocalize)) {
-                    options.onlocalize = $.noop;
-                }
-                var b, v = 0, bnds = [], pre = function () {
-                    if (b >= bnds.length) {
-                        next();
+        requires: 'util,event',
+        init: function (next, opts, t) {
+            tajin = t;
+            events = {
+                bundle: tajin.event.add('i18n/bundle/loaded'),
+                html: tajin.event.add('i18n/html/loaded'),
+                image: tajin.event.add('i18n/image/loaded')
+            };
+            $.extend(options, opts);
+            if (!$.isFunction(options.onlocalize)) {
+                options.onlocalize = $.noop;
+            }
+            var b, v = 0, bnds = [], pre = function () {
+                if (b >= bnds.length) {
+                    next();
+                } else {
+                    var variants = options.bundles[bnds[b]].preload || [];
+                    if (v >= variants.length) {
+                        v = 0;
+                        b++;
+                        pre();
                     } else {
-                        var variants = options.bundles[bnds[b]].preload || [];
-                        if (v >= variants.length) {
-                            v = 0;
-                            b++;
-                            pre();
-                        } else {
-                            if (options.debug) {
-                                console.log('[tajin.i18n] preloading', bnds[b], variants[v]);
-                            }
-                            load_bundle(bnds[b], variants[v], function () {
-                                v++;
-                                pre();
-                            });
+                        if (options.debug) {
+                            console.log('[tajin.i18n] preloading', bnds[b], variants[v]);
                         }
-                    }
-                };
-                for (b in options.bundles) {
-                    if (options.bundles.hasOwnProperty(b)) {
-                        bnds.push(b);
+                        load_bundle(bnds[b], variants[v], function () {
+                            v++;
+                            pre();
+                        });
                     }
                 }
-                b = 0;
-                pre();
-            },
+            };
+            for (b in options.bundles) {
+                if (options.bundles.hasOwnProperty(b)) {
+                    bnds.push(b);
+                }
+            }
+            b = 0;
+            pre();
+        },
+        exports: {
             load: function (name, locale, cb) {
                 if (!options.bundles[name]) {
                     throw new Error('Inexisting bundle: ' + name);

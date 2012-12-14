@@ -20,26 +20,26 @@
 
     var root_level = 'none',
         loggers = {
-            all:{
-                level:10
+            all: {
+                level: 10
             },
-            log:{
-                level:20
+            log: {
+                level: 20
             },
-            debug:{
-                level:20
+            debug: {
+                level: 20
             },
-            info:{
-                level:30
+            info: {
+                level: 30
             },
-            warn:{
-                level:40
+            warn: {
+                level: 40
             },
-            error:{
-                level:50
+            error: {
+                level: 50
             },
-            none:{
-                level:60
+            none: {
+                level: 60
             }
         },
         Logger = function (name, level) {
@@ -70,44 +70,43 @@
     }
 
     Logger.prototype = {
-        debug:function () {
+        debug: function () {
             doLog(this.name, 'debug', arguments, this.level);
         },
-        info:function (msg) {
+        info: function (msg) {
             doLog(this.name, 'info', arguments, this.level);
         },
-        warn:function (msg) {
+        warn: function (msg) {
             doLog(this.name, 'warn', arguments, this.level);
         },
-        error:function (msg) {
+        error: function (msg) {
             doLog(this.name, 'error', arguments, this.level);
         }
     };
 
     w.tajin.install({
-        name:'log',
-        requires:'core',
-        exports:{
-            init:function (next, opts) {
-                var tajin = this, l = (opts.level || root_level).toLowerCase();
-                root_level = loggers[l] ? l : root_level;
-                opts.level = root_level;
-                next();
-            },
-            debug:function () {
+        name: 'log',
+        init: function (next, opts, tajin) {
+            var l = (opts.level || root_level).toLowerCase();
+            root_level = loggers[l] ? l : root_level;
+            opts.level = root_level;
+            next();
+        },
+        exports: {
+            debug: function () {
                 doLog('tajin.log', 'debug', arguments);
             },
-            info:function () {
+            info: function () {
                 doLog('tajin.log', 'info', arguments);
             },
-            warn:function () {
+            warn: function () {
                 doLog('tajin.log', 'warn', arguments);
             },
-            error:function () {
+            error: function () {
                 doLog('tajin.log', 'error', arguments);
             },
-            logger:function (name, level) {
-                if(!name) {
+            logger: function (name, level) {
+                if (!name) {
                     throw new Error('Missing logger name');
                 }
                 return new Logger(name, level);

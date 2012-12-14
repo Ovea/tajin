@@ -20,12 +20,12 @@
 
     w.tajin.install({
         name: 'test-module',
-        requires: 'core',
+        requires: 'event',
+        init: function (next, opts) {
+            opts.init_called = true;
+            next();
+        },
         exports: {
-            init: function (next, opts) {
-                opts.init_called = true;
-                next();
-            }
         }
     });
 

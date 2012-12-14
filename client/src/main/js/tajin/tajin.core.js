@@ -17,14 +17,9 @@
 /*global jQuery, window, console*/
 (function (w, $) {
     "use strict";
-    var ready = 0, listeners = [], modules = [
-        {
-            name: 'core'
-        }
-    ], Tajin = function () {
+    var ready = 0, listeners = [], modules = [], Tajin = function () {
     };
-    w.tajin = new Tajin();
-    $.extend(w.tajin, ({
+    Tajin.prototype = {
         uninstall: function (name) {
             if (!name) {
                 throw new Error('Module name is missing');
@@ -33,7 +28,7 @@
             for (i = 0; i < modules.length; i++) {
                 if (modules[i].name === name) {
                     modules.splice(i, 1);
-                    delete w.tajin[name];
+                    delete this[name];
                     break;
                 }
             }
@@ -45,7 +40,7 @@
             if (!module.name) {
                 throw new Error('Module name is missing');
             }
-            w.tajin.uninstall(module.name);
+            this.uninstall(module.name);
             if (module.requires) {
                 var missing = $.isArray(module.requires) ? module.requires.slice(0) : module.requires.split(','), p, i;
                 for (i = 0; i < modules.length; i++) {
@@ -58,54 +53,70 @@
                     throw new Error("Error loading module '" + module.name + "': missing modules: " + missing);
                 }
             }
+            if (!module.exports) {
+                module.exports = {}
+            }
+            if (!$.isFunction(module.init)) {
+                module.init = function (next) {
+                    next();
+                };
+            }
+            if (ready === 2) {
+                this.options[module.name] = this.options[module.name] || {};
+                module.init($.noop, this.options[module.name], this);
+            }
             modules.push(module);
-            if (module.exports) {
-                w.tajin[module.name] = module.exports;
-            }
-            if (ready === 2 && module.exports && $.isFunction(module.exports.init)) {
-                w.tajin.options[module.name] = w.tajin.options[module.name] || {};
-                module.exports.init.call(module.exports, $.noop, w.tajin.options[module.name], w.tajin);
-            }
         },
         init: function (opts) {
-            if (ready === 0) {
+            if (ready === 0 || ready === 1) {
+                if (ready === 0) {
+                    this.options = $.extend(true, {
+                        debug: false,
+                        onready: $.noop
+                    }, w.tajin_init || {}, opts || {});
+                }
                 ready = 1;
-                w.tajin.options = $.extend(true, {
-                    debug: false,
-                    onready: $.noop
-                }, w.tajin_init || {}, opts || {});
-                var n, i = -1,
+                var n, i = -1, self = this,
                     inits = $.grep(modules, function (m) {
-                        return m.exports && $.isFunction(m.exports.init);
+                        return m.tajin_init !== 'success';
                     }),
                     next = function () {
                         i++;
                         if (i < inits.length) {
-                            n = inits[i].name;
-                            w.tajin.options[n] = w.tajin.options[n] || {};
-                            if (w.tajin.options.debug) {
-                                console.log('[tajin.core] init', n, w.tajin.options[n]);
+                            if (i > 0) {
+                                // exports previously suceed module
+                                self[n] = inits[i - 1].exports;
+                                inits[i - 1].tajin_init = 'success';
                             }
-                            inits[i].exports.init.call(inits[i].exports, next, w.tajin.options[n], w.tajin);
+                            n = inits[i].name;
+                            self.options[n] = self.options[n] || {};
+                            if (self.options.debug) {
+                                console.log('[tajin.core] init', n, self.options[n]);
+                            }
+                            try {
+                                inits[i].init(next, self.options[n], self);
+                            } catch (e) {
+                                inits[i].tajin_init = e;
+                                throw  e;
+                            }
                         } else if (i === inits.length) {
-                            if (w.tajin.options.debug) {
-                                console.log('[tajin.core] onready - init completed with options', w.tajin.options);
+                            if (self.options.debug) {
+                                console.log('[tajin.core] onready - init completed with options', self.options);
                             }
                             ready = 2;
-                            if ($.isFunction(w.tajin.options.onready)) {
-                                w.tajin.options.onready(w.tajin);
+                            if ($.isFunction(self.options.onready)) {
+                                self.options.onready(self);
                             }
                             while (listeners.length) {
-                                listeners.shift()(w.tajin);
+                                listeners.shift()(self);
                             }
                         }
                     };
-                delete w.tajin_init;
                 next();
             }
         },
         toString: function () {
-            return "Tajin Framework, version ${project.version}, modules: " + w.tajin.modules();
+            return "Tajin Framework, version ${project.version}, modules: " + this.modules();
         },
         modules: function () {
             return $.map(modules, function (e) {
@@ -115,11 +126,12 @@
         ready: function (fn) {
             if ($.isFunction(fn)) {
                 if (ready === 2) {
-                    fn(w.tajin);
+                    fn(this);
                 } else {
                     listeners.push(fn);
                 }
             }
         }
-    }));
+    };
+    w.tajin = new Tajin();
 }(window, jQuery));
