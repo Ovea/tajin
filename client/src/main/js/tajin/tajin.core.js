@@ -83,12 +83,12 @@
                     }),
                     next = function () {
                         i++;
+                        if (i > 0 && i <= inits.length) {
+                            // exports previously suceed module
+                            self[n] = inits[i - 1].exports;
+                            inits[i - 1].tajin_init = 'success';
+                        }
                         if (i < inits.length) {
-                            if (i > 0) {
-                                // exports previously suceed module
-                                self[n] = inits[i - 1].exports;
-                                inits[i - 1].tajin_init = 'success';
-                            }
                             n = inits[i].name;
                             self.options[n] = self.options[n] || {};
                             if (self.options.debug) {

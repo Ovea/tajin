@@ -52,10 +52,13 @@ describe("tajin.i18n", function () {
             tajin.i18n.load('app3', 'fr_CA', function (bundle) {
                 bundle.localize(document);
             });
-            waitsFor(function(){
-                return called;
-            }, 'too long', 600);
-            tajin.options.i18n.onlocalize = old;
+            try {
+                waitsFor(function () {
+                    return called;
+                }, 'too long', 600);
+            } finally {
+                tajin.options.i18n.onlocalize = old;
+            }
         });
 
     });
