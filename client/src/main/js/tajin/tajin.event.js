@@ -17,7 +17,6 @@
 /*global window, jQuery, console*/
 (function (w, $) {
     "use strict";
-
     var e_uid = 1,
         e_cb_uid = 1,
         events = {},
@@ -169,19 +168,18 @@
 
     w.tajin.install({
         name: 'event',
-        requires: 'core',
+        init: function (next, opts, tajin) {
+            var ready = t_add({
+                id: 'tajin/ready',
+                state: true
+            });
+            tajin.ready(function () {
+                ready.fire();
+            });
+            //TODO MATHIEU - add remote features here with cometd if opts.remote
+            next();
+        },
         exports: {
-            init: function (next, opts, tajin) {
-                var ready = t_add({
-                    id: 'tajin/ready',
-                    state: true
-                });
-                tajin.ready(function () {
-                    ready.fire();
-                });
-                //TODO MATHIEU - add remote features here with cometd if opts.remote
-                next();
-            },
             get: function (id, opts) {
                 if (!events[id]) {
                     this.add($.extend({}, opts, {
@@ -224,12 +222,11 @@
             },
             add: t_add,
             reset: function (id) {
-                w.tajin.event.get(id).reset();
+                this.get(id).reset();
             },
             destroy: function (id) {
-                w.tajin.event.get(id).destroy();
+                this.get(id).destroy();
             }
         }
     });
-
 }(window, jQuery));

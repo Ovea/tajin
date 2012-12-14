@@ -17,44 +17,44 @@
 /*global window, jQuery, console*/
 (function (w, $) {
     "use strict";
-    if (!$.mobile) {
-        return;
-    }
     var current_page;
     w.tajin.install({
         name: 'jqm',
-        requires: 'core,event,timer,store',
+        requires: 'event,timer,store',
+        init: function (next, opts, tajin) {
+            if (!$.mobile) {
+                throw new Error('jQuery Mobile scripts not found ! Please add them.');
+            }
+            var tevent = tajin.event,
+                events = {
+                    beforeshow: tajin.event.add('jqm/beforeshow'),
+                    show: tajin.event.add('jqm/show'),
+                    beforehide: tajin.event.add('jqm/beforehide'),
+                    hide: tajin.event.add('jqm/hide'),
+                    init: tajin.event.add('jqm/init')
+                },
+                fire = function (evt, event) {
+                    var page = $(event.target), name = page.attr('id');
+                    events[evt].fire(page);
+                    if (name) {
+                        tevent.get('jqm/' + evt + '/' + name).fire(page);
+                    }
+                };
+            $(document).on('pagebeforeshow',function (event) {
+                current_page = $(event.target);
+                fire('beforeshow', event);
+            }).on('pagebeforehide',function (event) {
+                    fire('beforehide', event);
+                }).on('pageshow',function (event) {
+                    fire('show', event);
+                }).on('pagehide',function (event) {
+                    fire('hide', event);
+                }).on('pageinit', function (event) {
+                    fire('init', event);
+                });
+            next();
+        },
         exports: {
-            init: function (next, opts, tajin) {
-                var tevent = tajin.event,
-                    events = {
-                        beforeshow: tajin.event.add('jqm/beforeshow'),
-                        show: tajin.event.add('jqm/show'),
-                        beforehide: tajin.event.add('jqm/beforehide'),
-                        hide: tajin.event.add('jqm/hide'),
-                        init: tajin.event.add('jqm/init')
-                    },
-                    fire = function (evt, event) {
-                        var page = $(event.target), name = page.attr('id');
-                        events[evt].fire(page);
-                        if (name) {
-                            tevent.get('jqm/' + evt + '/' + name).fire(page);
-                        }
-                    };
-                $(document).on('pagebeforeshow',function (event) {
-                    current_page = $(event.target);
-                    fire('beforeshow', event);
-                }).on('pagebeforehide',function (event) {
-                        fire('beforehide', event);
-                    }).on('pageshow',function (event) {
-                        fire('show', event);
-                    }).on('pagehide',function (event) {
-                        fire('hide', event);
-                    }).on('pageinit', function (event) {
-                        fire('init', event);
-                    });
-                next();
-            },
             page: function () {
                 var p = current_page || $('body div[data-role=page]:visible');
                 return p.length ? p : null;

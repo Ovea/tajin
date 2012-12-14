@@ -19,21 +19,19 @@
     "use strict";
     w.tajin.install({
         name: 'config',
-        requires: 'core,util',
-        exports: {
-            init: function (next, opts, tajin) {
-                var url = opts.url;
-                if (!url) {
-                    url = tajin.util.path('tajin-client.json');
-                    opts.url = url;
-                }
-                $.getJSON(url,function (cfg) {
-                    tajin.options = $.extend(true, cfg || {}, tajin.options);
-                    next();
-                }).error(function () {
-                        next();
-                    });
+        requires: 'util',
+        init: function (next, opts, tajin) {
+            var url = opts.url;
+            if (!url) {
+                url = tajin.util.path('tajin-client.json');
+                opts.url = url;
             }
+            $.getJSON(url,function (cfg) {
+                tajin.options = $.extend(true, cfg || {}, tajin.options);
+                next();
+            }).error(function () {
+                    next();
+                });
         }
     });
 }(window, jQuery));
