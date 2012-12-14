@@ -44,18 +44,18 @@ describe("tajin.i18n", function () {
         });
 
         it("can be configured with a custom 'onlocalize' callback", function () {
-            var stub = {
-                customOnLocalize: function () {
-                }
+            var called = false;
+            var old = tajin.options.i18n.onlocalize;
+            tajin.options.i18n.onlocalize = function () {
+                called = true;
             };
-            tajin.options.i18n.onlocalize = stub.customOnLocalize();
-            spyOn(stub, "customOnLocalize");
-
             tajin.i18n.load('app3', 'fr_CA', function (bundle) {
                 bundle.localize(document);
-                expect(stub.customOnLocalize).toHaveBeenCalled();
             });
-
+            waitsFor(function(){
+                return called;
+            }, 'too long', 600);
+            tajin.options.i18n.onlocalize = old;
         });
 
     });

@@ -33,24 +33,24 @@ describe("tajin", function () {
         });
 
         it("restart initialization at failure point when a module initialization fails", function () {
-            var steps = [];
-            var m1 = {
-                name: 'm1',
-                init: function () {
-                    steps.push('m1');
-                }
-            }, m2 = {
-                name: 'm2',
-                init: function () {
-                    steps.push('m2');
-                }
-            }, failing = {
-                name: 'failing',
-                init: function () {
-                    steps.push('failing');
-                }
-            };
-            var t = new Tajin();
+            var steps = [],
+                m1 = {
+                    name: 'mod1',
+                    init: function () {
+                        steps.push('m1');
+                    }
+                }, m2 = {
+                    name: 'mod2',
+                    init: function () {
+                        steps.push('m2');
+                    }
+                }, failing = {
+                    name: 'failing',
+                    init: function () {
+                        steps.push('failing');
+                    }
+                },
+                t = new Tajin();
             t.install(m1);
             t.install(failing);
             t.install(m2);
