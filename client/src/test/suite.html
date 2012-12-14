@@ -16,6 +16,8 @@
     <script type="text/javascript" src="lib/jasmine.js"></script>
     <script type="text/javascript" src="lib/jasmine-html.js"></script>
 
+    <script type="text/javascript" src="lib/handlebars-1.0.rc.1.js"></script>
+
     <script type="text/javascript">
         (function () {
             var jasmineEnv = window.jasmineEnv = jasmine.getEnv(),
@@ -97,6 +99,14 @@
     <div id="page_2" data-role="page">
         <div data-role="content">page 2 <a href="#page_1" data-role="button">-> page 1</a></div>
     </div>
+
+    <div id="i18n">
+        <span rel="localize[msg3]"></span>
+        <a href="localize[link]">lien</a>
+
+        <div custom-attr="localize[link]">tag</div>
+    </div>
+
 </div>
 
 </body>
