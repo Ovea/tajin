@@ -17,15 +17,34 @@
 /*global window, jQuery, console*/
 (function (w, $) {
     "use strict";
-
-    var exp = {};
-
-
+    if (!w.JSON || !w.JSON.parse || !w.JSON.stringify) {
+        return;
+    }
 
     w.tajin.install({
         name: 'store',
         requires: 'core',
-        exports: exp
+        exports: {
+            init: function (next, opts, tajin) {
+                //detect
+                self.type = '...';
+                next();
+            },
+            get: function (k) {
+                if (k !== 'string') {
+                    throw new Error('Key must be a string');
+                }
+            },
+            has: function (k) {
+                var v = this.get(k);
+            },
+            del: function (k) {
+
+            },
+            put: function (k, v) {
+
+            }
+        }
     });
 
 }(window, jQuery));

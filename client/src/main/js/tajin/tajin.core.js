@@ -21,8 +21,10 @@
         {
             name: 'core'
         }
-    ];
-    w.tajin = {
+    ], Tajin = function () {
+    };
+    w.tajin = new Tajin();
+    $.extend(w.tajin, ({
         uninstall: function (name) {
             if (!name) {
                 throw new Error('Module name is missing');
@@ -62,7 +64,7 @@
             }
             if (ready === 2 && module.exports && $.isFunction(module.exports.init)) {
                 w.tajin.options[module.name] = w.tajin.options[module.name] || {};
-                module.exports.init.call(w.tajin, $.noop, w.tajin.options[module.name], module.exports);
+                module.exports.init.call(module.exports, $.noop, w.tajin.options[module.name], w.tajin);
             }
         },
         init: function (opts) {
@@ -84,7 +86,7 @@
                             if (w.tajin.options.debug) {
                                 console.log('[tajin.core] init', n, w.tajin.options[n]);
                             }
-                            inits[i].exports.init.call(w.tajin, next, w.tajin.options[n], inits[i].exports);
+                            inits[i].exports.init.call(inits[i].exports, next, w.tajin.options[n], w.tajin);
                         } else if (i === inits.length) {
                             if (w.tajin.options.debug) {
                                 console.log('[tajin.core] onready - init completed with options', w.tajin.options);
@@ -119,5 +121,5 @@
                 }
             }
         }
-    };
+    }));
 }(window, jQuery));
