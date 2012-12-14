@@ -161,18 +161,24 @@ describe("tajin.i18n", function () {
                 });
             });
 
-//            it("localizes specific HTML attributes (href, src, ...)", function () {
-//                this.fail('TODO');
-//            });
-//
-//            it("localizes unattached DOM fragment", function () {
-//                this.fail('TODO');
-//                // var html = $(template({ title: "My New Post", body: "This is my first post!", url: res_fr_CA.url('pub.jpg') })); bundle.localize(html);
-//            });
-//
-//            it("localizes to another locale same DOM fragment", function () {
-//                this.fail('TODO');
-//            });
+            it("localizes specific HTML attributes (href, src, ...)", function () {
+                var element = $('#i18n').find('a:first');
+                expect(element.attr('href')).toBe('localize[link]');
+
+                tajin.i18n.load('app', 'fr_CA', function (bundle) {
+                    bundle.localize(element);
+                    expect(element.attr('href')).toBe('http://goto/fr.ca');
+                });
+            });
+
+            it("localizes unattached DOM fragment", function () {
+                this.fail('TODO');
+                // var html = $(template({ title: "My New Post", body: "This is my first post!", url: res_fr_CA.url('pub.jpg') })); bundle.localize(html);
+            });
+
+            it("localizes to another locale same DOM fragment", function () {
+                this.fail('TODO');
+            });
 
         });
 
