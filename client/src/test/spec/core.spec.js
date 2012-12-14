@@ -33,17 +33,34 @@ describe("tajin", function () {
         });
 
         it("restart initialization at failure point when a module initialization fails", function () {
+            var steps = [];
             var m1 = {
-                name: 'test',
+                name: 'm1',
                 init: function () {
-                    c++;
+                    steps.push('m1');
+                }
+            }, m2 = {
+                name: 'm2',
+                init: function () {
+                    steps.push('m2');
+                }
+            }, failing = {
+                name: 'failing',
+                init: function () {
+                    steps.push('failing');
                 }
             };
-            this.fail('TODO');
-            tajin.install(m);
-            expect(c).toBe(1);
-            tajin.init();
-            expect(c).toBe(1);
+            var t = new Tajin();
+            t.install(m1);
+            t.install(failing);
+            t.install(m2);
+            expect(steps).toBe([]);
+            try {
+                tajin.init();
+                this.fail('should not go there');
+            } catch (e) {
+            }
+
         });
 
         it("exposes module exports, options and tajin to module's init functions", function () {

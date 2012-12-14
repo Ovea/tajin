@@ -17,9 +17,10 @@
 /*global jQuery, window, console*/
 (function (w, $) {
     "use strict";
-    var ready = 0, listeners = [], modules = [], Tajin = function () {
+    var ready = 0, listeners = [], modules = [];
+    w.Tajin = function () {
     };
-    Tajin.prototype = {
+    w.Tajin.prototype = {
         uninstall: function (name) {
             if (!name) {
                 throw new Error('Module name is missing');
@@ -133,5 +134,5 @@
             }
         }
     };
-    w.tajin = new Tajin();
+    w.tajin = new w.Tajin();
 }(window, jQuery));

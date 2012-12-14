@@ -134,25 +134,22 @@
             if (options.debug) {
                 console.log('[tajin.i18n] localize', this.name, this.locale);
             }
-            var self = this, e = (expr instanceof jQuery) ? expr : $(expr);
-            if (e.attr('rel') && e.attr('rel').toLowerCase().match(/^localize/)) {
-                var key = e.attr("rel").match(/localize\[([\.\w]+)\]/)[1], v = self.value(key);
-                if (options.debug) {
-                    console.log('[tajin.i18n] localize', self.name, self.locale, key, v, e);
-                }
-                options.onlocalize(self.name, self.locale, e, key, v);
-            }
-
-            e.find('[rel*="localize"]').each(function () {
+            var self = this, e = (expr instanceof jQuery) ? expr : $(expr), doloc = function () {
                 var elem = $(this), key = elem.attr("rel").match(/localize\[([\.\w]+)\]/)[1], v = self.value(key);
                 if (options.debug) {
                     console.log('[tajin.i18n] localize', self.name, self.locale, key, v, elem);
                 }
                 options.onlocalize(self.name, self.locale, elem, key, v);
+            };
+            if (e.attr('rel') && e.attr('rel').match(/^localize/)) {
+                doloc.call(e);
+            }
+            e.find('[rel*="localize"]').each(function () {
+                doloc.call(this);
             });
             $.each(options.attributes, function (i, attr) {
                 e.find('[' + attr + '^="localize"]').each(function () {
-                    var elem = $(this),  key = elem.attr(attr).match(/localize\[([\.\w]+)\]/)[1], v = self.value(key);
+                    var elem = $(this), key = elem.attr(attr).match(/localize\[([\.\w]+)\]/)[1], v = self.value(key);
                     if (options.debug) {
                         console.log('[tajin.i18n] localize', self.name, self.locale, key, v, elem);
                     }
