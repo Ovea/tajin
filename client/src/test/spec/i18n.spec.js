@@ -24,11 +24,6 @@ describe("tajin.i18n", function () {
             expect(tajin.options.i18n.bundles.app.variants).toContain('fr_CA');
             expect(tajin.options.i18n.bundles.app.variants).toContain('en_US');
 
-            expect(tajin.options.i18n.bundles.app.preload).toContain('fr_CA');
-            expect(tajin.options.i18n.bundles.app.preload).toContain('en');
-            expect(tajin.options.i18n.bundles.app.preload).toContain('fr');
-            expect(tajin.options.i18n.bundles.app.preload).toContain('en_US');
-
             expect(tajin.options.i18n.resources.length).toBe(2);
             expect(tajin.options.i18n.resources[0].path).toBe('spec/i18n/contents/pub.html');
             expect(tajin.options.i18n.resources[0].variants.length).toBe(2);
@@ -42,12 +37,25 @@ describe("tajin.i18n", function () {
         });
 
         it("has preloaded specified bundles and locales", function () {
-            this.fail('TODO');
-            // see config "preload": ["fr_CA", "en", "fr", "en_US"]
+            expect(tajin.options.i18n.bundles.app.preload).toContain('fr_CA');
+            expect(tajin.options.i18n.bundles.app.preload).toContain('en');
+            expect(tajin.options.i18n.bundles.app.preload).toContain('fr');
+            expect(tajin.options.i18n.bundles.app.preload).toContain('en_US');
         });
 
         it("can be configured with a custom 'onlocalize' callback", function () {
-            this.fail('TODO');
+            var stub = {
+                customOnLocalize: function () {
+                }
+            };
+            tajin.options.i18n.onlocalize = stub.customOnLocalize();
+            spyOn(stub, "customOnLocalize");
+
+            tajin.i18n.load('app3', 'fr_CA', function (bundle) {
+                bundle.localize(document);
+                expect(stub.customOnLocalize).toHaveBeenCalled();
+            });
+
         });
 
     });
@@ -63,23 +71,42 @@ describe("tajin.i18n", function () {
         });
 
         it("loads bundle using specified locale", function () {
-            this.fail('TODO');
-            // tajin.i18n.load('app', 'fr_CA', function (bundle) {...});
+            tajin.i18n.load('app', 'fr_CA', function (bundle) {
+                expect(bundle.name).toBe('app');
+                expect(bundle.locale).toBe('fr_CA');
+                expect(bundle.resolved).toBe('fr_CA');
+            });
         });
 
-        it("it load bundles and merge them", function () {
-            this.fail('TODO');
-            // tajin.i18n.load('app', 'fr_CA', function (bundle) {...});
+        it("it load bundles and merge them from fr_ca => fr => en", function () {
+            tajin.i18n.load('app', 'fr_CA', function (bundle) {
+                expect(bundle.value('msg1')).toBe('english 1');
+                expect(bundle.value('msg2')).toBe('french 2');
+                expect(bundle.value('msg3')).toBe('french CA 3');
+                expect(bundle.value('inner.msg')).toBe('french');
+                expect(bundle.value('link')).toBe('http://goto/fr.ca');
+
+            });
         });
 
         it("degrades to less specific bundle if specified one is missing", function () {
-            this.fail('TODO');
-            // tajin.i18n.load('app', 'fr_FR', function (bundle) { => fallback to fr
+            tajin.i18n.load('app', 'fr_FR', function (bundle) {
+                expect(bundle.name).toBe('app');
+                expect(bundle.locale).toBe('fr_FR');
+                expect(bundle.resolved).toBe('fr');
+            });
         });
 
 
         it("calls provided callback when complete", function () {
-            this.fail('TODO');
+            var obj = {
+                f: function (bundle) {
+                }
+            };
+
+            spyOn(obj, 'f');
+            tajin.i18n.load('app', 'fr_CA', obj.f);
+            expect(obj.f).toHaveBeenCalled();
         });
 
         it("fires event i18n/bundle/loaded when complete", function () {
@@ -91,27 +118,7 @@ describe("tajin.i18n", function () {
             tajin.event.get('i18n/bundle/loaded').listen(obj.f);
             tajin.i18n.load('app', 'fr_FR');
             expect(obj.f).toHaveBeenCalled();
-
-
         });
-
-//        it("fires event i18n/html/loaded when complete", function () {
-//            var obj = {
-//                f: function () {
-//                }
-//            };
-//            spyOn(obj, 'f');
-//            tajin.event.get('i18n/html/loaded').listen(obj.f);
-//            tajin.i18n.load('app', 'fr_FR');
-//            expect(obj.f).toHaveBeenCalled();
-//
-//
-//        });
-
-
-//            html: this.event.add('i18n/html/loaded'),
-//            image: this.event.add('i18n/image/loaded')
-
 
     });
 
@@ -144,21 +151,28 @@ describe("tajin.i18n", function () {
         describe("bundle.localize()", function () {
 
             it("localizes HTML elements using rel attribute", function () {
-                this.fail('TODO');
+                var element = $('#i18n').find('span:first');
+
+                expect(element.text()).toBe('');
+
+                tajin.i18n.load('app', 'fr_CA', function (bundle) {
+                    bundle.localize(element);
+                    expect(element.text()).toBe('french CA 3');
+                });
             });
 
-            it("localizes specific HTML attributes (href, src, ...)", function () {
-                this.fail('TODO');
-            });
-
-            it("localizes unattached DOM fragment", function () {
-                this.fail('TODO');
-                // var html = $(template({ title: "My New Post", body: "This is my first post!", url: res_fr_CA.url('pub.jpg') })); bundle.localize(html);
-            });
-
-            it("localizes to another locale same DOM fragment", function () {
-                this.fail('TODO');
-            });
+//            it("localizes specific HTML attributes (href, src, ...)", function () {
+//                this.fail('TODO');
+//            });
+//
+//            it("localizes unattached DOM fragment", function () {
+//                this.fail('TODO');
+//                // var html = $(template({ title: "My New Post", body: "This is my first post!", url: res_fr_CA.url('pub.jpg') })); bundle.localize(html);
+//            });
+//
+//            it("localizes to another locale same DOM fragment", function () {
+//                this.fail('TODO');
+//            });
 
         });
 
@@ -224,11 +238,46 @@ describe("tajin.i18n", function () {
 
     });
 
+    //        it("fires event i18n/html/loaded when complete", function () {
+//            var obj = {
+//                f: function () {
+//                }
+//            };
+//            spyOn(obj, 'f');
+//            tajin.event.get('i18n/html/loaded').listen(obj.f);
+//            tajin.i18n.load('app', 'fr_FR');
+//            expect(obj.f).toHaveBeenCalled();
+//
+//
+//        });
+
+
+//            html: this.event.add('i18n/html/loaded'),
+//            image: this.event.add('i18n/image/loaded')
+
+
 });
 
 describe("Handlebars integration", function () {
 
     it("can load, process and localize i18n-ized template", function () {
+        tajin.i18n.load('app', 'fr_CA', function (bundle) {
+            bundle.localize(document);
+            var res_fr_CA = tajin.i18n.resources('fr-CA');
+            res_fr_CA.html('pub.html', function (url) {
+                console.log(this);
+                var template = Handlebars.compile(this);
+                var html = $(template({
+                    title: "My New Post",
+                    body: "This is my first post!",
+                    url: res_fr_CA.url('pub.jpg')
+                }));
+                bundle.localize(html);
+//                $('body').append(html);
+            });
+        });
+
+
         this.fail('TODO');
         // see full sample in other html pages
     });
@@ -238,5 +287,8 @@ describe("Handlebars integration", function () {
 function browser_locale() {
     var locale = (navigator.language || navigator.userLanguage).replace(/-/, '_').toLowerCase();
     return locale.length > 3 ? locale.substring(0, 3) + locale.substring(3).toUpperCase() : locale;
+}
+
+function fakeOnLocalize() {
 }
 
