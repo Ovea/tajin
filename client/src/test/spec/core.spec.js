@@ -60,7 +60,6 @@ describe("tajin", function () {
                     err: function (t, e) {
                         call_err = true;
                         expect(e.message).toBe('exception');
-                        alert(steps);
                         expect(steps.length).toBe(2);
                         expect(steps[0]).toBe(1);
                         expect(steps[1]).toBe(3);

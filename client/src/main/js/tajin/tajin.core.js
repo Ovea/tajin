@@ -61,7 +61,7 @@
                     }
                 }
                 if (!module.exports) {
-                    module.exports = {}
+                    module.exports = {};
                 }
                 if (!$.isFunction(module.init)) {
                     module.init = function (next) {
@@ -142,7 +142,7 @@
                     }
                 }
             }
-        })
+        });
     };
     w.tajin = new w.Tajin();
 }(window, jQuery));

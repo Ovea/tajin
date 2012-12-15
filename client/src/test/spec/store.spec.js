@@ -18,6 +18,7 @@ describe("tajin.store", function () {
         });
 
         it("removes k if v is null or undefined", function () {
+            tajin.store.clear();
             tajin.store.put('k2', 'v');
             expect(tajin.store.has('k2')).toBe(true);
             tajin.store.put('k2', null);
@@ -29,10 +30,11 @@ describe("tajin.store", function () {
         });
 
         it("returns previous value associated to k or null if none", function () {
-            var v = tajin.store.put('k3', 'v1');
-            expect(v).toBeNull();
-            v = tajin.store.put('k3', 'v2');
-            expect(v).toBe('v1');
+            tajin.store.clear();
+            var v1 = tajin.store.put('k3', 'v1');
+            expect(v1).toBeNull();
+            var v2 = tajin.store.put('k3', 'v2');
+            expect(v2).toBe('v1');
         });
 
     });
@@ -100,9 +102,9 @@ describe("tajin.store", function () {
 
     describe("tajin.store.type", function () {
 
-        it("returns the storage type used (local, session, global, user, memory)", function () {
+        it("returns the storage type used (localStorage, sessionStorage, globalStorage, userData, memory)", function () {
             // on major browsers
-            expect(tajin.store.type).toBe('local');
+            expect(tajin.store.type).toBe('localStorage');
         });
 
     });
