@@ -36,17 +36,20 @@ describe("tajin", function () {
             var steps = [],
                 m1 = {
                     name: 'mod1',
-                    init: function () {
-                        steps.push('m1');
+                    init: function (next) {
+                        steps.push(1);
+                        next();
                     }
                 }, m2 = {
                     name: 'mod2',
-                    init: function () {
-                        steps.push('m2');
+                    init: function (next) {
+                        steps.push(2);
+                        next();
                     }
                 }, failing = {
                     name: 'failing',
-                    init: function () {
+                    init: function (next) {
+                        steps.push(3);
                         throw new Error('exception');
                     }
                 },
@@ -57,34 +60,43 @@ describe("tajin", function () {
                     err: function (t, e) {
                         call_err = true;
                         expect(e.message).toBe('exception');
-                        expect(steps.length).toBe(1);
-                        expect(steps[0]).toBe('mod1');
+                        alert(steps);
+                        expect(steps.length).toBe(2);
+                        expect(steps[0]).toBe(1);
+                        expect(steps[1]).toBe(3);
                     },
                     succ: function (t) {
                         call_succ = true;
-                        expect(steps.length).toBe(2);
-                        expect(steps[1]).toBe('mod2');
+                        expect(steps.length).toBe(3);
+                        expect(steps[2]).toBe(2);
                     }
                 };
             t.install(m1);
             t.install(failing);
             t.install(m2);
             expect(steps.length).toBe(0);
-            tajin.init({
-                onerror: obj.err,
-                onready: obj.succ
-            });
+            try {
+                t.init({
+                    onerror: obj.err,
+                    onready: obj.succ
+                });
+                // since no module is asynchrnous, the error is thrown in this part of code
+                this.fail();
+            } catch (e) {
+                expect(e.message).toBe('exception');
+            }
             waitsFor(function () {
                 return call_err;
-            }, 600, 'too long');
+            }, 600, 'waiting for error');
             t.uninstall(failing);
-            tajin.init({
+            t.init({
                 onerror: obj.err,
                 onready: obj.succ
             });
             waitsFor(function () {
-                return call_err;
-            }, 600, 'too long');
+                return call_succ;
+            }, 600, 'waiting for success');
+            expect(steps.length).toBe(3);
         });
 
         it("exposes module exports, options and tajin to module's init functions", function () {

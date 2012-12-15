@@ -25,6 +25,9 @@
                 return status;
             },
             uninstall: function (name) {
+                if (name && typeof name !== 'string') {
+                    name = name.name;
+                }
                 if (!name) {
                     throw new Error('Module name is missing');
                 }
