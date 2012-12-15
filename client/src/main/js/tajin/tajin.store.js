@@ -23,25 +23,25 @@
         }
         return;
     }
-    var impl,
-        prefix = "__tajin__",
-        adapt_html5 = function (storage) {
-            return {
-                get: function (k) {
-                    var v = storage.getItem(k);
-                    return typeof v === 'string' ? JSON.parse(v) : v;
-                },
-                put: function (k, v) {
-                    storage.setItem(k, JSON.stringify(v));
-                },
-                del: function (k) {
-                    storage.removeItem(k);
-                }
+    var StoreModule = function () {
+        var impl,
+            prefix = "__tajin__",
+            adapt_html5 = function (storage) {
+                return {
+                    get: function (k) {
+                        var v = storage.getItem(k);
+                        return typeof v === 'string' ? JSON.parse(v) : v;
+                    },
+                    put: function (k, v) {
+                        storage.setItem(k, JSON.stringify(v));
+                    },
+                    del: function (k) {
+                        storage.removeItem(k);
+                    }
+                };
             };
-        };
-    w.tajin.install({
-        name: 'store',
-        init: function (next, opts, tajin) {
+        this.name = 'store';
+        this.init = function (next, opts, tajin) {
             // localStorage + sessionStorage: IE 8+, Firefox 3.5+, Safari 4+, Chrome 4+, Opera 10.5+, iPhone 2+, Android 2+
             // globalStorage: Firefox 2+ (See: https://developer.mozilla.org/en/dom/storage#globalStorage)
             $(['localStorage', 'sessionStorage', 'globalStorage']).each(function (i, store) {
@@ -70,8 +70,8 @@
             // IE 8+, Firefox 3.5+, Safari 4+, Chrome 4+, Opera 10.5+, iPhone 2+, Android 2+
             this.type = '...';
             next();
-        },
-        exports: {
+        };
+        this.exports = {
             get: function (k) {
                 if (typeof k !== 'string') {
                     throw new Error('Key must be a string');
@@ -96,6 +96,9 @@
                     return old;
                 }
             }
-        }
-    });
+        };
+    };
+
+    w.tajin.install(new StoreModule());
+
 }(window, jQuery));

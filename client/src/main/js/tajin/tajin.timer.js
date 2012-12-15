@@ -18,11 +18,10 @@
 (function (w, $) {
     "use strict";
 
-    var uid = 1;
-
-    w.tajin.install({
-        name: 'timer',
-        exports: {
+    var TimerModule = function () {
+        var uid = 1;
+        this.name = 'timer';
+        this.exports = {
             timers: {},
             stop: function (id) {
                 if (this.timers[id]) {
@@ -72,7 +71,10 @@
                 };
                 return this.timers[id];
             }
-        }
-    });
+        };
+    };
+
+
+    w.tajin.install(new TimerModule());
 
 }(window, jQuery));

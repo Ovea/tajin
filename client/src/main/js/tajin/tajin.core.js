@@ -17,122 +17,129 @@
 /*global jQuery, window, console*/
 (function (w, $) {
     "use strict";
-    var ready = 0, listeners = [], modules = [];
     w.Tajin = function () {
-    };
-    w.Tajin.prototype = {
-        uninstall: function (name) {
-            if (!name) {
-                throw new Error('Module name is missing');
-            }
-            var i;
-            for (i = 0; i < modules.length; i++) {
-                if (modules[i].name === name) {
-                    modules.splice(i, 1);
-                    delete this[name];
-                    break;
+        var self = this, status = 'new', listeners = [], modules = [];
+        this.options = {};
+        $.extend(self, {
+            status: function () {
+                return status;
+            },
+            uninstall: function (name) {
+                if (!name) {
+                    throw new Error('Module name is missing');
                 }
-            }
-        },
-        install: function (module) {
-            if (ready === 1) {
-                throw new Error('Initializing...');
-            }
-            if (!module.name) {
-                throw new Error('Module name is missing');
-            }
-            this.uninstall(module.name);
-            if (module.requires) {
-                var missing = $.isArray(module.requires) ? module.requires.slice(0) : module.requires.split(','), p, i;
+                var i;
                 for (i = 0; i < modules.length; i++) {
-                    p = $.inArray(modules[i].name, missing);
-                    if (p >= 0) {
-                        missing.splice(p, 1);
+                    if (modules[i].name === name) {
+                        modules.splice(i, 1);
+                        delete this[name];
+                        break;
                     }
                 }
-                if (missing.length) {
-                    throw new Error("Error loading module '" + module.name + "': missing modules: " + missing);
+            },
+            install: function (module) {
+                if (status === 'initializing') {
+                    throw new Error('Initializing...');
                 }
-            }
-            if (!module.exports) {
-                module.exports = {}
-            }
-            if (!$.isFunction(module.init)) {
-                module.init = function (next) {
-                    next();
-                };
-            }
-            if (ready === 2) {
-                this.options[module.name] = this.options[module.name] || {};
-                module.init($.noop, this.options[module.name], this);
-            }
-            modules.push(module);
-        },
-        init: function (opts) {
-            if (ready === 0 || ready === 1) {
-                if (ready === 0) {
-                    this.options = $.extend(true, {
-                        debug: false,
-                        onready: $.noop
-                    }, w.tajin_init || {}, opts || {});
+                if (!module.name) {
+                    throw new Error('Module name is missing');
                 }
-                ready = 1;
-                var n, i = -1, self = this,
-                    inits = $.grep(modules, function (m) {
-                        return m.tajin_init !== 'success';
-                    }),
-                    next = function () {
-                        i++;
-                        if (i > 0 && i <= inits.length) {
-                            // exports previously suceed module
-                            self[n] = inits[i - 1].exports;
-                            inits[i - 1].tajin_init = 'success';
+                self.uninstall(module.name);
+                if (module.requires) {
+                    var missing = $.isArray(module.requires) ? module.requires.slice(0) : module.requires.split(','), p, i;
+                    for (i = 0; i < modules.length; i++) {
+                        p = $.inArray(modules[i].name, missing);
+                        if (p >= 0) {
+                            missing.splice(p, 1);
                         }
-                        if (i < inits.length) {
-                            n = inits[i].name;
-                            self.options[n] = self.options[n] || {};
-                            if (self.options.debug) {
-                                console.log('[tajin.core] init', n, self.options[n]);
-                            }
-                            try {
-                                inits[i].init(next, self.options[n], self);
-                            } catch (e) {
-                                inits[i].tajin_init = e;
-                                throw  e;
-                            }
-                        } else if (i === inits.length) {
-                            if (self.options.debug) {
-                                console.log('[tajin.core] onready - init completed with options', self.options);
-                            }
-                            ready = 2;
-                            if ($.isFunction(self.options.onready)) {
-                                self.options.onready(self);
-                            }
-                            while (listeners.length) {
-                                listeners.shift()(self);
-                            }
-                        }
+                    }
+                    if (missing.length) {
+                        throw new Error("Error loading module '" + module.name + "': missing modules: " + missing);
+                    }
+                }
+                if (!module.exports) {
+                    module.exports = {}
+                }
+                if (!$.isFunction(module.init)) {
+                    module.init = function (next) {
+                        next();
                     };
-                next();
-            }
-        },
-        toString: function () {
-            return "Tajin Framework, version ${project.version}, modules: " + this.modules();
-        },
-        modules: function () {
-            return $.map(modules, function (e) {
-                return e.name;
-            });
-        },
-        ready: function (fn) {
-            if ($.isFunction(fn)) {
-                if (ready === 2) {
-                    fn(this);
-                } else {
-                    listeners.push(fn);
+                }
+                if (status === 'ready') {
+                    self.options[module.name] = self.options[module.name] || {};
+                    module.init($.noop, self.options[module.name], this);
+                }
+                modules.push(module);
+            },
+            init: function (opts) {
+                if (status === 'new' || status === 'initializing') {
+                    if (status === 'new') {
+                        self.options = $.extend(true, {
+                            debug: false,
+                            onready: $.noop
+                        }, w.tajin_init || {}, opts || {});
+                    }
+                    status = 'initializing';
+                    var n, i = -1,
+                        inits = $.grep(modules, function (m) {
+                            return m.tajin_init !== 'success';
+                        }),
+                        next = function () {
+                            i++;
+                            if (i > 0 && i <= inits.length) {
+                                // exports previously suceed module
+                                self[n] = inits[i - 1].exports;
+                                inits[i - 1].tajin_init = 'success';
+                            }
+                            if (i < inits.length) {
+                                n = inits[i].name;
+                                self.options[n] = self.options[n] || {};
+                                if (self.options.debug) {
+                                    console.log('[tajin.core] init', n, self.options[n]);
+                                }
+                                try {
+                                    inits[i].init(next, self.options[n], self);
+                                } catch (e) {
+                                    inits[i].tajin_init = e;
+                                    if ($.isFunction(self.options.onerror)) {
+                                        self.options.onerror(self, e);
+                                    }
+                                    throw e;
+                                }
+                            } else if (i === inits.length) {
+                                if (self.options.debug) {
+                                    console.log('[tajin.core] onready - init completed with options', self.options);
+                                }
+                                status = 'ready';
+                                if ($.isFunction(self.options.onready)) {
+                                    self.options.onready(self);
+                                }
+                                while (listeners.length) {
+                                    listeners.shift()(self);
+                                }
+                            }
+                        };
+                    next();
+                }
+            },
+            toString: function () {
+                return "Tajin Framework, version ${project.version}, modules: " + self.modules();
+            },
+            modules: function () {
+                return $.map(modules, function (e) {
+                    return e.name;
+                });
+            },
+            ready: function (fn) {
+                if ($.isFunction(fn)) {
+                    if (status === 'ready') {
+                        fn(this);
+                    } else {
+                        listeners.push(fn);
+                    }
                 }
             }
-        }
+        })
     };
     w.tajin = new w.Tajin();
 }(window, jQuery));

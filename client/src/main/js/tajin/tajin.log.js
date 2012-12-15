@@ -17,82 +17,81 @@
 /*global jQuery, window, console*/
 (function (w, $) {
     "use strict";
+    var LogModule = function () {
+        var root_level = 'none',
+            loggers = {
+                all: {
+                    level: 10
+                },
+                log: {
+                    level: 20
+                },
+                debug: {
+                    level: 20
+                },
+                info: {
+                    level: 30
+                },
+                warn: {
+                    level: 40
+                },
+                error: {
+                    level: 50
+                },
+                none: {
+                    level: 60
+                }
+            },
+            Logger = function (name, level) {
+                this.name = name;
+                this.level = (level || root_level).toLowerCase();
+                this.level = loggers[this.level] ? this.level : root_level;
+            };
 
-    var root_level = 'none',
-        loggers = {
-            all: {
-                level: 10
-            },
-            log: {
-                level: 20
-            },
-            debug: {
-                level: 20
-            },
-            info: {
-                level: 30
-            },
-            warn: {
-                level: 40
-            },
-            error: {
-                level: 50
-            },
-            none: {
-                level: 60
+        $.each(['log', 'debug', 'info', 'warn', 'error'], function (i, m) {
+            loggers[m].f = window.console && window.console[m] ?
+                (typeof console[m] === 'function' ? function (args) {
+                    console[m].apply(console, args);
+                } : console[m]) : (loggers.log.f || $.noop);
+        });
+
+        function doLog(name, level, argum, loggerLevel) {
+            if (loggers[level].level >= loggers[loggerLevel || root_level].level) {
+                var i, args = [' [' + name + '] '];
+                if (argum.length) {
+                    args[0] += argum[0];
+                    for (i = 1; i < argum.length; i++) {
+                        args.push(argum[i]);
+                    }
+                }
+                args[0] = level.toUpperCase() + args[0];
+                loggers[level].f(args);
             }
-        },
-        Logger = function (name, level) {
-            this.name = name;
-            this.level = (level || root_level).toLowerCase();
-            this.level = loggers[this.level] ? this.level : root_level;
+        }
+
+        Logger.prototype = {
+            debug: function () {
+                doLog(this.name, 'debug', arguments, this.level);
+            },
+            info: function (msg) {
+                doLog(this.name, 'info', arguments, this.level);
+            },
+            warn: function (msg) {
+                doLog(this.name, 'warn', arguments, this.level);
+            },
+            error: function (msg) {
+                doLog(this.name, 'error', arguments, this.level);
+            }
         };
 
-    $.each(['log', 'debug', 'info', 'warn', 'error'], function (i, m) {
-        loggers[m].f = window.console && window.console[m] ?
-            (typeof console[m] === 'function' ? function (args) {
-                console[m].apply(console, args);
-            } : console[m]) : (loggers.log.f || $.noop);
-    });
-
-    function doLog(name, level, argum, loggerLevel) {
-        if (loggers[level].level >= loggers[loggerLevel || root_level].level) {
-            var i, args = [' [' + name + '] '];
-            if (argum.length) {
-                args[0] += argum[0];
-                for (i = 1; i < argum.length; i++) {
-                    args.push(argum[i]);
-                }
-            }
-            args[0] = level.toUpperCase() + args[0];
-            loggers[level].f(args);
-        }
-    }
-
-    Logger.prototype = {
-        debug: function () {
-            doLog(this.name, 'debug', arguments, this.level);
-        },
-        info: function (msg) {
-            doLog(this.name, 'info', arguments, this.level);
-        },
-        warn: function (msg) {
-            doLog(this.name, 'warn', arguments, this.level);
-        },
-        error: function (msg) {
-            doLog(this.name, 'error', arguments, this.level);
-        }
-    };
-
-    w.tajin.install({
-        name: 'log',
-        init: function (next, opts, tajin) {
+        this.name = 'log';
+        this.init = function (next, opts, tajin) {
             var l = (opts.level || root_level).toLowerCase();
             root_level = loggers[l] ? l : root_level;
             opts.level = root_level;
             next();
-        },
-        exports: {
+        };
+        this.exports = {
             debug: function () {
                 doLog('tajin.log', 'debug', arguments);
             },
@@ -111,7 +110,9 @@
                 }
                 return new Logger(name, level);
             }
-        }
-    });
+        };
+    };
+
+    w.tajin.install(new LogModule());
 
 }(window, jQuery));

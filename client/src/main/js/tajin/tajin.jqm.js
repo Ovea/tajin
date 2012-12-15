@@ -17,11 +17,11 @@
 /*global window, jQuery, console*/
 (function (w, $) {
     "use strict";
-    var current_page;
-    w.tajin.install({
-        name: 'jqm',
-        requires: 'event,timer,store',
-        init: function (next, opts, tajin) {
+    var JQMModule = function () {
+        var current_page;
+        this.name = 'jqm';
+        this.requires = 'event,timer,store';
+        this.init = function (next, opts, tajin) {
             if (!$.mobile) {
                 throw new Error('jQuery Mobile scripts not found ! Please add them.');
             }
@@ -53,8 +53,8 @@
                     fire('init', event);
                 });
             next();
-        },
-        exports: {
+        };
+        this.exports = {
             page: function () {
                 var p = current_page || $('body div[data-role=page]:visible');
                 return p.length ? p : null;
@@ -69,7 +69,9 @@
                 }
                 return null;
             }
-        }
-    });
+        };
+    };
+
+    w.tajin.install(new JQMModule());
 
 }(window, jQuery));

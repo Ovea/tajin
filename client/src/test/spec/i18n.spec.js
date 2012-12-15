@@ -44,18 +44,17 @@ describe("tajin.i18n", function () {
         });
 
         it("can be configured with a custom 'onlocalize' callback", function () {
-            var called = false;
-            var old = tajin.options.i18n.onlocalize;
+            var called = false, old = tajin.options.i18n.onlocalize;
             tajin.options.i18n.onlocalize = function () {
                 called = true;
             };
-            tajin.i18n.load('app3', 'fr_CA', function (bundle) {
+            tajin.i18n.load('app3', 'fr_CA', function(bundle) {
                 bundle.localize(document);
             });
             try {
                 waitsFor(function () {
                     return called;
-                }, 'too long', 600);
+                }, 'too long', 1000);
             } finally {
                 tajin.options.i18n.onlocalize = old;
             }
@@ -167,7 +166,6 @@ describe("tajin.i18n", function () {
             it("localizes specific HTML attributes (href, src, ...)", function () {
                 var element = $('#i18n').find('a:first');
                 expect(element.attr('href')).toBe('localize[link]');
-
                 tajin.i18n.load('app', 'fr_CA', function (bundle) {
                     bundle.localize(element);
                     expect(element.attr('href')).toBe('http://goto/fr.ca');
@@ -297,7 +295,3 @@ function browser_locale() {
     var locale = (navigator.language || navigator.userLanguage).replace(/-/, '_').toLowerCase();
     return locale.length > 3 ? locale.substring(0, 3) + locale.substring(3).toUpperCase() : locale;
 }
-
-function fakeOnLocalize() {
-}
-
