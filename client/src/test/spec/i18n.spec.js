@@ -45,19 +45,16 @@ describe("tajin.i18n", function () {
 
         it("can be configured with a custom 'onlocalize' callback", function () {
             var called = false, old = tajin.options.i18n.onlocalize;
-            tajin.options.i18n.onlocalize = function () {
+            tajin.options.i18n.onlocalize = function (bundle, locale, elem, key, value) {
                 called = true;
             };
             tajin.i18n.load('app3', 'fr_CA', function(bundle) {
                 bundle.localize(document);
-            });
-            try {
-                waitsFor(function () {
-                    return called;
-                }, 'too long', 1000);
-            } finally {
                 tajin.options.i18n.onlocalize = old;
-            }
+            });
+            waitsFor(function () {
+                return called;
+            }, 'too long', 1000);
         });
 
     });

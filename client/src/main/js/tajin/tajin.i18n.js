@@ -126,26 +126,33 @@
                 var self = this,
                     e = (expr instanceof jQuery) ? expr : $(expr),
                     attrs = $.isArray(tajin.options.i18n.attributes) ? tajin.options.i18n.attributes : ['href', 'src'],
-                    doloc = function () {
+                    cb = tajin.options.i18n.onlocalize,
+                    dolocEl = function () {
                         var elem = $(this), key = elem.attr("rel").match(/localize\[([\.\w]+)\]/)[1], v = self.value(key);
                         if (tajin.options.i18n.debug) {
                             console.log('[tajin.i18n] localize', self.name, self.locale, key, v, elem);
                         }
-                        tajin.options.i18n.onlocalize(self.name, self.locale, elem, key, v);
-                    };
-                if (e.attr('rel') && e.attr('rel').match(/^localize/)) {
-                    doloc.call(e);
-                }
-                e.find('[rel*="localize"]').each(function () {
-                    doloc.call(this);
-                });
-                $.each(attrs, function (i, attr) {
-                    e.find('[' + attr + '^="localize"]').each(function () {
+                        cb(self.name, self.locale, elem, key, v);
+                    },
+                    dolocAttr = function (attr) {
                         var elem = $(this), key = elem.attr(attr).match(/localize\[([\.\w]+)\]/)[1], v = self.value(key);
                         if (tajin.options.i18n.debug) {
                             console.log('[tajin.i18n] localize', self.name, self.locale, key, v, elem);
                         }
                         elem.attr(attr, v);
+                    };
+                if (e.attr('rel') && e.attr('rel').match(/^localize/)) {
+                    dolocEl.call(e);
+                }
+                e.find('[rel*="localize"]').each(function () {
+                    dolocEl.call(this);
+                });
+                $.each(attrs, function (i, attr) {
+                    if (e.attr(attr) && e.attr(attr).match(/^localize/)) {
+                        dolocAttr.call(e, attr);
+                    }
+                    e.find('[' + attr + '^="localize"]').each(function () {
+                        dolocAttr.call(this, attr);
                     });
                 });
             },
