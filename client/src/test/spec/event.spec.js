@@ -123,7 +123,7 @@ describe("tajin.event", function () {
             describe("EventList", function () {
 
                 it("it has listen, once, fire, toString, remove, reset, destroy, sync methods with targets all events in the list", function () {
-                    var all = tajin.event.getAll('my/evt1', 'my/evt2', 'my/evt3');
+                    var all = tajin.event.getAll('my/sync/a1', 'my/sync/a2', 'my/sync/a3');
                     expect(all.listen).toBeDefined();
                     expect(all.once).toBeDefined();
                     expect(all.fire).toBeDefined();
@@ -138,15 +138,51 @@ describe("tajin.event", function () {
                 describe("eventList.sync(cb)", function () {
 
                     it("calls cb when all events in the list are triggered", function () {
-
+                        var all = tajin.event.getAll('my/sync/a1', 'my/sync/a2'),
+                            obj = {
+                                f: function (e1, e2) {
+                                }
+                            };
+                        spyOn(obj, 'f');
+                        all.sync(obj.f);
+                        all[0].fire();
+                        all[1].fire();
+                        expect(obj.f).toHaveBeenCalled();
                     });
 
                     it("calls cb again if at lest one of all events in the list is triggered another time", function () {
-
+                        var c = 0;
+                        var all = tajin.event.getAll('my/sync/b1', 'my/sync/b2'),
+                            obj = {
+                                f: function (e1, e2) {
+                                    c++;
+                                }
+                            };
+                        all.sync(obj.f);
+                        expect(c).toBe(0);
+                        all[0].fire();
+                        expect(c).toBe(0);
+                        all[1].fire();
+                        expect(c).toBe(0);
+                        expect(c).toBe(1);
+                        all[1].fire();
+                        expect(c).toBe(2);
                     });
 
                     it("explode parameters to match each event parameter", function () {
-
+                        var all = tajin.event.getAll('my/sync/c1', 'my/sync/c2', 'my/sync/c3'),
+                            obj = {
+                                f: function (e1, e2, e3) {
+                                }
+                            };
+                        spyOn(obj, 'f');
+                        all.sync(obj.f);
+                        all[0].fire('data1');
+                        all[1].fire('data2');
+                        all[2].fire('data3');
+                        expect(obj.f).toHaveBeenCalledWith('data1', 'data2', 'data3');
+                        all[1].fire('data22');
+                        expect(obj.f).toHaveBeenCalledWith('data1', 'data22', 'data3');
                     });
 
                 });
@@ -154,15 +190,48 @@ describe("tajin.event", function () {
                 describe("eventList.syncOnce(cb)", function () {
 
                     it("calls cb when all events in the list are triggered", function () {
-
+                        var all = tajin.event.getAll('my/sync/d1', 'my/sync/d2'),
+                            obj = {
+                                f: function (e1, e2) {
+                                }
+                            };
+                        spyOn(obj, 'f');
+                        all.syncOnce(obj.f);
+                        all[0].fire();
+                        all[1].fire();
+                        expect(obj.f).toHaveBeenCalledWith();
                     });
 
                     it("cb is caled at most one time event if one of all events in the list is triggered another time", function () {
-
+                        var c = 0;
+                        var all = tajin.event.getAll('my/sync/e1', 'my/sync/e2'),
+                            obj = {
+                                f: function (e1, e2) {
+                                    c++;
+                                }
+                            };
+                        all.syncOnce(obj.f);
+                        expect(c).toBe(0);
+                        all[0].fire();
+                        expect(c).toBe(0);
+                        all[1].fire();
+                        expect(c).toBe(1);
+                        all[1].fire();
+                        expect(c).toBe(1);
                     });
 
                     it("explode parameters to match each event parameter", function () {
-
+                        var all = tajin.event.getAll('my/sync/f1', 'my/sync/f2', 'my/sync/f3'),
+                            obj = {
+                                f: function (e1, e2, e3) {
+                                }
+                            };
+                        spyOn(obj, 'f');
+                        all.syncOnce(obj.f);
+                        all[0].fire('data1');
+                        all[1].fire('data2');
+                        all[2].fire('data3');
+                        expect(obj.f).toHaveBeenCalledWith('data1', 'data2', 'data3');
                     });
 
                 });
