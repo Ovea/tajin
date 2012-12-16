@@ -26,28 +26,6 @@ if (window.jqmcontrib == undefined) {
                 order:['html5', 'cookie', 'page']
             });
 
-        function cancelTimer() {
-            if (timer) {
-                clearTimeout(timer);
-                timer = null;
-            }
-        }
-
-        window.jqmcontrib = {
-
-            bridge:function (bus) {
-
-                // Page transition events
-                $(document).bind('pagebeforeshow', function (event, data) {
-                    cancelTimer();
-                    var page = $(event.target);
-                    var name = page.attr('id');
-                    logger.debug('pagebeforeshow => ' + name);
-                    bus.topic('/event/ui/view/pagebeforeshow').publish(page, data);
-                    bus.topic('/event/ui/view/pagebeforeshow/' + name).publish(page, event, data);
-                });
-        };
-
         // Navigation Object
         window.jqmcontrib.Navigation = function (bus) {
             var self = this;
@@ -82,31 +60,6 @@ if (window.jqmcontrib == undefined) {
 
         window.jqmcontrib.Navigation.prototype = {
 
-            cancelChangePage:function () {
-                cancelTimer();
-            },
-
-            willChangePage:function (delay, location, opts, jqm_opts) {
-                var self = this;
-                cancelTimer();
-                timer = setTimeout(function () {
-                    timer = null;
-                    self.changePage(location, opts, jqm_opts);
-                }, delay);
-            },
-
-            changePage:function (location, opts, jqm_opts) {
-                logger.debug('Changing page to', location);
-                if (opts) {
-                    logger.debug('Setting options', opts);
-                    if (typeof opts === 'object') {
-                        opts.from = this.pageName()
-                    }
-                    storage.set('ovea-restore', opts);
-                }
-                $.mobile.changePage(location + '.html', jqm_opts || {});
-            },
-
             redirect:function (location, opts) {
                 logger.debug('Redirecting to: ' + location);
                 if (opts) {
@@ -119,6 +72,15 @@ if (window.jqmcontrib == undefined) {
                 window.location = location;
             }
         }
+
+        jaxspot.navigation.redirectAndPublish = function (location, topic, data) {
+            logger.debug('Preparing redirection and publish', location, topic);
+            jaxspot.navigation.redirect(options.ws.app, {
+                topic:topic,
+                data:data
+            });
+        };
+
     })(jQuery);
 
 }

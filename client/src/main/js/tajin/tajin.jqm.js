@@ -18,21 +18,15 @@
 (function (w, $) {
     "use strict";
     var JQMModule = function () {
-        var current_page;
+        var current_page, the_tajin, will_change_timer, events;
         this.name = 'jqm';
         this.requires = 'event,timer,store';
         this.init = function (next, opts, tajin) {
             if (!$.mobile) {
                 throw new Error('jQuery Mobile scripts not found ! Please add them.');
             }
+            the_tajin = tajin;
             var tevent = tajin.event,
-                events = {
-                    beforeshow: tajin.event.add('jqm/beforeshow'),
-                    show: tajin.event.add('jqm/show'),
-                    beforehide: tajin.event.add('jqm/beforehide'),
-                    hide: tajin.event.add('jqm/hide'),
-                    init: tajin.event.add('jqm/init')
-                },
                 fire = function (evt, event) {
                     var page = $(event.target), name = page.attr('id');
                     events[evt].fire(page);
@@ -40,8 +34,20 @@
                         tevent.get('jqm/' + evt + '/' + name).fire(page);
                     }
                 };
+            events = {
+                beforeshow: tajin.event.add('jqm/beforeshow'),
+                show: tajin.event.add('jqm/show'),
+                beforehide: tajin.event.add('jqm/beforehide'),
+                hide: tajin.event.add('jqm/hide'),
+                init: tajin.event.add('jqm/init'),
+                first: tajin.event.add('jqm/first'),
+                count: tajin.event.add('jqm/count')
+            };
             $(document).on('pagebeforeshow',function (event) {
                 current_page = $(event.target);
+                if (will_change_timer && will_change_timer.isActive()) {
+                    will_change_timer.stop();
+                }
                 fire('beforeshow', event);
             }).on('pagebeforehide',function (event) {
                     fire('beforehide', event);
@@ -52,6 +58,19 @@
                 }).on('pageinit', function (event) {
                     fire('init', event);
                 });
+            events.beforeshow.listen(function (page) {
+                var displayed = the_tajin.store.get('tajin.jqm.page_count') || {},
+                    name = page.attr('id');
+                if ($.isEmptyObject(displayed)) {
+                    events.first.fire(page);
+                }
+                displayed[name] = (displayed[name] || 0) + 1;
+                the_tajin.store.put('tajin.jqm.page_count', displayed);
+                events.count.fire({
+                    page: page,
+                    count: displayed[name]
+                });
+            });
             next();
         };
         this.exports = {
@@ -68,6 +87,48 @@
                     }
                 }
                 return null;
+            },
+            cancelChangePage: function () {
+                if (will_change_timer && will_change_timer.isActive()) {
+                    will_change_timer.stop();
+                }
+            },
+            willChangePage: function (delay, location, callback, jqm_opts) {
+                var self = this;
+                this.cancelChangePage();
+                will_change_timer = the_tajin.timer.schedule('tajin.jqm.willChangePage', delay, false, function () {
+                    self.changePage(location, data, jqm_opts);
+                });
+            },
+            changePage: function (location, callback, jqm_opts) {
+                if ($.isFunction(callback)) {
+                    events.beforeshow.once(function (page) {
+                        var p_uri = page.attr('data-url');
+                        if (p_uri.charAt(0) != '/') {
+                            p_uri += '/';
+                        }
+                        if (location.charAt(0) != '/') {
+                            location += '/';
+                        }
+                        if (p_uri == location + '.html') {
+                            callback(page);
+                        }
+                    });
+                }
+                $.mobile.changePage(location + '.html', jqm_opts || {});
+            },
+            redirect: function (location, data) {
+                data = data || {};
+                data.from = this.pageName();
+                the_tajin.store.put('tajin.jqm.nav', data);
+                window.location = location;
+            },
+            redirectThenFire: function (location, topic, data) {
+                this.redirect(location, {
+                    topic: topic,
+                    data: data
+                });
+                window.location = location;
             }
         };
     };
