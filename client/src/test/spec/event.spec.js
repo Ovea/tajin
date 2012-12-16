@@ -109,7 +109,7 @@ describe("tajin.event", function () {
 
         });
 
-        describe("tajin.event.getAll()", function () {
+        describe("var eventList = tajin.event.getAll()", function () {
 
             it("gets many event object at once", function () {
                 var all = tajin.event.getAll('my/evt1', 'my/evt2', 'my/evt3');
@@ -118,6 +118,55 @@ describe("tajin.event", function () {
                 expect(all[2].stateful).toBe(true);
                 expect(all[2].listen).toBeDefined();
                 expect(all[2].fire).toBeDefined();
+            });
+
+            describe("EventList", function () {
+
+                it("it has listen, once, fire, toString, remove, reset, destroy, sync methods with targets all events in the list", function () {
+                    var all = tajin.event.getAll('my/evt1', 'my/evt2', 'my/evt3');
+                    expect(all.listen).toBeDefined();
+                    expect(all.once).toBeDefined();
+                    expect(all.fire).toBeDefined();
+                    expect(all.toString).toBeDefined();
+                    expect(all.remove).toBeDefined();
+                    expect(all.reset).toBeDefined();
+                    expect(all.destroy).toBeDefined();
+                    expect(all.sync).toBeDefined();
+                    expect(all.syncOnce).toBeDefined();
+                });
+
+                describe("eventList.sync(cb)", function () {
+
+                    it("calls cb when all events in the list are triggered", function () {
+
+                    });
+
+                    it("calls cb again if at lest one of all events in the list is triggered another time", function () {
+
+                    });
+
+                    it("explode parameters to match each event parameter", function () {
+
+                    });
+
+                });
+
+                describe("eventList.syncOnce(cb)", function () {
+
+                    it("calls cb when all events in the list are triggered", function () {
+
+                    });
+
+                    it("cb is caled at most one time event if one of all events in the list is triggered another time", function () {
+
+                    });
+
+                    it("explode parameters to match each event parameter", function () {
+
+                    });
+
+                });
+
             });
 
         });

@@ -162,6 +162,12 @@
                         for (i = 0; i < events.length; i++) {
                             events[i].reset();
                         }
+                    },
+                    sync: function (cb) {
+
+                    },
+                    syncOnce: function (cb) {
+
                     }
                 });
                 return events;
