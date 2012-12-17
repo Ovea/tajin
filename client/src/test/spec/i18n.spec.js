@@ -213,10 +213,14 @@ describe("tajin.i18n", function () {
 
     describe("Object tajin.i18n.resources(locale) r", function () {
 
+        it("if no locale is passed, uses browser locale", function () {
+            expect(tajin.i18n.resources().locale).toBe(browser_locale());
+        });
+
         describe("r.locale", function () {
 
-            it("provides requested locale", function () {
-                expect(tajin.i18n.resources().locale).toBe('en_US');
+            it("provides requested locale as formated", function () {
+                expect(tajin.i18n.resources('fr-CA').locale).toBe('fr_CA');
             });
 
         });

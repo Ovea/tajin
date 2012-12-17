@@ -282,8 +282,7 @@
                 });
             },
             resources: function (locale) {
-                locale = fix_locale(locale);
-                return new Resources(locale);
+                return new Resources(fix_locale(locale));
             }
         };
     };
