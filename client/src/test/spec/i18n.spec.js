@@ -177,18 +177,28 @@ describe("tajin.i18n", function () {
             it("localizes unattached DOM fragment", function () {
                 var res_fr_CA = tajin.i18n.resources('fr-CA');
                 var called = false;
-                res_fr_CA.html('spec/i18n/contents/template.html', function () {
-                    var template = Handlebars.compile(this);
-                    var html = $(template());
+                res_fr_CA.html('spec/i18n/contents/template.html', function (html) {
+                    var template = Handlebars.compile(html);
+                    html = $(template({
+                        title: "",
+                        body: "",
+                        url: ''
+                    }));
 
                     expect(html.find('span').text()).toBe('');
                     expect(html.find('a').attr('href')).toBe('localize[link]');
 
-                    bundle.localize(html);
+                    tajin.i18n.load('app', 'fr_CA', function (bundle) {
+                        bundle.localize(html);
+                        called = true;
+                    });
+
+                    waitsFor(function () {
+                        return called;
+                    }, 'too long', 10000);
+
                     expect(html.find('span').text()).toBe('french CA 3');
                     expect(html.find('a').attr('href')).toBe('http://goto/fr.ca');
-
-                    called = true;
                 });
             });
 
@@ -241,7 +251,7 @@ describe("tajin.i18n", function () {
                 var called = false;
                 var res_fr_CA = tajin.i18n.resources('fr-CA');
 
-                res_fr_CA.image('pub.jpg', function (url) {
+                res_fr_CA.image('pub.jpg', function (img, url) {
                     expect(url).toMatch('pub_fr.jpg');
                     called = true;
                 });
@@ -293,9 +303,9 @@ describe("tajin.i18n", function () {
                 var called = false;
                 var res_ko_Ko = tajin.i18n.resources('ko-KO');
 
-                res_ko_Ko.html('pub.html', function (url) {
+                res_ko_Ko.html('pub.html', function (html, url) {
                     expect(url).toMatch('pub_ko.html');
-                    expect($(this).find('p').text()).toBe('머신을 돌려서 같은 그림 3개가 나왔다면, 그 선물에 당첨되신 거예요. 축하합니다!');
+                    expect($(html).find('p').text()).toBe('머신을 돌려서 같은 그림 3개가 나왔다면, 그 선물에 당첨되신 거예요. 축하합니다!');
                     called = true;
                 });
 
@@ -351,9 +361,9 @@ describe("Handlebars integration", function () {
             var called = false;
             var res_fr_CA = tajin.i18n.resources('fr-CA');
 
-            res_fr_CA.html('spec/i18n/contents/template.html', function () {
-                var template = Handlebars.compile(this);
-                var html = $(template({
+            res_fr_CA.html('spec/i18n/contents/template.html', function (html) {
+                var template = Handlebars.compile(html);
+                html = $(template({
                     title: "My New Post",
                     body: "This is my first post!",
                     url: res_fr_CA.url('pub.jpg')

@@ -86,10 +86,10 @@
                 cb = cb || $.noop;
                 img.load(function () {
                     if (!this.complete || typeof this.naturalWidth === "undefined" || this.naturalWidth === 0) {
-                        cb.call(img, u, true);
+                        cb(img, u, true);
                     } else {
                         events.image.fire(img);
-                        cb.call(img, u, false);
+                        cb(img, u, false);
                     }
                 }).attr('src', u);
             },
@@ -97,19 +97,20 @@
                 var u = this.url(res);
                 cb = cb || $.noop;
                 if (rescache[u]) {
-                    cb.call(rescache[u], u, false);
+                    cb(rescache[u], u, false);
                     events.html.fire(rescache[u]);
                 }
                 $.ajax({
+                    dataType: 'html',
                     cache: false,
                     url: u,
                     success: function (html) {
                         rescache[u] = html;
                         events.html.fire(rescache[u]);
-                        cb.call(rescache[u], u, false);
+                        cb(rescache[u], u, false);
                     },
                     error: function () {
-                        cb.call('', u, true);
+                        cb('', u, true);
                     }
                 });
             }
