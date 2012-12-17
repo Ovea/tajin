@@ -58,29 +58,6 @@ if (window.jqmcontrib == undefined) {
 
         };
 
-        window.jqmcontrib.Navigation.prototype = {
-
-            redirect:function (location, opts) {
-                logger.debug('Redirecting to: ' + location);
-                if (opts) {
-                    logger.debug('Setting options', opts);
-                    if (typeof opts === 'object') {
-                        opts.from = this.pageName()
-                    }
-                    storage.set('ovea-restore', opts);
-                }
-                window.location = location;
-            }
-        }
-
-        jaxspot.navigation.redirectAndPublish = function (location, topic, data) {
-            logger.debug('Preparing redirection and publish', location, topic);
-            jaxspot.navigation.redirect(options.ws.app, {
-                topic:topic,
-                data:data
-            });
-        };
-
     })(jQuery);
 
 }
