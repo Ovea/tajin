@@ -103,6 +103,7 @@
                 $.ajax({
                     cache: false,
                     url: u,
+                    dataType: 'html',
                     success: function (html) {
                         rescache[u] = html;
                         cb.call(rescache[u], u, false);

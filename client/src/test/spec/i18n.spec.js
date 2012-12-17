@@ -48,7 +48,7 @@ describe("tajin.i18n", function () {
             tajin.options.i18n.onlocalize = function (bundle, locale, elem, key, value) {
                 called = true;
             };
-            tajin.i18n.load('app3', 'fr_CA', function(bundle) {
+            tajin.i18n.load('app3', 'fr_CA', function (bundle) {
                 bundle.localize(document);
                 tajin.options.i18n.onlocalize = old;
             });
@@ -170,12 +170,36 @@ describe("tajin.i18n", function () {
             });
 
             it("localizes unattached DOM fragment", function () {
-                this.fail('TODO');
-                // var html = $(template({ title: "My New Post", body: "This is my first post!", url: res_fr_CA.url('pub.jpg') })); bundle.localize(html);
+                var res_fr_CA = tajin.i18n.resources('fr-CA');
+                var called = false;
+                res_fr_CA.html('spec/i18n/contents/template.html', function () {
+                    var template = Handlebars.compile(this);
+                    var html = $(template());
+
+                    expect(html.find('span').text()).toBe('');
+                    expect(html.find('a').attr('href')).toBe('localize[link]');
+
+                    bundle.localize(html);
+                    expect(html.find('span').text()).toBe('french CA 3');
+                    expect(html.find('a').attr('href')).toBe('http://goto/fr.ca');
+
+                    called = true;
+                });
             });
 
             it("localizes to another locale same DOM fragment", function () {
-                this.fail('TODO');
+                var element = $('#i18n').find('span:first');
+
+                tajin.i18n.load('app', 'fr_CA', function (bundle) {
+                    bundle.localize(element);
+                    expect(element.text()).toBe('french CA 3');
+                });
+
+                tajin.i18n.load('app', 'en', function (bundle) {
+                    bundle.localize(element);
+                    expect(element.text()).toBe('english 3');
+                });
+
             });
 
         });
@@ -242,50 +266,45 @@ describe("tajin.i18n", function () {
 
     });
 
-    //        it("fires event i18n/html/loaded when complete", function () {
-//            var obj = {
-//                f: function () {
-//                }
-//            };
-//            spyOn(obj, 'f');
-//            tajin.event.get('i18n/html/loaded').listen(obj.f);
-//            tajin.i18n.load('app', 'fr_FR');
-//            expect(obj.f).toHaveBeenCalled();
-//
-//
-//        });
-
-
-//            html: this.event.add('i18n/html/loaded'),
-//            image: this.event.add('i18n/image/loaded')
-
-
 });
 
 describe("Handlebars integration", function () {
 
     it("can load, process and localize i18n-ized template", function () {
         tajin.i18n.load('app', 'fr_CA', function (bundle) {
-            bundle.localize(document);
             var res_fr_CA = tajin.i18n.resources('fr-CA');
-            res_fr_CA.html('pub.html', function (url) {
-                console.log(this);
+            var called = false;
+            res_fr_CA.html('spec/i18n/contents/template.html', function () {
                 var template = Handlebars.compile(this);
                 var html = $(template({
                     title: "My New Post",
                     body: "This is my first post!",
                     url: res_fr_CA.url('pub.jpg')
                 }));
+
+                // 1 - the template is localized
+                expect(html.find('.title').text()).toBe('My New Post');
+                expect(html.find('.body').text()).toBe('This is my first post!');
+                expect(html.find('span').text()).toBe('');
+                expect(html.find('a').attr('href')).toBe('localize[link]');
+                expect(html.find('img').attr('src')).toMatch('pub_fr.jpg');
+
+                // 2 - it can be processed
                 bundle.localize(html);
-//                $('body').append(html);
+                expect(html.find('.title').text()).toBe('My New Post');
+                expect(html.find('.body').text()).toBe('This is my first post!');
+                expect(html.find('span').text()).toBe('french CA 3');
+                expect(html.find('a').attr('href')).toBe('http://goto/fr.ca');
+                expect(html.find('img').attr('src')).toMatch('pub_fr.jpg');
+
+                called = true;
             });
+
+            waitsFor(function () {
+                return called;
+            }, 'too long', 10000);
         });
-
-
-        this.fail('TODO');
-        // see full sample in other html pages
     });
-
 });
 
 function browser_locale() {
