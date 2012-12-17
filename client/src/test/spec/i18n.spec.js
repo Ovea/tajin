@@ -102,7 +102,6 @@ describe("tajin.i18n", function () {
             });
         });
 
-
         it("calls provided callback when complete", function () {
             var obj = {
                 f: function (bundle) {
@@ -235,18 +234,51 @@ describe("tajin.i18n", function () {
         describe("r.image()", function () {
 
             it("loads i18n-ized image", function () {
-                this.fail('TODO');
-                // res_fr_CA.image('pub.jpg', function (url, error) {
+                var called = false;
+                var res_fr_CA = tajin.i18n.resources('fr-CA');
+
+                res_fr_CA.image('pub.jpg', function (url) {
+                    expect(url).toMatch('pub_fr.jpg');
+                    called = true;
+                });
+
+                waitsFor(function () {
+                    return called;
+                }, 'too long', 10000);
             });
 
             it("fires event i18n/image/loaded when load completes", function () {
-                this.fail('TODO');
-                // res_fr_CA.image('pub.jpg')
-                // tajin.event.get('i18n/image/loaded').listen(obj.f);
+                var called = false;
+                var obj = {
+                    cb: function () {
+                    }
+                };
+
+                spyOn(obj, 'cb');
+                tajin.event.get('i18n/image/loaded').listen(obj.cb);
+
+                var res_fr_CA = tajin.i18n.resources('fr-CA');
+                res_fr_CA.image('pub.jpg', function () {
+                    expect(obj.cb).toHaveBeenCalled();
+                    called = true;
+                });
+
+                waitsFor(function () {
+                    return called;
+                }, 'too long', 10000);
             });
 
             it("call optional callback when load completes", function () {
-                this.fail('TODO');
+                var called = false;
+                var res_fr_CA = tajin.i18n.resources('fr-CA');
+
+                res_fr_CA.image('pub.jpg', function () {
+                    called = true;
+                });
+
+                waitsFor(function () {
+                    return called;
+                }, 'callback not called', 10000);
             });
 
         });
@@ -254,18 +286,52 @@ describe("tajin.i18n", function () {
         describe("r.html()", function () {
 
             it("loads i18n-ized html template", function () {
-                this.fail('TODO');
-                // res_fr_CA.html('pub.html', function (url) {
+                var called = false;
+                var res_ko_Ko = tajin.i18n.resources('ko-KO');
+
+                res_ko_Ko.html('pub.html', function (url) {
+                    expect(url).toMatch('pub_ko.html');
+                    expect($(this).find('p').text()).toBe('머신을 돌려서 같은 그림 3개가 나왔다면, 그 선물에 당첨되신 거예요. 축하합니다!');
+                    called = true;
+                });
+
+                waitsFor(function () {
+                    return called;
+                }, 'too long', 10000);
             });
 
             it("fires event i18n/html/loaded when load completes", function () {
-                this.fail('TODO');
-                // res_fr_CA.html('pub.html')
-                // tajin.event.get('i18n/html/loaded').listen(obj.f);
+                var called = false;
+                var obj = {
+                    cb: function () {
+                    }
+                };
+
+                spyOn(obj, 'cb');
+                tajin.event.get('i18n/html/loaded').listen(obj.cb);
+
+                var res_fr_CA = tajin.i18n.resources('fr-CA');
+                res_fr_CA.html('pub.html', function () {
+                    expect(obj.cb).toHaveBeenCalled();
+                    called = true;
+                });
+
+                waitsFor(function () {
+                    return called;
+                }, 'too long', 10000);
             });
 
             it("call optional callback when load completes", function () {
-                this.fail('TODO');
+                var called = false;
+                var res_fr_CA = tajin.i18n.resources('fr-CA');
+
+                res_fr_CA.html('pub.html', function () {
+                    called = true;
+                });
+
+                waitsFor(function () {
+                    return called;
+                }, 'callback not called', 10000);
             });
 
         });
@@ -278,8 +344,9 @@ describe("Handlebars integration", function () {
 
     it("can load, process and localize i18n-ized template", function () {
         tajin.i18n.load('app', 'fr_CA', function (bundle) {
-            var res_fr_CA = tajin.i18n.resources('fr-CA');
             var called = false;
+            var res_fr_CA = tajin.i18n.resources('fr-CA');
+
             res_fr_CA.html('spec/i18n/contents/template.html', function () {
                 var template = Handlebars.compile(this);
                 var html = $(template({

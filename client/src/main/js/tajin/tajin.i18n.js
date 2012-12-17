@@ -88,8 +88,8 @@
                     if (!this.complete || typeof this.naturalWidth === "undefined" || this.naturalWidth === 0) {
                         cb.call(img, u, true);
                     } else {
-                        cb.call(img, u, false);
                         events.image.fire(img);
+                        cb.call(img, u, false);
                     }
                 }).attr('src', u);
             },
@@ -103,11 +103,10 @@
                 $.ajax({
                     cache: false,
                     url: u,
-                    dataType: 'html',
                     success: function (html) {
                         rescache[u] = html;
-                        cb.call(rescache[u], u, false);
                         events.html.fire(rescache[u]);
+                        cb.call(rescache[u], u, false);
                     },
                     error: function () {
                         cb.call('', u, true);
