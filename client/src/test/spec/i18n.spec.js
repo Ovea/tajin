@@ -24,16 +24,22 @@ describe("tajin.i18n", function () {
             expect(tajin.options.i18n.bundles.app.variants).toContain('fr_CA');
             expect(tajin.options.i18n.bundles.app.variants).toContain('en_US');
 
-            expect(tajin.options.i18n.resources.length).toBe(2);
-            expect(tajin.options.i18n.resources[0].path).toBe('spec/i18n/contents/pub.html');
-            expect(tajin.options.i18n.resources[0].variants.length).toBe(2);
-            expect(tajin.options.i18n.resources[0].variants).toContain('fr');
-            expect(tajin.options.i18n.resources[0].variants).toContain('ko');
+            expect(tajin.options.i18n.resources.length).toBe(3);
 
-            expect(tajin.options.i18n.resources[1].path).toBe('spec/i18n/images/pub.jpg');
+            expect(tajin.options.i18n.resources[0].path).toBe('spec/i18n/contents/template.html');
+            expect(tajin.options.i18n.resources[0].variants.length).toBe(2);
+            expect(tajin.options.i18n.resources[0].variants).toContain('en');
+            expect(tajin.options.i18n.resources[0].variants).toContain('fr');
+
+            expect(tajin.options.i18n.resources[1].path).toBe('spec/i18n/contents/pub.html');
             expect(tajin.options.i18n.resources[1].variants.length).toBe(2);
             expect(tajin.options.i18n.resources[1].variants).toContain('fr');
             expect(tajin.options.i18n.resources[1].variants).toContain('ko');
+
+            expect(tajin.options.i18n.resources[2].path).toBe('spec/i18n/images/pub.jpg');
+            expect(tajin.options.i18n.resources[2].variants.length).toBe(2);
+            expect(tajin.options.i18n.resources[2].variants).toContain('fr');
+            expect(tajin.options.i18n.resources[2].variants).toContain('ko');
         });
 
         it("has preloaded specified bundles and locales", function () {
@@ -211,8 +217,7 @@ describe("tajin.i18n", function () {
         describe("r.locale", function () {
 
             it("provides requested locale", function () {
-                this.fail('TODO');
-                // locale asked
+                expect(tajin.i18n.resources().locale).toBe('en_US');
             });
 
         });
@@ -220,8 +225,9 @@ describe("tajin.i18n", function () {
         describe("r.url()", function () {
 
             it("gets real URL of an i18n-ized resource", function () {
-                this.fail('TODO');
-                // var res_fr_CA = tajin.i18n.resources('fr-CA'); res_fr_CA.url('contents/pub.html')
+                var res_fr_CA = tajin.i18n.resources('fr-CA');
+                var url = res_fr_CA.url('spec/i18n/contents/pub.html');
+                expect(url).toMatch('pub_fr.html');
             });
 
         });
