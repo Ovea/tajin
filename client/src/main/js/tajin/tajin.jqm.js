@@ -22,7 +22,7 @@
             var opts = the_tajin.store.del('tajin.jqm.nav');
             if (opts) {
                 self.restoring = true;
-                restore.fire(opts);
+                events.restore.fire(opts);
                 if (opts.to) {
                     self.exports.changePage(opts.to);
                 }
@@ -108,20 +108,20 @@
                 var self = this;
                 this.cancelChangePage();
                 will_change_timer = the_tajin.timer.schedule('tajin.jqm.willChangePage', delay, false, function () {
-                    self.changePage(location, data, jqm_opts);
+                    self.changePage(location, callback, jqm_opts);
                 });
             },
             changePage: function (location, callback, jqm_opts) {
                 if ($.isFunction(callback)) {
                     events.beforeshow.once(function (page) {
                         var p_uri = page.attr('data-url');
-                        if (p_uri.charAt(0) != '/') {
+                        if (p_uri.charAt(0) !== '/') {
                             p_uri += '/';
                         }
-                        if (location.charAt(0) != '/') {
+                        if (location.charAt(0) !== '/') {
                             location += '/';
                         }
-                        if (p_uri == location + '.html') {
+                        if (p_uri === location + '.html') {
                             callback(page);
                         }
                     });
