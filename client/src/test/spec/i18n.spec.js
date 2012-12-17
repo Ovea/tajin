@@ -71,7 +71,6 @@ describe("tajin.i18n", function () {
             tajin.i18n.load('app', '', function (bundle) {
                 expect(bundle.name).toBe('app');
                 expect(bundle.locale).toBe(browser_locale());
-                expect(bundle.resolved).toBe(browser_locale());
             });
         });
 
