@@ -18,7 +18,17 @@
 (function (w, $) {
     "use strict";
     var JQMModule = function () {
-        var current_page, the_tajin, will_change_timer, events;
+        var self = this, current_page, the_tajin, will_change_timer, events, restoreState = function () {
+            var opts = the_tajin.store.del('tajin.jqm.nav');
+            if (opts) {
+                self.restoring = true;
+                restore.fire(opts);
+                if (opts.to) {
+                    self.exports.changePage(opts.to);
+                }
+                self.restoring = false;
+            }
+        };
         this.name = 'jqm';
         this.requires = 'event,timer,store';
         this.init = function (next, opts, tajin) {
@@ -41,7 +51,8 @@
                 hide: tajin.event.add('jqm/hide'),
                 init: tajin.event.add('jqm/init'),
                 first: tajin.event.add('jqm/first'),
-                count: tajin.event.add('jqm/count')
+                count: tajin.event.add('jqm/count'),
+                restore: tajin.event.add('jqm/restore')
             };
             $(document).on('pagebeforeshow',function (event) {
                 current_page = $(event.target);
@@ -118,9 +129,10 @@
                 $.mobile.changePage(location + '.html', jqm_opts || {});
             },
             redirect: function (location, data) {
-                data = data || {};
-                data.from = this.pageName();
-                the_tajin.store.put('tajin.jqm.nav', data);
+                the_tajin.store.put('tajin.jqm.nav', {
+                    from: this.pageName(),
+                    data: data
+                });
                 window.location = location;
             },
             redirectThenFire: function (location, topic, data) {
