@@ -1,12 +1,10 @@
 Tajin Event
 
     * support event server-side & client transparent a travers comnetd ou autre
-    * sync
     * batchs sur un event
 
 Tajin JS
 
-    * navigation
     * cors
     * crypto
 

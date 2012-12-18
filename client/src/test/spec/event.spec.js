@@ -163,7 +163,6 @@ describe("tajin.event", function () {
                         all[0].fire();
                         expect(c).toBe(0);
                         all[1].fire();
-                        expect(c).toBe(0);
                         expect(c).toBe(1);
                         all[1].fire();
                         expect(c).toBe(2);
@@ -199,7 +198,7 @@ describe("tajin.event", function () {
                         all.syncOnce(obj.f);
                         all[0].fire();
                         all[1].fire();
-                        expect(obj.f).toHaveBeenCalledWith();
+                        expect(obj.f).toHaveBeenCalled()
                     });
 
                     it("cb is caled at most one time event if one of all events in the list is triggered another time", function () {

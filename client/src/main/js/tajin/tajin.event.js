@@ -87,9 +87,9 @@
                     },
                     once: function (cb) {
                         if ($.isFunction(cb)) {
-                            var self = this, f = function () {
+                            var self = this, f = function (data) {
                                 self.remove(f);
-                                cb.call(this, arguments);
+                                cb.call(this, data);
                             };
                             self.listen(f);
                         }
@@ -119,6 +119,24 @@
                 return events[opts.id];
             },
             toEventList = function (events) {
+                var syncf = function (call, cb) {
+                    var m = events.length, i, args = [], triggered = {};
+                    for (i = 0; i < m; i++) {
+                        (function (idx) {
+                            events[i][call](function (arg) {
+                                args[idx] = arg;
+                                triggered[idx] = true;
+                                var j;
+                                for (j = 0; j < m; j++) {
+                                    if (!triggered[j]) {
+                                        return;
+                                    }
+                                }
+                                cb.apply(events, args);
+                            });
+                        }(i));
+                    }
+                };
                 $.extend(events, {
                     toString: function () {
                         var s = 'EventList(', i;
@@ -164,10 +182,10 @@
                         }
                     },
                     sync: function (cb) {
-
+                        syncf('listen', cb);
                     },
                     syncOnce: function (cb) {
-
+                        syncf('once', cb);
                     }
                 });
                 return events;
