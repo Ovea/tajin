@@ -120,21 +120,21 @@
             },
             toEventList = function (events) {
                 var syncf = function (call, cb) {
-                    var m = events.length, i, args = [], triggered = {};
-                    for (i = 0; i < m; i++) {
-                        (function (idx) {
-                            events[i][call](function (arg) {
-                                args[idx] = arg;
-                                triggered[idx] = true;
-                                var j;
-                                for (j = 0; j < m; j++) {
-                                    if (!triggered[j]) {
-                                        return;
-                                    }
+                    var m = events.length, i, args = [], triggered = {}, f = function (idx) {
+                        events[i][call](function (arg) {
+                            args[idx] = arg;
+                            triggered[idx] = true;
+                            var j;
+                            for (j = 0; j < m; j++) {
+                                if (!triggered[j]) {
+                                    return;
                                 }
-                                cb.apply(events, args);
-                            });
-                        }(i));
+                            }
+                            cb.apply(events, args);
+                        });
+                    };
+                    for (i = 0; i < m; i++) {
+                        f(i);
                     }
                 };
                 $.extend(events, {
