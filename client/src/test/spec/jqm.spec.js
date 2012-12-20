@@ -37,10 +37,13 @@ describe("tajin.jqm", function () {
     describe("tajin.jqm.page()", function () {
 
         it("returns current JQM page", function () {
-            this.fail('TODO');
+            var current_page = tajin.jqm.page();
+            expect(current_page.selector).toBe('body div[data-role=page]:visible');
+            expect(current_page.attr('id')).toBe('page_1');
         });
 
         it("returns null if not found", function () {
+            // TODO Math comment tester ca ?
             this.fail('TODO');
         });
 
@@ -49,10 +52,11 @@ describe("tajin.jqm", function () {
     describe("tajin.jqm.pageName()", function () {
 
         it("returns current JQM page name", function () {
-            this.fail('TODO');
+            expect(tajin.jqm.pageName()).toBe('page_1');
         });
 
         it("returns null if no current page or if page ID is missing", function () {
+            // TODO Math comment tester ca ? (if faudrait un autre DOM complet)
             this.fail('TODO');
         });
 
@@ -61,15 +65,25 @@ describe("tajin.jqm", function () {
     describe("tajin.jqm.changePage()", function () {
 
         it("changes current JQM page", function () {
-            this.fail('TODO'); // tajin.jqm.changePage(page)
+            expect(tajin.jqm.pageName()).toBe('page_1');
+            tajin.jqm.changePage('page_2');
+
+            setTimeout(function() {expect(tajin.jqm.pageName()).toBe('page_2')}, 1000);
         });
 
         it("can run a callback after page changed", function () {
-            this.fail('TODO'); // tajin.jqm.changePage(page, callback)
+            expect(tajin.jqm.pageName()).toBe('page_1');
+            tajin.jqm.changePage('page_2', function() {
+                expect(tajin.jqm.pageName()).toBe('page_2');
+            });
         });
 
         it("can be provided by optional JQM options for page transition", function () {
-            this.fail('TODO'); // tajin.jqm.changePage(page, callback, jqmOpts)
+            // TODO Math comment tester ca ?
+            expect(tajin.jqm.pageName()).toBe('page_1');
+            tajin.jqm.changePage('page_2', function() {
+                expect(tajin.jqm.pageName()).toBe('page_2');
+            }, { transition: "slideup"});
         });
 
     });
@@ -114,6 +128,21 @@ describe("tajin.jqm", function () {
 
     });
 
+
+
+    describe("tajin.event.get('jqm/init')", function() {
+
+        it("Event triggered at page initialization", function () {
+            this.fail('TODO'); // tajin.jqm.redirect()
+        });
+
+
+    });
+
+
+
+
+
 });
 
 /*
@@ -141,3 +170,33 @@ describe("tajin.jqm", function () {
  console.log('hide', page.attr('id'));
  });
  });*/
+
+//describe("e.listen()", function () {
+//
+//    it("adds a listener", function () {
+//        var evt = tajin.event.add();
+//        var obj = {
+//            l: function () {
+//            }
+//        };
+//        spyOn(obj, 'l');
+//        evt.listen(obj.l);
+//        evt.fire();
+//        expect(obj.l).toHaveBeenCalled();
+//    });
+//
+//    it("checks for multiple registration errors", function () {
+//        var evt = tajin.event.add(), c = 0;
+//        var obj = {
+//            l: function () {
+//                c++;
+//            }
+//        };
+//        evt.listen(obj.l);
+//        evt.listen(obj.l);
+//        evt.listen(obj.l);
+//        evt.fire();
+//        expect(c).toBe(1);
+//    });
+//
+//});
