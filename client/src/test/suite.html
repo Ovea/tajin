@@ -92,9 +92,12 @@
 </head>
 <body>
 
-<div style="position: absolute;top: 0;left: 0;width: 300px;height: 50px;">
+<div style="position: absolute;bottom: 0px;right: 0px;width: 300px;height: 40px;font-size: smaller;overflow: visible; margin: 0;">
     <div data-role="page">
-        <div data-role="content">root - displayed once - cannot come back <a href="page_1.html" data-role="button">-> page 1</a></div>
+        <div data-role="content">
+            displayed once - cannot come back, NO ID !
+            <div><a href="page_1.html" data-role="button">-> page 1</a></div>
+        </div>
     </div>
     <div id="i18n">
         <span rel="localize[msg3]"></span>
@@ -102,7 +105,6 @@
 
         <div custom-attr="localize[link]">tag</div>
     </div>
-
 </div>
 
 </body>

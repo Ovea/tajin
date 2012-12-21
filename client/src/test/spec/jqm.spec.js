@@ -86,15 +86,20 @@ describe("tajin.jqm", function () {
             expect($('#page_2').find('#my-content').length).toBe(1);
             var loaded;
             tajin.event.get('jqm/show/page_2').once(function (page) {
-                alert('loaded: ' + page.attr('id'));
+                expect(tajin.jqm.pageName()).toBe('page_2');
+                expect($('#page_2').find('#my-content').length).toBe(0);
                 loaded = true;
             });
-            tajin.jqm.changePage('page_2', null, {reloadPage: true});
+            tajin.jqm.changePage(window.location.href, null, {
+                allowSamePageTransition: true,
+                transition: 'none',
+                showLoadMsg: false,
+                reloadPage: true
+            });
             waitsFor(function () {
                 return loaded;
-            }, '', 1000);
-            expect(tajin.jqm.pageName()).toBe('page_2');
-            expect($('#page_2').find('#my-content').length).toBe(0);
+            }, 'lod page 2', 10000);
+
         });
 
     });
