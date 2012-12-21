@@ -36,6 +36,9 @@
                 throw new Error('jQuery Mobile scripts not found ! Please add them.');
             }
             the_tajin = tajin;
+            if (!opts.extension) {
+                opts.extension = '.html';
+            }
             var tevent = tajin.event,
                 fire = function (evt, event) {
                     var page = $(event.target), name = page.attr('id');
@@ -118,18 +121,18 @@
                 if ($.isFunction(callback)) {
                     events.beforeshow.once(function (page) {
                         var p_uri = page.attr('data-url');
-                        if (p_uri.charAt(0) !== '/') {
-                            p_uri += '/';
-                        }
                         if (location.charAt(0) !== '/') {
-                            location += '/';
+                            location = '/' + location;
                         }
-                        if (p_uri === location + '.html') {
+                        if (location.lastIndexOf(the_tajin.options.jqm.extension) === -1) {
+                            location += the_tajin.options.jqm.extension;
+                        }
+                        if (p_uri.length === location.length + p_uri.lastIndexOf(location)) {
                             callback(page);
                         }
                     });
                 }
-                $.mobile.changePage(location + '.html', jqm_opts || {});
+                $.mobile.changePage(location + the_tajin.options.jqm.extension, jqm_opts || {});
             },
             redirect: function (location, data) {
                 the_tajin.store.put('tajin.jqm.nav', {
