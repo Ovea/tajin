@@ -82,7 +82,7 @@ describe("tajin.jqm", function () {
 
         it("can be provided by optional JQM options for page transition", function () {
             expect(tajin.jqm.pageName()).toBe('page_1');
-            $('#page_2').append('<span id="my-content">some content</span>');
+            $('#page_2').append('<span id="my-content">some content to be removed</span>');
             expect($('#page_2').find('#my-content').length).toBe(1);
             var loaded;
             tajin.event.get('jqm/show/page_2').once(function (page) {
