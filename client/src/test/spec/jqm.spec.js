@@ -39,25 +39,22 @@ describe("tajin.jqm", function () {
         it("returns current JQM page", function () {
             var current_page = tajin.jqm.page();
             expect(current_page.selector).toBe('body div[data-role=page]:visible');
-            expect(current_page.attr('id')).toBe('page_1');
-        });
-
-        it("returns null if not found", function () {
-            // TODO Math comment tester ca ?
-            this.fail('TODO');
+            expect(current_page.attr('id')).toBeUndefined();
         });
 
     });
 
     describe("tajin.jqm.pageName()", function () {
 
-        it("returns current JQM page name", function () {
-            expect(tajin.jqm.pageName()).toBe('page_1');
+        it("returns null if no current page or if page ID is missing", function () {
+            expect(tajin.jqm.pageName()).toBeNull()
         });
 
-        it("returns null if no current page or if page ID is missing", function () {
-            // TODO Math comment tester ca ? (if faudrait un autre DOM complet)
-            this.fail('TODO');
+        it("returns current JQM page name", function () {
+            $('body div[data-role=page]:visible a').click();
+            waitsFor(function () {
+                return tajin.jqm.pageName() === 'page_1';
+            }, '', 1000);
         });
 
     });
@@ -67,23 +64,37 @@ describe("tajin.jqm", function () {
         it("changes current JQM page", function () {
             expect(tajin.jqm.pageName()).toBe('page_1');
             tajin.jqm.changePage('page_2');
-
-            setTimeout(function() {expect(tajin.jqm.pageName()).toBe('page_2')}, 1000);
+            waitsFor(function () {
+                return tajin.jqm.pageName() === 'page_2';
+            }, '', 1000);
         });
 
         it("can run a callback after page changed", function () {
-            expect(tajin.jqm.pageName()).toBe('page_1');
-            tajin.jqm.changePage('page_2', function() {
-                expect(tajin.jqm.pageName()).toBe('page_2');
+            expect(tajin.jqm.pageName()).toBe('page_2');
+            var called;
+            tajin.jqm.changePage('page_1', function () {
+                called = true;
             });
+            waitsFor(function () {
+                return called;
+            }, '', 1000);
         });
 
         it("can be provided by optional JQM options for page transition", function () {
-            // TODO Math comment tester ca ?
             expect(tajin.jqm.pageName()).toBe('page_1');
-            tajin.jqm.changePage('page_2', function() {
-                expect(tajin.jqm.pageName()).toBe('page_2');
-            }, { transition: "slideup"});
+            $('#page_2').append('<span id="my-content">some content</span>');
+            expect($('#page_2').find('#my-content').length).toBe(1);
+            var loaded;
+            tajin.event.get('jqm/show/page_2').once(function (page) {
+                alert('loaded: ' + page.attr('id'));
+                loaded = true;
+            });
+            tajin.jqm.changePage('page_2', null, {reloadPage: true});
+            waitsFor(function () {
+                return loaded;
+            }, '', 1000);
+            expect(tajin.jqm.pageName()).toBe('page_2');
+            expect($('#page_2').find('#my-content').length).toBe(0);
         });
 
     });
@@ -128,20 +139,22 @@ describe("tajin.jqm", function () {
 
     });
 
-
-
-    describe("tajin.event.get('jqm/init')", function() {
+    describe("tajin.event.get('jqm/init')", function () {
 
         it("Event triggered at page initialization", function () {
             this.fail('TODO'); // tajin.jqm.redirect()
         });
 
-
     });
 
+    describe("RESET')", function () {
 
+        it("removes hash in address bar", function () {
+            window.location.hash = '';
+            $.mobile.changePage('suite.html');
+        });
 
-
+    });
 
 });
 
