@@ -87,7 +87,10 @@
         this.exports = {
             page: function () {
                 var p = current_page || $('body div[data-role=page]:visible');
-                return p.length ? p : null;
+                if (p.length) {
+                    return p;
+                }
+                throw new Error('Illegal state: no JQM page is currently visible');
             },
             pageName: function () {
                 var a, p = this.page();
