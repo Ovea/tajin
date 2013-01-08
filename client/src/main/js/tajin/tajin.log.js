@@ -85,7 +85,7 @@
         };
 
         this.name = 'log';
-        this.init = function (next, opts, tajin) {
+        this.onconfigure = function (next, opts, tajin) {
             var l = (opts.level || root_level).toLowerCase();
             root_level = loggers[l] ? l : root_level;
             opts.level = root_level;

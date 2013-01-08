@@ -20,7 +20,7 @@
     w.tajin.install({
         name: 'config',
         requires: 'util',
-        init: function (next, opts, tajin) {
+        onconfigure: function (next, opts, tajin) {
             var url = opts.url;
             if (!url) {
                 url = tajin.util.path('tajin-client.json');

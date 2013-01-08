@@ -41,7 +41,7 @@
 
     w.tajin.install({
         name: 'util',
-        init: function (next, opts, tajin) {
+        onconfigure: function (next, opts, tajin) {
             if (opts.check_ids !== false) {
                 $(function () {
                     if (opts.debug) {

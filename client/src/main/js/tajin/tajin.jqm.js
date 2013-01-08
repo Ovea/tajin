@@ -18,27 +18,26 @@
 (function (w, $) {
     "use strict";
     var JQMModule = function () {
-        var self = this, current_page, the_tajin, will_change_timer, events, restoreState = function () {
+        var self = this, restoring, current_page, the_tajin, will_change_timer, events, restoreState = function () {
             var opts = the_tajin.store.del('tajin.jqm.nav');
             if (opts) {
-                self.restoring = true;
+                restoring = true;
                 events.restore.fire(opts);
-                if (opts.to) {
-                    self.exports.changePage(opts.to);
+                if (opts.data && opts.data.to) {
+                    self.exports.changePage(opts.data.to);
+                } else if (opts.data && opts.data.topic) {
+                    the_tajin.events.get(opts.data.topic).fire(opts.data.data || {});
                 }
-                self.restoring = false;
+                restoring = false;
             }
         };
         this.name = 'jqm';
         this.requires = 'event,timer,store';
-        this.init = function (next, opts, tajin) {
+        this.oninstall = function (tajin) {
             if (!$.mobile) {
                 throw new Error('jQuery Mobile scripts not found ! Please add them.');
             }
             the_tajin = tajin;
-            if (!opts.extension) {
-                opts.extension = '.html';
-            }
             var tevent = tajin.event,
                 fire = function (evt, event) {
                     var page = $(event.target), name = page.attr('id');
@@ -57,10 +56,16 @@
                 count: tajin.event.add('jqm/count'),
                 restore: tajin.event.add('jqm/restore')
             };
+            $(function () {
+                restoreState();
+            });
             $(document).on('pagebeforeshow',function (event) {
                 current_page = $(event.target);
                 if (will_change_timer && will_change_timer.isActive()) {
                     will_change_timer.stop();
+                }
+                if (!restoring) {
+                    restoreState();
                 }
                 fire('beforeshow', event);
             }).on('pagebeforehide',function (event) {
@@ -85,11 +90,10 @@
                     count: displayed[name]
                 });
             });
-            next();
         };
         this.exports = {
             page: function () {
-                var p = current_page || $('body div[data-role=page]:visible');
+                var p = current_page || $('body div[data-role=page]:visible:first');
                 if (p.length) {
                     return p;
                 }
@@ -118,8 +122,9 @@
                 });
             },
             changePage: function (location, callback, jqm_opts) {
-                if (location.lastIndexOf(the_tajin.options.jqm.extension) === -1) {
-                    location += the_tajin.options.jqm.extension;
+                var ext = the_tajin.options.jqm.extension || '.html';
+                if (location.lastIndexOf(ext) === -1) {
+                    location += ext;
                 }
                 if ($.isFunction(callback)) {
                     events.beforeshow.once(function (page) {

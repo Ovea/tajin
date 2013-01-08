@@ -21,7 +21,7 @@
     w.tajin.install({
         name: 'test-module',
         requires: 'event',
-        init: function (next, opts) {
+        onconfigure: function (next, opts) {
             opts.init_called = true;
             next();
         },

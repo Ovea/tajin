@@ -38,7 +38,7 @@ describe("tajin.jqm", function () {
 
         it("returns current JQM page", function () {
             var current_page = tajin.jqm.page();
-            expect(current_page.selector).toBe('body div[data-role=page]:visible');
+            expect(current_page.selector).toBe('');
             expect(current_page.attr('id')).toBeUndefined();
         });
 

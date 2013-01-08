@@ -20,6 +20,6 @@
     if ($.isFunction(w.tajin_init)) {
         w.tajin_init(w.tajin);
     } else {
-        w.tajin.init();
+        w.tajin.configure();
     }
 }(window, jQuery));

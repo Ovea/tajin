@@ -20,7 +20,7 @@
     w.tajin.install({
         name: 'dom',
         requires: 'event',
-        init: function (next, opts, tajin) {
+        oninstall: function (tajin) {
             var evt = tajin.event.add({
                 id: 'dom/loaded',
                 state: true
@@ -28,7 +28,6 @@
             $(function () {
                 evt.fire();
             });
-            next();
         }
     });
 }(window, jQuery));

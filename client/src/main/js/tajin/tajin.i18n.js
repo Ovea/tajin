@@ -127,7 +127,7 @@
                 var self = this,
                     e = (expr instanceof jQuery) ? expr : $(expr),
                     attrs = $.isArray(tajin.options.i18n.attributes) ? tajin.options.i18n.attributes : ['href', 'src'],
-                    cb = tajin.options.i18n.onlocalize,
+                    cb = tajin.options.i18n.onlocalize || $.noop,
                     dolocEl = function () {
                         var elem = $(this), key = elem.attr("rel").match(/localize\[([\.\w]+)\]/)[1], v = self.value(key);
                         if (tajin.options.i18n.debug) {
@@ -230,27 +230,26 @@
 
         m.name = 'i18n';
         m.requires = 'util,event';
-        m.init = function (next, opts, t) {
+        m.oninstall = function (t) {
             tajin = t;
             events = {
                 bundle: tajin.event.add('i18n/bundle/loaded'),
                 html: tajin.event.add('i18n/html/loaded'),
                 image: tajin.event.add('i18n/image/loaded')
             };
-            if (!$.isFunction(opts.onlocalize)) {
-                opts.onlocalize = $.noop;
-            }
+        };
+        m.onconfigure = function (next, opts) {
             var b, v = 0, bnds = [], pre = function () {
                 if (b >= bnds.length) {
                     next();
                 } else {
-                    var variants = tajin.options.i18n.bundles[bnds[b]].preload || [];
+                    var variants = opts.bundles[bnds[b]].preload || [];
                     if (v >= variants.length) {
                         v = 0;
                         b++;
                         pre();
                     } else {
-                        if (tajin.options.i18n.debug) {
+                        if (opts.debug) {
                             console.log('[tajin.i18n] preloading', bnds[b], variants[v]);
                         }
                         load_bundle(bnds[b], variants[v], function () {
@@ -260,8 +259,8 @@
                     }
                 }
             };
-            for (b in tajin.options.i18n.bundles) {
-                if (tajin.options.i18n.bundles.hasOwnProperty(b)) {
+            for (b in opts.bundles) {
+                if (opts.bundles.hasOwnProperty(b)) {
                     bnds.push(b);
                 }
             }

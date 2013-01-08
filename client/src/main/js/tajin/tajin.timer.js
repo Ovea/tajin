@@ -74,7 +74,6 @@
         };
     };
 
-
     w.tajin.install(new TimerModule());
 
 }(window, jQuery));

@@ -12,23 +12,23 @@ describe("tajin", function () {
 
     });
 
-    describe("tajin.init()", function () {
+    describe("tajin.configure()", function () {
 
         it("does nothing if called more than 1 time when succeed", function () {
             var c = 0;
             var m = {
                 name: 'test',
-                init: function () {
+                onconfigure: function () {
                     c++;
                 }
             };
             tajin.install(m);
             expect(c).toBe(1);
-            tajin.init();
+            tajin.configure();
             expect(c).toBe(1);
         });
 
-        it("calls each module exported init() method", function () {
+        it("calls each module exported onconfigure() method", function () {
             expect(tajin.options['test-module'].init_called).toBe(true);
         });
 
@@ -36,19 +36,19 @@ describe("tajin", function () {
             var steps = [],
                 m1 = {
                     name: 'mod1',
-                    init: function (next) {
+                    onconfigure: function (next) {
                         steps.push(1);
                         next();
                     }
                 }, m2 = {
                     name: 'mod2',
-                    init: function (next) {
+                    onconfigure: function (next) {
                         steps.push(2);
                         next();
                     }
                 }, failing = {
                     name: 'failing',
-                    init: function (next) {
+                    onconfigure: function (next) {
                         steps.push(3);
                         throw new Error('exception');
                     }
@@ -75,7 +75,7 @@ describe("tajin", function () {
             t.install(m2);
             expect(steps.length).toBe(0);
             try {
-                t.init({
+                t.configure({
                     onerror: obj.err,
                     onready: obj.succ
                 });
@@ -88,7 +88,7 @@ describe("tajin", function () {
                 return call_err;
             }, 600, 'waiting for error');
             t.uninstall(failing);
-            t.init({
+            t.configure({
                 onerror: obj.err,
                 onready: obj.succ
             });
@@ -102,7 +102,7 @@ describe("tajin", function () {
             var passed = 0;
             var m = {
                 name: 'module-2',
-                init: function (next, opts, tajin) {
+                onconfigure: function (next, opts, tajin) {
                     expect(typeof next).toBe('function');
                     expect(typeof opts).toBe('object');
                     expect(opts.myopt).toBe('myvalue');
@@ -143,11 +143,11 @@ describe("tajin", function () {
             expect(tajin.modules()).toContain('module1');
         });
 
-        it("module init() method called at install time if tajin is initialized", function () {
+        it("module onconfigure() method called at install time if tajin is initialized", function () {
             var c = 0;
             var m = {
                 name: 'test',
-                init: function () {
+                onconfigure: function () {
                     c++;
                 }
             };
@@ -176,13 +176,13 @@ describe("tajin", function () {
             var c1 = 0, c2 = 0;
             var m1 = {
                     name: 'test-m1',
-                    init: function () {
+                    onconfigure: function () {
                         c1++;
                     }
                 },
                 m2 = {
                     name: 'test-m1',
-                    init: function () {
+                    onconfigure: function () {
                         c2++;
                     }
                 };

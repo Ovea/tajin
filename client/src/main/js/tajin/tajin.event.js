@@ -191,7 +191,7 @@
                 return events;
             };
         this.name = 'event';
-        this.init = function (next, opts, tajin) {
+        this.oninstall = function (tajin) {
             var ready = t_add({
                 id: 'tajin/ready',
                 state: true
@@ -199,6 +199,8 @@
             tajin.ready(function () {
                 ready.fire();
             });
+        };
+        this.onconfigure = function (next, opts, tajin) {
             //TODO MATHIEU - add remote features here with cometd if opts.remote
             next();
         };

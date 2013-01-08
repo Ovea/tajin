@@ -57,7 +57,7 @@
                 }
             }
         };
-        this.init = function (next, opts, tajin) {
+        this.oninstall = function (tajin) {
             // localStorage + sessionStorage: IE 8+, Firefox 3.5+, Safari 4+, Chrome 4+, Opera 10.5+, iPhone 2+, Android 2+
             // globalStorage: Firefox 2+ (See: https://developer.mozilla.org/en/dom/storage#globalStorage)
             $(['localStorage', 'sessionStorage', 'globalStorage']).each(function (i, store) {
@@ -164,7 +164,6 @@
                 };
                 self.exports.type = 'memory';
             }
-            next();
         };
     };
 

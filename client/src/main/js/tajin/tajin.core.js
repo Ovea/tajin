@@ -63,29 +63,32 @@
                 if (!module.exports) {
                     module.exports = {};
                 }
-                if (!$.isFunction(module.init)) {
-                    module.init = function (next) {
-                        next();
-                    };
+                self.options[module.name] = self.options[module.name] || {};
+                self[module.name] = module.exports;
+                if ($.isFunction(module.oninstall)) {
+                    module.oninstall(self);
                 }
                 if (status === 'ready') {
-                    self.options[module.name] = self.options[module.name] || {};
-                    module.init($.noop, self.options[module.name], this);
+                    if($.isFunction(module.onconfigure)) {
+                        module.onconfigure($.noop, self.options[module.name], self);
+                    } else {
+                        module.tajin_init = 'success';
+                    }
                 }
                 modules.push(module);
             },
-            init: function (opts) {
+            configure: function (opts) {
                 if (status === 'new' || status === 'initializing') {
                     if (status === 'new') {
                         self.options = $.extend(true, {
                             debug: false,
                             onready: $.noop
-                        }, w.tajin_init || {}, opts || {});
+                        }, self.options || {}, w.tajin_init || {}, opts || {});
                     }
                     status = 'initializing';
                     var n, i = -1,
                         inits = $.grep(modules, function (m) {
-                            return m.tajin_init !== 'success';
+                            return m.tajin_init !== 'success' && $.isFunction(m.onconfigure);
                         }),
                         next = function () {
                             i++;
@@ -101,7 +104,7 @@
                                     console.log('[tajin.core] init', n, self.options[n]);
                                 }
                                 try {
-                                    inits[i].init(next, self.options[n], self);
+                                    inits[i].onconfigure(next, self.options[n], self);
                                 } catch (e) {
                                     inits[i].tajin_init = e;
                                     if ($.isFunction(self.options.onerror)) {
