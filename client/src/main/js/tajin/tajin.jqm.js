@@ -35,7 +35,7 @@
         this.requires = 'event,timer,store';
         this.oninstall = function (tajin) {
             if (!$.mobile) {
-                throw new Error('jQuery Mobile scripts not found ! Please add them.');
+                throw new Error('jQuery Mobile scripts not found ! Please add them before Tajin.');
             }
             the_tajin = tajin;
             var tevent = tajin.event,
