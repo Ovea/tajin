@@ -118,21 +118,21 @@
                 });
             },
             changePage: function (location, callback, jqm_opts) {
+                if (location.lastIndexOf(the_tajin.options.jqm.extension) === -1) {
+                    location += the_tajin.options.jqm.extension;
+                }
                 if ($.isFunction(callback)) {
                     events.beforeshow.once(function (page) {
                         var p_uri = page.attr('data-url');
                         if (location.charAt(0) !== '/') {
                             location = '/' + location;
                         }
-                        if (location.lastIndexOf(the_tajin.options.jqm.extension) === -1) {
-                            location += the_tajin.options.jqm.extension;
-                        }
                         if (p_uri.length === location.length + p_uri.lastIndexOf(location)) {
                             callback(page);
                         }
                     });
                 }
-                $.mobile.changePage(location + the_tajin.options.jqm.extension, jqm_opts || {});
+                $.mobile.changePage(location, jqm_opts || {});
             },
             redirect: function (location, data) {
                 the_tajin.store.put('tajin.jqm.nav', {
