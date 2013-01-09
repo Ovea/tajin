@@ -18,6 +18,7 @@
         <plugins>
             <plugin>
                 <artifactId>maven-plugin-plugin</artifactId>
+                <version>2.9</version>
                 <configuration>
                     <goalPrefix>tajin</goalPrefix>
                 </configuration>

@@ -21,7 +21,7 @@ import com.ovea.tajin.resources.TajinResourceManager;
 import java.util.concurrent.CountDownLatch;
 
 /**
- * Watxh for resoruce change to rebuild resources
+ * Watch for resoruce change to rebuild resources
  *
  * @author Mathieu Carbou (mathieu.carbou@gmail.com)
  * @date 2012-11-27
