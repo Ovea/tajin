@@ -26,10 +26,23 @@
         <dependency>
             <groupId>org.codehaus.groovy</groupId>
             <artifactId>groovy-all</artifactId>
+            <classifier>indy</classifier>
         </dependency>
         <dependency>
             <groupId>com.beust</groupId>
             <artifactId>jcommander</artifactId>
+        </dependency>
+
+        <dependency>
+            <groupId>org.eclipse.jetty.orbit</groupId>
+            <artifactId>javax.servlet</artifactId>
+            <scope>provided</scope>
+        </dependency>
+
+        <dependency>
+            <groupId>com.ovea.tajin.server</groupId>
+            <artifactId>tajin-server-jetty9</artifactId>
+            <scope>test</scope>
         </dependency>
     </dependencies>
 

@@ -30,7 +30,7 @@ import com.ovea.tajin.resources.TajinResourceManager;
 public final class BuildMojo extends TajinMavenPlugin {
     @Override
     void execute(TajinConfig config) {
-        TajinResourceManager manager = new TajinResourceManager(config, webapp);
+        TajinResourceManager manager = new TajinResourceManager(config);
         manager.buid();
     }
 }

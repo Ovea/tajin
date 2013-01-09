@@ -31,7 +31,8 @@ import java.util.concurrent.CountDownLatch;
 public final class WatchMojo extends TajinMavenPlugin {
     @Override
     void execute(TajinConfig config) {
-        final TajinResourceManager manager = new TajinResourceManager(config, webapp);
+        final TajinResourceManager manager = new TajinResourceManager(config);
+        manager.buid();
         manager.watch();
         Runtime.getRuntime().addShutdownHook(new Thread() {
             @Override
@@ -42,9 +43,7 @@ public final class WatchMojo extends TajinMavenPlugin {
         try {
             new CountDownLatch(1).await();
         } catch (InterruptedException e) {
-
             Thread.currentThread().interrupt();
-            throw new RuntimeException(e.getMessage(), e);
         }
     }
 }

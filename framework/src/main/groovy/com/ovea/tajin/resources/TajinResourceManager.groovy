@@ -25,36 +25,34 @@ import java.util.concurrent.atomic.AtomicBoolean
  */
 class TajinResourceManager {
 
-    final File webapp
     final TajinConfig config
 
     private final AtomicBoolean watching = new AtomicBoolean(false)
 
-    TajinResourceManager(TajinConfig config, File webapp = new File('.')) {
+    TajinResourceManager(TajinConfig config) {
         this.config = config
-        this.webapp = webapp
-        if (!webapp.exists() || !webapp.directory) {
-            throw new IllegalArgumentException('Illegal Webapp folder: ' + webapp)
+        config.onchange { TajinConfig tc ->
+            //TODO MATHIEU - reload this
+            println "Modified: ${tc}"
+            buid()
         }
     }
 
     void watch() {
         synchronized (this) {
-
+            config.watch()
+            //TODO MATHIEU - add additional folders from config
         }
     }
 
     void unwatch() {
         synchronized (this) {
-
+            config.unwatch()
+            //TODO MATHIEU - add additional folders from config
         }
     }
 
-    boolean isWatching() {
-        return watching.get()
-    }
-
     void buid() {
-
+        println 'Building...'
     }
 }
