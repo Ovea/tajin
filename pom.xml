@@ -29,8 +29,8 @@
         <module>server</module>
         <module>client</module>
         <module>framework</module>
-        <module>maven-plugin</module>
         <module>all</module>
+        <module>maven-plugin</module>
         <module>samples</module>
     </modules>
 
