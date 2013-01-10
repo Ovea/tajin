@@ -93,18 +93,24 @@ class TajinConfig {
             String filename = config.asFile.name
             Paths.get(config.asFile.parent).register(watchService, ENTRY_CREATE, ENTRY_MODIFY)
             TajinConfig tajinConfig = this
-            Thread.start 'TajinConfig-Reloader', {
+            watcher = Thread.start 'TajinConfig-Reloader', {
                 while (watching.get() && !Thread.currentThread().interrupted) {
-                    WatchKey key = watchService.take()
-                    for (WatchEvent<?> watchEvent : key.pollEvents()) {
-                        Path file = (Path) watchEvent.context()
-                        if (filename == file.toFile().name) {
-                            if (loadConfig(true)) {
-                                listeners.each { it.call(tajinConfig) }
+                    try {
+                        WatchKey key = watchService.take()
+                        for (WatchEvent<?> watchEvent : key.pollEvents()) {
+                            Path file = (Path) watchEvent.context()
+                            if (filename == file.toFile().name) {
+                                if (loadConfig(true)) {
+                                    listeners.each { it.call(tajinConfig) }
+                                }
                             }
                         }
+                        key.reset()
+                    } catch (InterruptedException ignored) {
+                        Thread.currentThread().interrupt()
+                        watching.set(false)
+                        break
                     }
-                    key.reset()
                 }
             }
         }

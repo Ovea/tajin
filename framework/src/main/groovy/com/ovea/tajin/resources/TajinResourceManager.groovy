@@ -55,4 +55,6 @@ class TajinResourceManager {
     void buid() {
         println 'Building...'
     }
+
+    private void watch
 }
