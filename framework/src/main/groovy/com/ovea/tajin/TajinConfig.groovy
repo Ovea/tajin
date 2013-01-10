@@ -19,15 +19,7 @@ import com.ovea.tajin.io.Resource
 import groovy.json.JsonSlurper
 import groovy.text.SimpleTemplateEngine
 
-import java.nio.file.*
-import java.util.concurrent.CopyOnWriteArrayList
-import java.util.concurrent.atomic.AtomicBoolean
 import java.util.concurrent.atomic.AtomicReference
-import java.util.logging.Level
-import java.util.logging.Logger
-
-import static java.nio.file.StandardWatchEventKinds.ENTRY_CREATE
-import static java.nio.file.StandardWatchEventKinds.ENTRY_MODIFY
 
 /**
  * @author Mathieu Carbou (mathieu.carbou@gmail.com)
@@ -35,17 +27,10 @@ import static java.nio.file.StandardWatchEventKinds.ENTRY_MODIFY
  */
 class TajinConfig {
 
-    static final String DEFAULT_LOCATION = 'WEB-INF/tajin.json'
-
-    private static final Logger LOGGER = Logger.getLogger(TajinConfig.name)
-
-    private final List<Closure<?>> listeners = new CopyOnWriteArrayList<>()
-    private final AtomicBoolean watching = new AtomicBoolean(false)
     private final AtomicReference<Object> cfg = new AtomicReference<>(new JsonSlurper().parseText("{}"))
-    private Thread watcher
     private Map<String, ?> context
+    private final Resource config
 
-    final Resource config
     final File webapp
     final boolean reloadable
 
@@ -60,22 +45,21 @@ class TajinConfig {
         this.webapp = webapp
         this.reloadable = config.file
         this.context = ctx
-        loadConfig()
+        reload()
     }
 
-    private boolean loadConfig(silent = false) {
+    File getFile() {
+        return config.asFile
+    }
+
+    @Override
+    String toString() {
+        return "TajinConfig{webapp=" + webapp + ", config=" + config + '}'
+    }
+
+    boolean reload() {
         def old = cfg.get().toString()
-        def conf
-        try {
-            conf = new JsonSlurper().parseText(new SimpleTemplateEngine().createTemplate(config.text).make(context + System.getenv() + System.properties + [web: webapp.canonicalPath]) as String)
-        } catch (e) {
-            conf = null
-            if (silent) {
-                LOGGER.log(Level.SEVERE, 'Error in JSON configuration at ' + conf + ' : ' + e.message)
-            } else {
-                throw new IllegalArgumentException('Unable to read Tajin JSON configuration file ' + config + ' : ' + e.message)
-            }
-        }
+        def conf = new JsonSlurper().parseText(new SimpleTemplateEngine().createTemplate(config.text).make(context + System.getenv() + System.properties + [web: webapp.canonicalPath]) as String)
         if (conf != null && conf.toString() != old) {
             cfg.set(conf)
             return true
@@ -83,47 +67,4 @@ class TajinConfig {
         return false
     }
 
-    void onchange(Closure<?> c) {
-        listeners << c
-    }
-
-    void watch() {
-        if (reloadable && !watching.getAndSet(true)) {
-            WatchService watchService = FileSystems.default.newWatchService()
-            String filename = config.asFile.name
-            Paths.get(config.asFile.parent).register(watchService, ENTRY_CREATE, ENTRY_MODIFY)
-            TajinConfig tajinConfig = this
-            watcher = Thread.start 'TajinConfig-Reloader', {
-                while (watching.get() && !Thread.currentThread().interrupted) {
-                    try {
-                        WatchKey key = watchService.take()
-                        for (WatchEvent<?> watchEvent : key.pollEvents()) {
-                            Path file = (Path) watchEvent.context()
-                            if (filename == file.toFile().name) {
-                                if (loadConfig(true)) {
-                                    listeners.each { it.call(tajinConfig) }
-                                }
-                            }
-                        }
-                        key.reset()
-                    } catch (InterruptedException ignored) {
-                        Thread.currentThread().interrupt()
-                        watching.set(false)
-                        break
-                    }
-                }
-            }
-        }
-    }
-
-    void unwatch() {
-        watching.getAndSet(false)
-        watcher?.interrupt()
-        watcher = null
-    }
-
-    @Override
-    public String toString() {
-        return "TajinConfig{webapp=" + webapp + ", config=" + config + '}'
-    }
 }

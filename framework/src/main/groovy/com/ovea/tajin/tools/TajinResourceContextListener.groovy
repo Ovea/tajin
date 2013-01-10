@@ -15,9 +15,8 @@
  */
 package com.ovea.tajin.tools
 
-import com.ovea.tajin.TajinConfig
+import com.ovea.tajin.Tajin
 import com.ovea.tajin.io.Resource
-import com.ovea.tajin.resources.TajinResourceManager
 
 import javax.servlet.ServletContextEvent
 import javax.servlet.ServletContextListener
@@ -29,22 +28,21 @@ import javax.servlet.ServletContextListener
 class TajinResourceContextListener implements ServletContextListener {
 
     private static final String PARAM_CONFIG = TajinResourceContextListener.name + '.config'
-    private TajinResourceManager resourceManager
+    private Tajin tajin
 
     @Override
     void contextInitialized(ServletContextEvent sce) {
         String configLocation = sce.servletContext.getInitParameter(PARAM_CONFIG)
         File webapp = new File(sce.servletContext.getRealPath('.'))
-        Resource config = configLocation ? Resource.resource(webapp, configLocation) : Resource.file(new File(webapp, TajinConfig.DEFAULT_LOCATION))
-        TajinConfig tajinConfig = new TajinConfig(webapp, config)
-        resourceManager = new TajinResourceManager(tajinConfig)
-        resourceManager.buid()
-        resourceManager.watch()
+        Resource config = configLocation ? Resource.resource(webapp, configLocation) : Resource.file(new File(webapp, Tajin.DEFAULT_CONFIG_LOCATION))
+        tajin = Tajin.load(webapp, config)
+        tajin.build()
+        tajin.watch()
     }
 
     @Override
     void contextDestroyed(ServletContextEvent sce) {
-        resourceManager.unwatch()
+        tajin.unwatch()
     }
 
 }

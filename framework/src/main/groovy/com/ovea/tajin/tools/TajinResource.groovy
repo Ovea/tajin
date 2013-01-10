@@ -17,9 +17,8 @@ package com.ovea.tajin.tools
 
 import com.beust.jcommander.JCommander
 import com.beust.jcommander.Parameter
-import com.ovea.tajin.TajinConfig
+import com.ovea.tajin.Tajin
 import com.ovea.tajin.io.Resource
-import com.ovea.tajin.resources.TajinResourceManager
 
 import java.util.concurrent.CountDownLatch
 
@@ -37,15 +36,14 @@ class TajinResource {
             commander.usage()
             System.exit(1)
         }
-        TajinConfig config = new TajinConfig(options.webapp, Resource.file(options.config))
-        TajinResourceManager manager = new TajinResourceManager(config)
-        manager.buid()
+        Tajin tajin = Tajin.load(options.webapp, Resource.file(options.config))
+        tajin.build()
         if (options.watch) {
-            manager.watch()
+            tajin.watch()
             Runtime.runtime.addShutdownHook(new Thread() {
                 @Override
                 void run() {
-                    manager.unwatch()
+                    tajin.unwatch()
                 }
             })
             try {
@@ -62,7 +60,7 @@ class TajinResource {
         File webapp = new File('src/main/webapp').canonicalFile
 
         @Parameter(names = ['-c', '--config'], required = true, arity = 1, description = 'Tajin JSON configuration file. Default to src/main/resources/META-INF/tajin.json')
-        File config = new File('src/main/webapp/WEB-INF/tajin.json').canonicalFile
+        File config = new File('src/main/webapp', Tajin.DEFAULT_CONFIG_LOCATION).canonicalFile
 
         @Parameter(names = ['-w', '--watch'], required = false, arity = 0, description = 'Watch for file change to regenerate resource files')
         boolean watch = false

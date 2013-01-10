@@ -17,8 +17,6 @@ package com.ovea.tajin.resources
 
 import com.ovea.tajin.TajinConfig
 
-import java.util.concurrent.atomic.AtomicBoolean
-
 /**
  * @author Mathieu Carbou (mathieu.carbou@gmail.com)
  * @date 2012-11-26
@@ -27,34 +25,20 @@ class TajinResourceManager {
 
     final TajinConfig config
 
-    private final AtomicBoolean watching = new AtomicBoolean(false)
-
     TajinResourceManager(TajinConfig config) {
         this.config = config
-        config.onchange { TajinConfig tc ->
-            //TODO MATHIEU - reload this
-            println "Modified: ${tc}"
-            buid()
-        }
     }
 
-    void watch() {
-        synchronized (this) {
-            config.watch()
-            //TODO MATHIEU - add additional folders from config
-        }
-    }
-
-    void unwatch() {
-        synchronized (this) {
-            config.unwatch()
-            //TODO MATHIEU - add additional folders from config
-        }
+    Collection<File> getResources() {
+        return []
     }
 
     void buid() {
-        println 'Building...'
+        println 'Building: all...'
     }
 
-    private void watch
+    void buid(File resource) {
+        println 'Building: ' + resource
+    }
+
 }

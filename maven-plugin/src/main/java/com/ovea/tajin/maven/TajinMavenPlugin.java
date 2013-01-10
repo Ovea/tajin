@@ -15,7 +15,7 @@
  */
 package com.ovea.tajin.maven;
 
-import com.ovea.tajin.TajinConfig;
+import com.ovea.tajin.Tajin;
 import com.ovea.tajin.io.Resource;
 import org.apache.maven.plugin.AbstractMojo;
 import org.apache.maven.project.MavenProject;
@@ -70,8 +70,8 @@ public abstract class TajinMavenPlugin extends AbstractMojo {
         for (Map.Entry<Object, Object> entry : p.entrySet()) {
             ctx.put(String.valueOf(entry.getKey()), entry.getValue());
         }
-        execute(new TajinConfig(webapp, Resource.file(config), ctx));
+        execute(Tajin.load(webapp, Resource.file(config), ctx));
     }
 
-    abstract void execute(TajinConfig config);
+    abstract void execute(Tajin tajin);
 }

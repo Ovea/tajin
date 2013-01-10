@@ -15,8 +15,7 @@
  */
 package com.ovea.tajin.maven;
 
-import com.ovea.tajin.TajinConfig;
-import com.ovea.tajin.resources.TajinResourceManager;
+import com.ovea.tajin.Tajin;
 
 import java.util.concurrent.CountDownLatch;
 
@@ -30,14 +29,13 @@ import java.util.concurrent.CountDownLatch;
  */
 public final class WatchMojo extends TajinMavenPlugin {
     @Override
-    void execute(TajinConfig config) {
-        final TajinResourceManager manager = new TajinResourceManager(config);
-        manager.buid();
-        manager.watch();
+    void execute(final Tajin tajin) {
+        tajin.build();
+        tajin.watch();
         Runtime.getRuntime().addShutdownHook(new Thread() {
             @Override
             public void run() {
-                manager.unwatch();
+                tajin.unwatch();
             }
         });
         try {

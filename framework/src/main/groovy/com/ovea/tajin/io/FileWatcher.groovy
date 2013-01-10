@@ -1,6 +1,7 @@
 package com.ovea.tajin.io
 
 import java.nio.file.FileSystems
+import java.nio.file.Path
 import java.nio.file.WatchKey
 import java.nio.file.WatchService
 import java.util.concurrent.CopyOnWriteArrayList
@@ -17,7 +18,7 @@ import static java.nio.file.StandardWatchEventKinds.*
 class FileWatcher {
 
     private final WatchService watchService = FileSystems.default.newWatchService()
-    private final Map<WatchKey, Map<String, ?>> watched = new HashMap<>()
+    private final Map<WatchKey, Bucket> watched = new HashMap<>()
     private final ReadWriteLock lock = new ReentrantReadWriteLock()
     private final AtomicReference<Thread> watcher = new AtomicReference<>()
 
@@ -25,15 +26,17 @@ class FileWatcher {
         lock.writeLock().lock()
         try {
             files.collect { it.canonicalFile }.unique().each {
-                def desc = watched.get(it)
-                if (desc) {
-                    desc.listeners << listener
-                } else {
-                    watched.put(it.toPath().register(watchService, ENTRY_CREATE, ENTRY_MODIFY, ENTRY_DELETE), [
-                        file: it,
-                        listeners: [listener] as CopyOnWriteArrayList
-                    ])
+                def folder = it.directory ? it : it.parentFile.canonicalFile
+                def filename = it.directory ? '*' : it.name
+                Bucket bucket = watched.find { k, v -> v.folder == folder }?.value
+                if (!bucket) {
+                    bucket = new Bucket(folder)
+                    watched.put(folder.toPath().register(watchService, ENTRY_CREATE, ENTRY_MODIFY, ENTRY_DELETE), bucket)
                 }
+                if (!bucket.listeners[filename]) {
+                    bucket.listeners[filename] = new CopyOnWriteArrayList<>()
+                }
+                bucket.listeners[filename] << listener
             }
             Thread t = watcher.get()
             if (watched && (!t || t.interrupted)) {
@@ -49,7 +52,11 @@ class FileWatcher {
                                 lock.readLock().unlock()
                             }
                             if (key.valid && desc) {
-                                key.pollEvents().each { desc.listeners*.call(it.kind().name(), it.context(), desc.file) }
+                                key.pollEvents().each {
+                                    def f = ((Path) it.context()).toFile()
+                                    desc.listeners[f.name]*.call(it.kind().name(), f, desc.file)
+                                    desc.listeners['*']*.call(it.kind().name(), f, desc.file)
+                                }
                             }
                             key.reset()
                         } catch (InterruptedException ignored) {
@@ -65,10 +72,23 @@ class FileWatcher {
     }
 
     void unwatch(Collection<File> files) {
-        files = files.collect { it.canonicalFile }.unique()
         lock.writeLock().lock()
         try {
-            watched.findAll { k, v -> v.file in files }.each { k, v -> k.cancel(); watched.remove(k) }
+            files.collect { it.canonicalFile }.unique().each {
+                def folder = it.directory ? it : it.parentFile.canonicalFile
+                Map.Entry<WatchKey, Bucket> entry = watched.find { k, v -> v.folder == folder }
+                if (entry) {
+                    if (it.directory) {
+                        entry.value.listeners.remove('*')
+                    } else {
+                        entry.value.listeners.remove(it.name)
+                    }
+                    if (!entry.value.listeners) {
+                        entry.key.cancel()
+                        watched.remove(entry.key)
+                    }
+                }
+            }
             Thread t = watcher.get()
             if (!watched && t && !t.interrupted) {
                 t.interrupt()
@@ -76,6 +96,25 @@ class FileWatcher {
             }
         } finally {
             lock.writeLock().unlock()
+        }
+    }
+
+    @Override
+    String toString() {
+        return "FileWatcher: " + watched.values()
+    }
+
+    private static class Bucket {
+        final File folder
+        final Map<String, Collection<Closure<?>>> listeners = new HashMap<>()
+
+        Bucket(File folder) {
+            this.folder = folder
+        }
+
+        @Override
+        String toString() {
+            return "${folder}:${listeners}"
         }
     }
 }

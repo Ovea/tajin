@@ -15,8 +15,7 @@
  */
 package com.ovea.tajin.maven;
 
-import com.ovea.tajin.TajinConfig;
-import com.ovea.tajin.resources.TajinResourceManager;
+import com.ovea.tajin.Tajin;
 
 /**
  * Build resources
@@ -29,8 +28,7 @@ import com.ovea.tajin.resources.TajinResourceManager;
  */
 public final class BuildMojo extends TajinMavenPlugin {
     @Override
-    void execute(TajinConfig config) {
-        TajinResourceManager manager = new TajinResourceManager(config);
-        manager.buid();
+    void execute(Tajin tajin) {
+        tajin.build();
     }
 }
