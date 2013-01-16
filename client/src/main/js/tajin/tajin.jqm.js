@@ -41,6 +41,7 @@
             var tevent = tajin.event,
                 fire = function (evt, event) {
                     var page = $(event.target), name = page.attr('id');
+                    page.name = name;
                     events[evt].fire(page);
                     if (name) {
                         tevent.get('jqm/' + evt + '/' + name).fire(page);
