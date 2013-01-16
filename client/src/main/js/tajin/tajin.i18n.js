@@ -278,6 +278,7 @@
                     if ($.isFunction(cb)) {
                         cb(bnd);
                     }
+                    tajin.event.get('i18n/bundle/loaded/' + name).fire(bnd);
                     events.bundle.fire(bnd);
                 });
             },
