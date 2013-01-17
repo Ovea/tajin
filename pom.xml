@@ -5,7 +5,7 @@
     <parent>
         <groupId>com.ovea</groupId>
         <artifactId>ovea</artifactId>
-        <version>9</version>
+        <version>10-SNAPSHOT</version>
     </parent>
 
     <groupId>com.ovea.tajin</groupId>
