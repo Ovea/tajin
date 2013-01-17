@@ -15,10 +15,7 @@
  */
 package com.ovea.tajin.io
 
-import java.nio.file.FileSystems
-import java.nio.file.Path
-import java.nio.file.WatchKey
-import java.nio.file.WatchService
+import java.nio.file.*
 import java.util.concurrent.CopyOnWriteArrayList
 import java.util.concurrent.atomic.AtomicReference
 import java.util.concurrent.locks.ReadWriteLock
@@ -67,10 +64,9 @@ class FileWatcher {
                                 lock.readLock().unlock()
                             }
                             if (key.valid && desc) {
-                                key.pollEvents().each {
-                                    def f = ((Path) it.context()).toFile()
-                                    desc.listeners[f.name]*.call(it.kind().name(), f, desc.folder)
-                                    desc.listeners['*']*.call(it.kind().name(), f, desc.folder)
+                                key.pollEvents().each { WatchEvent<Path> evt ->
+                                    def f = evt.context().toFile()
+                                    ((desc.listeners[f.name] ?: []) + (desc.listeners['*'] ?: []))*.call(new Event(evt.kind().name(), f, desc.folder))
                                 }
                             }
                             key.reset()
@@ -130,6 +126,32 @@ class FileWatcher {
         @Override
         String toString() {
             return "${folder}:${listeners}"
+        }
+    }
+
+    static class Event {
+
+        static final String ENTRY_CREATE = StandardWatchEventKinds.ENTRY_CREATE.name()
+        static final String ENTRY_MODIFY = StandardWatchEventKinds.ENTRY_MODIFY.name()
+        static final String ENTRY_DELETE = StandardWatchEventKinds.ENTRY_DELETE.name()
+
+        final File folder
+        final String type
+        final File target
+
+        Event(String type, File target, File folder) {
+            this.type = type
+            this.target = target
+            this.folder = folder
+        }
+
+        @Override
+        public String toString() {
+            return "Event{" +
+                "type='" + type + '\'' +
+                ", target=" + target +
+                ", folder=" + folder +
+                '}';
         }
     }
 }
