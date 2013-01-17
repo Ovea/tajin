@@ -19,8 +19,8 @@
         <connection>scm:git:git@github.com:Ovea/tajin.git</connection>
         <developerConnection>scm:git:git@github.com:Ovea/tajin.git</developerConnection>
         <url>http://github.com/Ovea/tajin</url>
-      <tag>HEAD</tag>
-  </scm>
+        <tag>HEAD</tag>
+    </scm>
 
     <properties>
         <jdk.version>1.7</jdk.version>
@@ -74,6 +74,52 @@
                                     <artifactId>tomcat-api</artifactId>
                                 </exclusion>
                             </exclusions>
+                        </dependency>
+                    </dependencies>
+                </plugin>
+                <plugin>
+                    <groupId>org.codehaus.gmaven</groupId>
+                    <artifactId>gmaven-plugin</artifactId>
+                    <version>1.5</version>
+                    <configuration>
+                        <source/>
+                        <providerSelection>2.0</providerSelection>
+                        <sourceEncoding>UTF-8</sourceEncoding>
+                        <targetBytecode>${jdk.version}</targetBytecode>
+                        <invokeDynamic>true</invokeDynamic>
+                    </configuration>
+                    <executions>
+                        <execution>
+                            <goals>
+                                <goal>generateStubs</goal>
+                                <goal>compile</goal>
+                                <goal>generateTestStubs</goal>
+                                <goal>testCompile</goal>
+                            </goals>
+                        </execution>
+                    </executions>
+                    <dependencies>
+                        <dependency>
+                            <groupId>org.codehaus.groovy</groupId>
+                            <artifactId>groovy-all</artifactId>
+                            <version>2.1.0-rc-1</version>
+                            <classifier>indy</classifier>
+                        </dependency>
+                        <dependency>
+                            <groupId>org.codehaus.gmaven.runtime</groupId>
+                            <artifactId>gmaven-runtime-2.0</artifactId>
+                            <version>1.5</version>
+                            <exclusions>
+                                <exclusion>
+                                    <groupId>org.codehaus.groovy</groupId>
+                                    <artifactId>groovy-all</artifactId>
+                                </exclusion>
+                            </exclusions>
+                        </dependency>
+                        <dependency>
+                            <groupId>org.apache.ant</groupId>
+                            <artifactId>ant</artifactId>
+                            <version>1.8.4</version>
                         </dependency>
                     </dependencies>
                 </plugin>
@@ -135,7 +181,7 @@
             <dependency>
                 <groupId>org.codehaus.groovy</groupId>
                 <artifactId>groovy-all</artifactId>
-                <version>2.1.0-beta-1</version>
+                <version>2.1.0-rc-1</version>
                 <classifier>indy</classifier>
             </dependency>
             <dependency>
