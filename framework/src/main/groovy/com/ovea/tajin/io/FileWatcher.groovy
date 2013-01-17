@@ -60,7 +60,7 @@ class FileWatcher {
                         try {
                             WatchKey key = watchService.take()
                             lock.readLock().lock()
-                            def desc
+                            Bucket desc
                             try {
                                 desc = watched.get(key)
                             } finally {
@@ -69,8 +69,8 @@ class FileWatcher {
                             if (key.valid && desc) {
                                 key.pollEvents().each {
                                     def f = ((Path) it.context()).toFile()
-                                    desc.listeners[f.name]*.call(it.kind().name(), f, desc.file)
-                                    desc.listeners['*']*.call(it.kind().name(), f, desc.file)
+                                    desc.listeners[f.name]*.call(it.kind().name(), f, desc.folder)
+                                    desc.listeners['*']*.call(it.kind().name(), f, desc.folder)
                                 }
                             }
                             key.reset()
