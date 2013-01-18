@@ -14,7 +14,7 @@
     <name>Tajin :: Servers :: Jetty 9</name>
 
     <properties>
-        <jettyVersion>9.0.0.M3</jettyVersion>
+        <jettyVersion>9.0.0.M4</jettyVersion>
     </properties>
 
     <build>

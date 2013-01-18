@@ -1,0 +1,27 @@
+<?xml version="1.0"?>
+
+<!DOCTYPE Configure PUBLIC "-//Jetty//Configure//EN" "http://www.eclipse.org/jetty/configure_9_0.dtd">
+
+<Configure id="webappContext" class="org.eclipse.jetty.webapp.WebAppContext">
+
+    <Call name="setInitParameter">
+        <Arg>com.ovea.tajin.tools.TajinResourceContextListener.config</Arg>
+        <Arg>web:WEB-INF/tajin.json</Arg>
+    </Call>
+    <Call name="setInitParameter">
+        <Arg>com.ovea.tajin.tools.TajinResourceContextListener.context</Arg>
+        <Arg>tajin/context</Arg>
+    </Call>
+
+    <New class="org.eclipse.jetty.plus.jndi.Resource">
+        <Arg>tajin/context</Arg>
+        <Arg>
+            <New class="java.util.Properties">
+                <Put name="host">localhost</Put>
+                <Put name="port">8080</Put>
+                <Put name="mocked">true</Put>
+            </New>
+        </Arg>
+    </New>
+
+</Configure>

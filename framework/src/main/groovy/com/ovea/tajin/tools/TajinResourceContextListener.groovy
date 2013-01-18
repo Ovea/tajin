@@ -18,6 +18,7 @@ package com.ovea.tajin.tools
 import com.ovea.tajin.Tajin
 import com.ovea.tajin.io.Resource
 
+import javax.naming.InitialContext
 import javax.servlet.ServletContextEvent
 import javax.servlet.ServletContextListener
 
@@ -28,13 +29,19 @@ import javax.servlet.ServletContextListener
 class TajinResourceContextListener implements ServletContextListener {
 
     private static final String PARAM_CONFIG = TajinResourceContextListener.name + '.config'
+    private static final String PARAM_CONTEXT = TajinResourceContextListener.name + '.context'
     private Tajin tajin
 
     @Override
     void contextInitialized(ServletContextEvent sce) {
         File webapp = new File(sce.servletContext.getRealPath('.'))
         String configLocation = System.getProperty(PARAM_CONFIG, sce.servletContext.getInitParameter(PARAM_CONFIG) ?: "file://${new File(webapp, Tajin.DEFAULT_CONFIG_LOCATION).absolutePath}")
-        tajin = Tajin.load(webapp, Resource.resource(webapp, configLocation))
+        Map<String, ?> p = new HashMap<>()
+        String ctxJndi = sce.servletContext.getInitParameter(PARAM_CONTEXT)
+        if (ctxJndi) {
+            p.putAll(new InitialContext().lookup(ctxJndi) as Map)
+        }
+        tajin = Tajin.load(webapp, Resource.resource(webapp, configLocation), p)
         tajin.build()
         tajin.watch()
     }
