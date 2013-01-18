@@ -1,3 +1,38 @@
 {
+    "client": {
+        "output": "tajin-client.json",
+        "modules": {
+            "log": {
+                "level": "all"
+            },
 
+            "pmp": {
+                "ws": {
+                    "api": "http://${host}:${port}/api",
+                    "root": "http://${host}:${port}"
+                },
+                "env": {
+                    "dev": true,
+                    "prod": false,
+                    "staging": false
+                },
+                "mocked": $mocked
+            },
+
+            "i18n": {
+                "debug": true,
+                "attributes": ["href", "src"],
+                "bundles": {
+                    "pmp": {
+                        "location": "js/i18n",
+                        "preload": ["en"]
+                    },
+                    "code": {
+                        "location": "js/i18n",
+                        "preload": ["en"]
+                    }
+                }
+            }
+        }
+    }
 }

@@ -16,6 +16,7 @@
 package com.ovea.tajin
 
 import com.ovea.tajin.io.FileWatcher
+import com.ovea.tajin.io.FileWatcher.Event
 import com.ovea.tajin.io.Resource
 import com.ovea.tajin.resources.TajinResourceManager
 
@@ -36,7 +37,7 @@ class Tajin {
     private final TajinConfig config
     private final TajinResourceManager resourceManager
 
-    Tajin(TajinConfig config) {
+    private Tajin(TajinConfig config) {
         this.config = config
         this.resourceManager = new TajinResourceManager(config)
         try {
@@ -53,12 +54,12 @@ class Tajin {
     void watch() {
         synchronized (this) {
             if (config.reloadable) {
-                watcher.watch([config.file], { String type ->
+                watcher.watch([config.file], { Event evt ->
                     // executed in watcher thread !
-                    if (type == 'ENTRY_MODIFY') {
+                    if (evt.type == 'ENTRY_MODIFY') {
                         try {
                             if (config.reload()) {
-
+                                build()
                             }
                         } catch (e) {
                             LOGGER.log(Level.SEVERE, 'Error loading JSON configuration ' + config + ' : ' + e.message)
@@ -66,12 +67,11 @@ class Tajin {
                     }
                 })
             }
-            watcher.watch(resourceManager.resources, { String type, File res ->
-                if (type == 'ENTRY_MODIFY' || type == 'ENTRY_CREATE') {
-                    resourceManager.buid(res)
+            watcher.watch(resourceManager.resources, { Event evt ->
+                if (evt.type == 'ENTRY_MODIFY' || evt.type == 'ENTRY_CREATE') {
+                    resourceManager.buid(evt.target)
                 }
             })
-            println watcher
         }
     }
 

@@ -58,13 +58,11 @@ class TajinConfig {
     }
 
     boolean reload() {
-        def old = cfg.get().toString()
-        def conf = new JsonSlurper().parseText(new SimpleTemplateEngine().createTemplate(config.text).make(context + System.getenv() + System.properties + [web: webapp.canonicalPath]) as String)
-        if (conf != null && conf.toString() != old) {
-            cfg.set(conf)
-            return true
-        }
-        return false
+        cfg.set(new JsonSlurper().parseText(new SimpleTemplateEngine().createTemplate(config.text).make(context + System.getenv() + System.properties + [web: webapp.canonicalPath]) as String))
+        return true
     }
 
+    Object getJson() {
+        return cfg.get() ?: [:]
+    }
 }

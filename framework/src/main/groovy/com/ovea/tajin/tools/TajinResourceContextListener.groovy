@@ -32,10 +32,9 @@ class TajinResourceContextListener implements ServletContextListener {
 
     @Override
     void contextInitialized(ServletContextEvent sce) {
-        String configLocation = sce.servletContext.getInitParameter(PARAM_CONFIG)
         File webapp = new File(sce.servletContext.getRealPath('.'))
-        Resource config = configLocation ? Resource.resource(webapp, configLocation) : Resource.file(new File(webapp, Tajin.DEFAULT_CONFIG_LOCATION))
-        tajin = Tajin.load(webapp, config)
+        String configLocation = System.getProperty(PARAM_CONFIG, sce.servletContext.getInitParameter(PARAM_CONFIG) ?: "file://${new File(webapp, Tajin.DEFAULT_CONFIG_LOCATION).absolutePath}")
+        tajin = Tajin.load(webapp, Resource.resource(webapp, configLocation))
         tajin.build()
         tajin.watch()
     }

@@ -16,6 +16,7 @@
 package com.ovea.tajin.resources
 
 import com.ovea.tajin.TajinConfig
+import groovy.json.JsonBuilder
 
 /**
  * @author Mathieu Carbou (mathieu.carbou@gmail.com)
@@ -30,11 +31,14 @@ class TajinResourceManager {
     }
 
     Collection<File> getResources() {
+        //TODO MATHIEU - find dynami resources
         return []
     }
 
     void buid() {
         println 'Building: all...'
+        File output = new File(config.webapp, config.json.client?.output as String ?: 'tajin-client.json')
+        output.text = new JsonBuilder(config.json.client?.modules ?: [:])
     }
 
     void buid(File resource) {

@@ -79,7 +79,7 @@ abstract class Resource {
      * http://...
      */
     static Resource resource(String pattern) {
-        return resource(null, pattern)
+        return resource(new File('.'), pattern)
     }
 
     /**
@@ -97,8 +97,7 @@ abstract class Resource {
         if (pattern.startsWith("web:"))
             return new FileResource(new File(basedir, pattern.substring(4)))
         if (pattern.startsWith("file:")) {
-            File f = new File(pattern.substring(5))
-            return new FileResource(f.absolute ? f : new File(basedir, pattern.substring(5)))
+            return new FileResource(new File(pattern.substring(5)))
         }
         try {
             return new UrlResource(new URL(pattern))
