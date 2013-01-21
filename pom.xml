@@ -86,7 +86,7 @@
                         <providerSelection>2.0</providerSelection>
                         <sourceEncoding>UTF-8</sourceEncoding>
                         <targetBytecode>${jdk.version}</targetBytecode>
-                        <invokeDynamic>true</invokeDynamic>
+                        <invokeDynamic>false</invokeDynamic>
                     </configuration>
                     <executions>
                         <execution>
@@ -103,7 +103,6 @@
                             <groupId>org.codehaus.groovy</groupId>
                             <artifactId>groovy-all</artifactId>
                             <version>2.1.0-rc-1</version>
-                            <classifier>indy</classifier>
                         </dependency>
                         <dependency>
                             <groupId>org.codehaus.gmaven.runtime</groupId>
@@ -182,7 +181,6 @@
                 <groupId>org.codehaus.groovy</groupId>
                 <artifactId>groovy-all</artifactId>
                 <version>2.1.0-rc-1</version>
-                <classifier>indy</classifier>
             </dependency>
             <dependency>
                 <groupId>com.beust</groupId>
