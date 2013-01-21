@@ -45,7 +45,11 @@ class TajinConfig {
         this.webapp = webapp
         this.reloadable = config.file
         this.context = ctx
-        reload()
+        try {
+            reload()
+        } catch (e) {
+            throw new IllegalArgumentException("Error in configuration ${config} for webapp ${webapp.absolutePath} : ${e.message}", e)
+        }
     }
 
     File getFile() {
