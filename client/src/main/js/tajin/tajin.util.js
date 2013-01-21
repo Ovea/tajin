@@ -58,7 +58,7 @@
         exports: {
             path: function (loc) {
                 loc = loc || '';
-                if (loc.indexOf('http') !== -1) {
+                if (loc.indexOf('http') === 0) {
                     return loc;
                 }
                 if (loc.charAt(0) === '/') {
