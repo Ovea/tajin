@@ -18,3 +18,4 @@ test-output
 tmp
 dependency-reduced-pom.xml
 /framework/src/test/webapp/tajin-client.json
+overlays
