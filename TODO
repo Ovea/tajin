@@ -28,6 +28,10 @@ Tajin Watcher
         * enabled true/false pour inclure ou pas selon env par exemple
         * config peut etre templatisée (i.e. expressions groovy)
 
+Tajin Framework
+
+    * Import stuff from old ovea tajin-util
+
 Tajin Tools
 
     * script pour verifier l i18n rel localize vs bundles configures dans tajin.json
