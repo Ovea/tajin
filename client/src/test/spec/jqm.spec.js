@@ -26,7 +26,7 @@ describe("tajin.jqm", function () {
         expect(tajin.event.has('jqm/hide')).toBe(true);
     });
 
-    it("register event jqm/first wich is triggered when a JQM page is shown the first time", function () {
+    it("register event jqm/first which is triggered when a JQM page is shown the first time", function () {
         expect(tajin.event.has('jqm/first')).toBe(true);
     });
 
