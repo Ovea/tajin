@@ -15,12 +15,9 @@
  */
 package com.ovea.tajin.server;
 
-import org.eclipse.jetty.server.Handler;
-import org.eclipse.jetty.server.HttpConnectionFactory;
-import org.eclipse.jetty.server.NCSARequestLog;
-import org.eclipse.jetty.server.NetworkConnector;
+import org.eclipse.jetty.jmx.MBeanContainer;
+import org.eclipse.jetty.server.*;
 import org.eclipse.jetty.server.Server;
-import org.eclipse.jetty.server.ServerConnector;
 import org.eclipse.jetty.server.handler.ContextHandlerCollection;
 import org.eclipse.jetty.server.handler.DefaultHandler;
 import org.eclipse.jetty.server.handler.HandlerCollection;
@@ -30,6 +27,7 @@ import org.eclipse.jetty.webapp.WebAppContext;
 import org.eclipse.jetty.xml.XmlConfiguration;
 
 import java.io.File;
+import java.lang.management.ManagementFactory;
 import java.net.URL;
 
 import static com.ovea.tajin.server.util.ClassloaderUtils.tryEnhanceContextClassloaderWithClasspath;
@@ -150,6 +148,9 @@ public final class Jetty9Container extends ContainerSkeleton<org.eclipse.jetty.s
         if (settings().has(PROPERTY_JETTY_WEB)) {
             webapp.setDescriptor(new File(settings().get(PROPERTY_JETTY_WEB)).getAbsolutePath());
         }
+
+        MBeanContainer mbContainer = new MBeanContainer(ManagementFactory.getPlatformMBeanServer());
+        jetty.addBean(mbContainer);
 
         return jetty;
     }
