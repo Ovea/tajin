@@ -167,7 +167,7 @@
         };
 
         function load_bundle(bundle, locale, cb, tries, index) {
-            var b, path, l;
+            var b, path, l, loc;
             if (arguments.length <= 3) {
                 if (cache[bundle] && cache[bundle][locale]) {
                     if (tajin.options.i18n.debug) {
@@ -198,7 +198,8 @@
                     }
                     load_bundle(bundle, locale, cb, tries, index + 1);
                 } else {
-                    path = tajin.util.path(tajin.options.i18n.bundles[bundle].location + '/' + bundle);
+                    loc = tajin.options.i18n.bundles[bundle].location;
+                    path = tajin.util.path((loc ? (loc + '/') : '') + bundle);
                     if (tries[index].length > 0) {
                         path += '_' + tries[index];
                     }
