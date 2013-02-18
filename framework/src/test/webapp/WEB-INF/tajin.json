@@ -1,5 +1,6 @@
 {
     "debug": true,
+
     "client": {
         "modules": {
             "log": {
@@ -24,5 +25,22 @@
                 }
             }
         }
+    },
+
+    "minify": [
+        "js/jquery/jquery.fastLiveFilter.js",
+        "js/jquery/jquery.mockjax.js",
+        "js/jquery/jquery.purl-2.2.js",
+        "js/jquery/jquery.tooltip.js",
+        "js/lib.js"
+    ],
+
+    "merge": {
+        "js/lib.js": [
+            "js/jquery/jquery-1.8.3.min.js",
+            "js/jquery/jquery.fastLiveFilter.min.js",
+            "js/jquery/jquery.json-2.2.min.js",
+            "js/jquery/jquery.purl-2.2.min.js"
+        ]
     }
 }

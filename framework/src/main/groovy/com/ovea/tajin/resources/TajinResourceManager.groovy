@@ -28,63 +28,30 @@ import static com.ovea.tajin.io.FileWatcher.Event.Kind.ENTRY_DELETE
  */
 class TajinResourceManager {
 
-    private static final String BUNDLE_FORMAT = '((_([a-z]{2}))|(_([a-z]{2}_[A-Z]{2})))?\\.json'
-
     final TajinConfig config
+
+    private final I18N i18n
 
     TajinResourceManager(TajinConfig config) {
         this.config = config
+        this.i18n = new I18N(config)
     }
 
     Collection<File> getResources() {
-        def watch = []
-        i18nBundles.each { bundle, cfg ->
-            watch << new File(config.webapp, cfg.location ?: '.').absoluteFile
-        }
-        return watch
+        return i18n.watchables
     }
 
     void buid() {
         config.log("Building Tajin resources...")
-        i18nBundles.each { String bundle, cfg ->
-            cfg.variants = findVariants(bundle, cfg)
-        }
+        i18n.build()
         updateClientConfig()
     }
 
     void modified(FileWatcher.Event event) {
         config.log("Modified: %s", event)
-        if (event.kind in [ENTRY_CREATE, ENTRY_DELETE]) {
-            def e = i18nBundles.find { String bundle, cfg -> event.target.name =~ "${bundle}${BUNDLE_FORMAT}" && event.folder == new File(config.webapp, cfg.location ?: '.').absoluteFile }
-            if (e) {
-                def variants = findVariants(e.key, e.value)
-                if (e.value.variants != variants) {
-                    e.value.variants = variants
-                    updateClientConfig()
-                }
-            }
+        if (event.kind in [ENTRY_CREATE, ENTRY_DELETE] && i18n.modified(event)) {
+            updateClientConfig()
         }
-    }
-
-    private def findVariants(String bundle, def cfg) {
-        File dir = new File(config.webapp, cfg.location ?: '.').absoluteFile
-        def variants = []
-        dir.eachFile { File f ->
-            def matcher = f.name =~ "${bundle}${BUNDLE_FORMAT}"
-            if (matcher) {
-                if (matcher[0][3]) {
-                    variants << matcher[0][3]
-                } else if (matcher[0][5]) {
-                    variants << matcher[0][5]
-                }
-            }
-        }
-        config.log("Variants found for bundle %s: %s", bundle, variants)
-        return variants
-    }
-
-    private def getI18nBundles() {
-        return config.hasClientConfig() ? (config.clientConfig?.i18n?.bundles ?: [:]) : [:]
     }
 
     private void updateClientConfig() {
