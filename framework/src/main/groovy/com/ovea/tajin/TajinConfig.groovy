@@ -16,6 +16,7 @@
 package com.ovea.tajin
 
 import com.ovea.tajin.io.Resource
+import groovy.json.JsonBuilder
 import groovy.json.JsonSlurper
 import groovy.text.SimpleTemplateEngine
 
@@ -28,6 +29,7 @@ import java.util.concurrent.atomic.AtomicReference
 class TajinConfig {
 
     private final AtomicReference<Object> cfg = new AtomicReference<>(new JsonSlurper().parseText("{}"))
+    private final AtomicReference<String> cfgStr = new AtomicReference<>("{}")
     private Map<String, ?> context
     private final Resource config
 
@@ -61,12 +63,51 @@ class TajinConfig {
         return "TajinConfig{webapp=" + webapp + ", config=" + config + '}'
     }
 
-    boolean reload() {
-        cfg.set(new JsonSlurper().parseText(new SimpleTemplateEngine().createTemplate(config.text).make(context + System.getenv() + System.properties + [web: webapp.canonicalPath]) as String))
-        return true
+    boolean modified() {
+        return readCfg().modified
     }
 
-    Object getJson() {
-        return cfg.get() ?: [:]
+    boolean reload() {
+        def c = readCfg()
+        if (c.modified && cfgStr.compareAndSet(c.oldCfgStr, c.newCfgStr)) {
+            cfg.set(c.newCfg)
+            log('Loaded Tajin configuration: %s', config)
+            return true
+        }
+        return false
+    }
+
+    private def readCfg() {
+        def newCfg = new JsonSlurper().parseText(new SimpleTemplateEngine().createTemplate(config.text).make(context + System.getenv() + System.properties + [web: webapp.canonicalPath]) as String)
+        def newCfgStr = new JsonBuilder(newCfg).toString()
+        def oldCfgStr = cfgStr.get()
+        return [
+            newCfg: newCfg,
+            newCfgStr: newCfgStr,
+            oldCfgStr: oldCfgStr,
+            modified: newCfgStr != oldCfgStr
+        ]
+    }
+
+    def getClientConfig() {
+        return cfg.get().client.modules ?: [:]
+    }
+
+    File getClientFile() {
+        return new File(webapp, cfg.get().client.output as String ?: 'tajin-client.json')
+    }
+
+    boolean hasClientConfig() {
+        return cfg.get()?.client
+    }
+
+    boolean getDebug() {
+        return cfg.get().debug ?: false
+    }
+
+    void log(String msg, Object... args) {
+        if (debug) {
+            println "[tajin] ${String.format(msg, args)}"
+        }
     }
 }

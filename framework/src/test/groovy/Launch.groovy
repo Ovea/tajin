@@ -16,6 +16,9 @@
 import com.ovea.tajin.server.ContainerConfiguration
 import com.ovea.tajin.server.Server
 
+System.setProperty('domain', 'localhost:8080')
+System.setProperty('mocked', 'true')
+
 ContainerConfiguration.create()
     .webappRoot('src/test/webapp')
     .buildContainer(Server.JETTY9)

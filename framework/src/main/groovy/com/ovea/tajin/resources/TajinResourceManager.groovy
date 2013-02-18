@@ -16,9 +16,11 @@
 package com.ovea.tajin.resources
 
 import com.ovea.tajin.TajinConfig
+import com.ovea.tajin.io.FileWatcher
 import groovy.json.JsonBuilder
 
-import java.util.logging.Logger
+import static com.ovea.tajin.io.FileWatcher.Event.Kind.ENTRY_CREATE
+import static com.ovea.tajin.io.FileWatcher.Event.Kind.ENTRY_DELETE
 
 /**
  * @author Mathieu Carbou (mathieu.carbou@gmail.com)
@@ -26,7 +28,7 @@ import java.util.logging.Logger
  */
 class TajinResourceManager {
 
-    private static final Logger LOGGER = Logger.getLogger(TajinResourceManager.name)
+    private static final String BUNDLE_FORMAT = '((_([a-z]{2}))|(_([a-z]{2}_[A-Z]{2})))?\\.json'
 
     final TajinConfig config
 
@@ -35,20 +37,63 @@ class TajinResourceManager {
     }
 
     Collection<File> getResources() {
-        //TODO MATHIEU - find dynamic resources
-        return []
+        def watch = []
+        i18nBundles.each { bundle, cfg ->
+            watch << new File(config.webapp, cfg.location ?: '.').absoluteFile
+        }
+        return watch
     }
 
     void buid() {
-        LOGGER.info("Rebuilding Tajin resources...")
-        File output = new File(config.webapp, config.json.client?.output as String ?: 'tajin-client.json')
-        output.text = new JsonBuilder(config.json.client?.modules ?: [:])
+        config.log("Building Tajin resources...")
+        i18nBundles.each { String bundle, cfg ->
+            cfg.variants = findVariants(bundle, cfg)
+        }
+        updateClientConfig()
     }
 
-    void buid(File changed) {
-        //TODO MATHIEU - find file to rebuild for changed file
-        File res = changed
-        LOGGER.info("Rebuilding Tajin resource ${res}...")
+    void modified(FileWatcher.Event event) {
+        config.log("Modified: %s", event)
+        if (event.kind in [ENTRY_CREATE, ENTRY_DELETE]) {
+            def e = i18nBundles.find { String bundle, cfg -> event.target.name =~ "${bundle}${BUNDLE_FORMAT}" && event.folder == new File(config.webapp, cfg.location ?: '.').absoluteFile }
+            if (e) {
+                def variants = findVariants(e.key, e.value)
+                if (e.value.variants != variants) {
+                    e.value.variants = variants
+                    updateClientConfig()
+                }
+            }
+        }
     }
 
+    private def findVariants(String bundle, def cfg) {
+        File dir = new File(config.webapp, cfg.location ?: '.').absoluteFile
+        def variants = []
+        dir.eachFile { File f ->
+            def matcher = f.name =~ "${bundle}${BUNDLE_FORMAT}"
+            if (matcher) {
+                if (matcher[0][3]) {
+                    variants << matcher[0][3]
+                } else if (matcher[0][5]) {
+                    variants << matcher[0][5]
+                }
+            }
+        }
+        config.log("Variants found for bundle %s: %s", bundle, variants)
+        return variants
+    }
+
+    private def getI18nBundles() {
+        return config.hasClientConfig() ? (config.clientConfig?.i18n?.bundles ?: [:]) : [:]
+    }
+
+    private void updateClientConfig() {
+        if (config.hasClientConfig()) {
+            config.clientFile.text = new JsonBuilder(config.clientConfig)
+            config.log("Wrote client config %s", config.clientFile)
+        } else {
+            config.clientFile.delete()
+            config.log("Removed client config %s", config.clientFile)
+        }
+    }
 }

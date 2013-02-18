@@ -48,17 +48,22 @@ class Tajin {
     }
 
     void build() {
+        config.log('Tajin.build()')
         resourceManager.buid()
     }
 
     void watch() {
         synchronized (this) {
+            config.log('Tajin.watch()')
             if (config.reloadable) {
+                config.log('Watching: %s', config.file)
                 watcher.watch([config.file], { Event evt ->
-                    // executed in watcher thread !
-                    if (evt.type == 'ENTRY_MODIFY') {
+                    if (evt.kind == Event.Kind.ENTRY_MODIFY) {
                         try {
-                            if (config.reload()) {
+                            if (config.modified()) {
+                                unwatch()
+                                config.reload()
+                                watch()
                                 build()
                             }
                         } catch (e) {
@@ -67,16 +72,19 @@ class Tajin {
                     }
                 })
             }
-            watcher.watch(resourceManager.resources, { Event evt ->
-                if (evt.type == 'ENTRY_MODIFY' || evt.type == 'ENTRY_CREATE') {
-                    resourceManager.buid(evt.target)
-                }
+            def res = resourceManager.resources
+            if (res) {
+                res.each { config.log('Watching: %s', it) }
+            }
+            watcher.watch(res, { Event evt ->
+                resourceManager.modified(evt)
             })
         }
     }
 
     void unwatch() {
         synchronized (this) {
+            config.log('Tajin.unwatch()')
             if (config.reloadable) {
                 watcher.unwatch([config.file])
             }

@@ -131,16 +131,19 @@ class FileWatcher {
 
     static class Event {
 
-        static final String ENTRY_CREATE = StandardWatchEventKinds.ENTRY_CREATE.name()
-        static final String ENTRY_MODIFY = StandardWatchEventKinds.ENTRY_MODIFY.name()
-        static final String ENTRY_DELETE = StandardWatchEventKinds.ENTRY_DELETE.name()
+        static enum Kind {
+            ENTRY_CREATE,
+            ENTRY_MODIFY,
+            ENTRY_DELETE,
+            UNKNOWN,
+        }
 
         final File folder
-        final String type
+        final Kind kind
         final File target
 
         Event(String type, File target, File folder) {
-            this.type = type
+            this.kind = Kind.values().find { it.name() == type } ?: Kind.UNKNOWN
             this.target = target
             this.folder = folder
         }
@@ -148,7 +151,7 @@ class FileWatcher {
         @Override
         public String toString() {
             return "Event{" +
-                "type='" + type + '\'' +
+                "kind='" + kind + '\'' +
                 ", target=" + target +
                 ", folder=" + folder +
                 '}';
