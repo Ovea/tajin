@@ -19,9 +19,6 @@ import com.ovea.tajin.TajinConfig
 import com.ovea.tajin.io.FileWatcher
 import groovy.json.JsonBuilder
 
-import static com.ovea.tajin.io.FileWatcher.Event.Kind.ENTRY_CREATE
-import static com.ovea.tajin.io.FileWatcher.Event.Kind.ENTRY_DELETE
-
 /**
  * @author Mathieu Carbou (mathieu.carbou@gmail.com)
  * @date 2012-11-26
@@ -30,26 +27,31 @@ class TajinResourceManager {
 
     final TajinConfig config
 
-    private final I18N i18n
+    private final Collection<ResourceBuilder> resourceBuilders
 
     TajinResourceManager(TajinConfig config) {
         this.config = config
-        this.i18n = new I18N(config)
+        resourceBuilders = [
+            new I18N(config),
+            new Minifier(config)
+        ]
     }
 
     Collection<File> getResources() {
-        return i18n.watchables
+        return resourceBuilders.collect { it.watchables }.flatten()
     }
 
     void buid() {
         config.log("Building Tajin resources...")
-        i18n.build()
+        resourceBuilders*.build()
         updateClientConfig()
     }
 
     void modified(FileWatcher.Event event) {
         config.log("Modified: %s", event)
-        if (event.kind in [ENTRY_CREATE, ENTRY_DELETE] && i18n.modified(event)) {
+        boolean modified = false
+        resourceBuilders.each { modified |= it.modified(event) }
+        if (modified) {
             updateClientConfig()
         }
     }
