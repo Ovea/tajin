@@ -32,14 +32,21 @@ class Minifier implements ResourceBuilder {
 
     @Override
     void build() {
-
+        watchables.each { minify(it) }
     }
 
     @Override
-    Collection<File> getWatchables() { config.minify.each { String path -> new File(config.webapp, path).absoluteFile } }
+    Collection<File> getWatchables() { config.minify.collect { String path -> new File(config.webapp, path).absoluteFile } }
 
     @Override
     boolean modified(FileWatcher.Event e) {
+        minify(e.target)
+        // do not need a client-json regeneration
         return false
+    }
+
+    private void minify(File src) {
+        config.log('Minify: %s', src)
+        //TODO: what to do for inisting resources like big.css which are created after ?
     }
 }

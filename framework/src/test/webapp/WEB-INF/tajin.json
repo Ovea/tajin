@@ -35,7 +35,8 @@
         "js/lib.js",
         "css/sample1.css",
         "css/sample2.css",
-        "css/inexisting.css"
+        "css/inexisting.css",
+        "css/big.css"
     ],
 
     "merge": {
