@@ -47,8 +47,6 @@ class TajinResourceContextListener implements ServletContextListener {
     }
 
     @Override
-    void contextDestroyed(ServletContextEvent sce) {
-        tajin.unwatch()
-    }
+    void contextDestroyed(ServletContextEvent sce) { tajin.unwatch() }
 
 }

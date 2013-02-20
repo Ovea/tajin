@@ -43,9 +43,7 @@ class I18N implements ResourceBuilder {
     }
 
     @Override
-    Collection<File> getWatchables() {
-        return bundles.collect { bundle, cfg -> new File(config.webapp, cfg.location ?: '.').absoluteFile }
-    }
+    Collection<File> getWatchables() { bundles.collect { bundle, cfg -> new File(config.webapp, cfg.location ?: '.').absoluteFile } }
 
     @Override
     boolean modified(FileWatcher.Event event) {
@@ -79,8 +77,6 @@ class I18N implements ResourceBuilder {
         return variants
     }
 
-    private def getBundles() {
-        return config.hasClientConfig() ? (config.clientConfig?.i18n?.bundles ?: [:]) : [:]
-    }
+    private def getBundles() { config.hasClientConfig() ? (config.clientConfig?.i18n?.bundles ?: [:]) : [:] }
 
 }

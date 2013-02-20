@@ -92,8 +92,6 @@ class Tajin {
         }
     }
 
-    static Tajin load(File webapp, Resource config, Map<String, ?> ctx = [:]) {
-        return new Tajin(new TajinConfig(webapp, config, ctx))
-    }
+    static Tajin load(File webapp, Resource config, Map<String, ?> ctx = [:]) { new Tajin(new TajinConfig(webapp, config, ctx)) }
 
 }

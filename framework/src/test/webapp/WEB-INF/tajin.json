@@ -32,7 +32,10 @@
         "js/jquery/jquery.mockjax.js",
         "js/jquery/jquery.purl-2.2.js",
         "js/jquery/jquery.tooltip.js",
-        "js/lib.js"
+        "js/lib.js",
+        "css/sample1.css",
+        "css/sample2.css",
+        "css/inexisting.css"
     ],
 
     "merge": {
@@ -41,6 +44,11 @@
             "js/jquery/jquery.fastLiveFilter.min.js",
             "js/jquery/jquery.json-2.2.min.js",
             "js/jquery/jquery.purl-2.2.min.js"
+        ],
+        "css/all.css": [
+            "css/sample1.min.css",
+            "css/sample2.min.css",
+            "css/inexisting.min.css"
         ]
     }
 }

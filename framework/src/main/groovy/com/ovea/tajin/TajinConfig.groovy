@@ -54,18 +54,12 @@ class TajinConfig {
         }
     }
 
-    File getFile() {
-        return config.asFile
-    }
+    File getFile() { config.asFile }
 
     @Override
-    String toString() {
-        return "TajinConfig{webapp=" + webapp + ", config=" + config + '}'
-    }
+    String toString() { "TajinConfig{webapp=" + webapp + ", config=" + config + '}' }
 
-    boolean modified() {
-        return readCfg().modified
-    }
+    boolean modified() { readCfg().modified }
 
     boolean reload() {
         def c = readCfg()
@@ -89,25 +83,19 @@ class TajinConfig {
         ]
     }
 
-    def getClientConfig() {
-        return cfg.get().client.modules ?: [:]
-    }
+    def getClientConfig() { cfg.get().client.modules ?: [:] }
 
-    File getClientFile() {
-        return new File(webapp, cfg.get().client.output as String ?: 'tajin-client.json')
-    }
+    File getClientFile() { new File(webapp, cfg.get().client.output as String ?: 'tajin-client.json') }
 
-    boolean hasClientConfig() {
-        return cfg.get()?.client
-    }
+    boolean hasClientConfig() { cfg.get()?.client }
 
-    boolean getDebug() {
-        return cfg.get().debug ?: false
-    }
+    boolean getDebug() { cfg.get().debug ?: false }
 
     void log(String msg, Object... args) {
         if (debug) {
             println "[tajin] ${String.format(msg, args)}"
         }
     }
+
+    def propertyMissing(String name) { cfg.get()[name] ?: [:] }
 }

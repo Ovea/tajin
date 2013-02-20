@@ -37,9 +37,7 @@ class TajinResourceManager {
         ]
     }
 
-    Collection<File> getResources() {
-        return resourceBuilders.collect { it.watchables }.flatten()
-    }
+    Collection<File> getResources() { resourceBuilders.collect { it.watchables }.flatten() }
 
     void buid() {
         config.log("Building Tajin resources...")
