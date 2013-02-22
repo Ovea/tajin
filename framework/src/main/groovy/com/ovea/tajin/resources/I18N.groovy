@@ -30,15 +30,22 @@ class I18N implements ResourceBuilder {
     private static final String BUNDLE_FORMAT = '((_([a-z]{2}))|(_([a-z]{2}_[A-Z]{2})))?\\.json'
 
     final TajinConfig config
+    Collection<File> watchables = []
 
     I18N(TajinConfig config) {
         this.config = config
+        config.onConfig {
+            config.trace("[%s] Tajin configuration changed", getClass().simpleName)
+            watchables = bundles.collect { bundle, cfg -> new File(config.webapp, cfg.location ?: '.') }.findAll { it && it.exists() }
+        }
     }
 
     @Override
     Work build() {
         bundles.each { String bundle, cfg ->
-            cfg.variants = findVariants(bundle, cfg)
+            if (!cfg.variants) {
+                cfg.variants = findVariants(bundle, cfg)
+            }
         }
         return Work.COMPLETED
     }
@@ -47,9 +54,6 @@ class I18N implements ResourceBuilder {
     Work complete(Work work) {
         return Work.COMPLETED
     }
-
-    @Override
-    Collection<File> getWatchables() { bundles.collect { bundle, cfg -> new File(config.webapp, cfg.location ?: '.') } }
 
     @Override
     boolean modified(FileWatcher.Event event) {
@@ -67,19 +71,23 @@ class I18N implements ResourceBuilder {
     }
 
     private def findVariants(String bundle, def cfg) {
-        File dir = new File(config.webapp, cfg.location ?: '.')
         def variants = []
-        dir.eachFile { File f ->
-            def matcher = f.name =~ "${bundle}${BUNDLE_FORMAT}"
-            if (matcher) {
-                if (matcher[0][3]) {
-                    variants << matcher[0][3]
-                } else if (matcher[0][5]) {
-                    variants << matcher[0][5]
+        File dir = new File(config.webapp, cfg.location ?: '.')
+        if (dir.exists()) {
+            dir.eachFile { File f ->
+                def matcher = f.name =~ "${bundle}${BUNDLE_FORMAT}"
+                if (matcher) {
+                    if (matcher[0][3]) {
+                        variants << matcher[0][3]
+                    } else if (matcher[0][5]) {
+                        variants << matcher[0][5]
+                    }
                 }
             }
+            config.log("[%s] Variants found for bundle %s: %s", getClass().simpleName, bundle, variants)
+        } else {
+            config.log("[%s] Not a local bundle: %s", getClass().simpleName, bundle)
         }
-        config.log("[%s] Variants found for bundle %s: %s", getClass().simpleName, bundle, variants)
         return variants
     }
 

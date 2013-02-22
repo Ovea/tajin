@@ -21,6 +21,10 @@
                     "mybnd": {
                         "location": "js/i18n",
                         "preload": ["en"]
+                    },
+                    "mybnd2": {
+                        "location": "http://remote",
+                        "preload": ["en"]
                     }
                 }
             }
@@ -28,13 +32,13 @@
     },
 
     "minify": [
+        "js/*.js",
         "js/jquery/jquery-1.8.3.js",
         "js/jquery/jquery.fastLiveFilter.js",
         "js/jquery/jquery.mockjax.js",
         "js/jquery/jquery.purl-2.2.js",
         "js/jquery/jquery.tooltip.js",
-        "css/sample1.css",
-        "css/sample2.css",
+        "css/*.css",
         "css/inexisting.css"
     ],
 
