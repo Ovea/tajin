@@ -103,7 +103,7 @@ class Minifier implements ResourceBuilder {
                         compressor.compress(w, -1)
                     }
                 }
-                config.log('[%s] %s => %s', getClass().simpleName, src.name, min.name)
+                config.log('[%s] + %s', getClass().simpleName, min.name)
                 return true
             } else if (src.name.endsWith('.js')) {
                 def error = [:]
@@ -147,7 +147,7 @@ class Minifier implements ResourceBuilder {
                 if (error) {
                     throw new EvaluatorException(error.message as String, src.absolutePath, error.line as int, error.lineSource as String, error.lineOffset as int);
                 }
-                config.log('[%s] %s => %s', getClass().simpleName, src.name, min.name)
+                config.log('[%s] + %s', getClass().simpleName, min.name)
                 return true
             }
         } else {
