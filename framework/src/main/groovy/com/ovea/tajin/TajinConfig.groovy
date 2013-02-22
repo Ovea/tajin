@@ -20,6 +20,7 @@ import groovy.json.JsonBuilder
 import groovy.json.JsonSlurper
 import groovy.text.SimpleTemplateEngine
 
+import java.util.concurrent.CopyOnWriteArrayList
 import java.util.concurrent.atomic.AtomicReference
 
 /**
@@ -32,6 +33,7 @@ class TajinConfig {
     private final AtomicReference<String> cfgStr = new AtomicReference<>("{}")
     private Map<String, ?> context
     private final Resource config
+    private final Collection<Closure<?>> onConfigs = new CopyOnWriteArrayList<>()
 
     final File webapp
     final boolean reloadable
@@ -66,9 +68,15 @@ class TajinConfig {
         if (c.modified && cfgStr.compareAndSet(c.oldCfgStr, c.newCfgStr)) {
             cfg.set(c.newCfg)
             log('Loaded Tajin configuration: %s', config)
+            onConfigs*.call()
             return true
         }
         return false
+    }
+
+    void onConfig(Closure<?> c) {
+        onConfigs << c
+        c.call()
     }
 
     private def readCfg() {
