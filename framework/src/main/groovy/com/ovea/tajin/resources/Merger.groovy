@@ -49,7 +49,7 @@ class Merger implements ResourceBuilder {
     }
 
     @Override
-    Collection<File> getWatchables() { (config.merge ?: [:]).values().flatten().unique().collect { new File(config.webapp, it) } }
+    Collection<File> getWatchables() { watchables() }
 
     @Override
     boolean modified(FileWatcher.Event e) {
@@ -65,11 +65,12 @@ class Merger implements ResourceBuilder {
     }
 
     boolean merge(String m) {
-        Collection<File> files = ((config.merge ?: [:])[m] ?: [:]).collect { new File(config.webapp, it as String) }
+        Collection<File> files = watchables(m)
         if (files) {
             boolean complete = true
             File big = new File(config.webapp, m)
             Class<?> c = getClass()
+            config.log('[%s] PROCESSING %s', getClass().simpleName, big.name)
             big.withWriter { w ->
                 files.each { File f ->
                     if (f.exists()) {
@@ -88,5 +89,9 @@ class Merger implements ResourceBuilder {
             return complete
         }
         return false
+    }
+
+    private Collection<File> watchables(String m = null) {
+        return (m ? ((config.merge ?: [:])[m] ?: []) : (config.merge ?: [:]).values().flatten()).collect { new File(config.webapp, it as String) }.findAll { !it.directory }.unique()
     }
 }

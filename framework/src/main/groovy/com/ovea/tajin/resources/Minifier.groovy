@@ -51,7 +51,7 @@ class Minifier implements ResourceBuilder {
     }
 
     @Override
-    Collection<File> getWatchables() { (config.minify ?: []).collect { String path -> new File(config.webapp, path) } }
+    Collection<File> getWatchables() { (config.minify ?: []).collect { String path -> new File(config.webapp, path) }.findAll { !it.directory } }
 
     @Override
     boolean modified(FileWatcher.Event e) {
