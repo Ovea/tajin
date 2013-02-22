@@ -31,11 +31,14 @@
         }
     },
 
-    "minify": [
-        "js/**/*.js",
-        "css/**/*.css",
-        "css/inexisting.css"
-    ],
+    "minify": {
+        "includes": [
+            "js/**/*.js",
+            "css/**/*.css",
+            "css/inexisting.css"
+        ],
+        "excludes": []
+    },
 
     "merge": {
         "js/lib.min.js": [

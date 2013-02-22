@@ -38,10 +38,11 @@ class Minifier implements ResourceBuilder {
     Minifier(TajinConfig config) {
         this.config = config
         config.onConfig {
-            Collection<String> w = new TreeSet((config.minify ?: []).findAll { String path -> !path.contains('*') })
+            Collection<String> w = new TreeSet((config.minify?.includes ?: []).findAll { String path -> !path.contains('*') })
             DirectoryScanner scanner = new DirectoryScanner(
                 basedir: config.webapp,
-                includes: (config.minify ?: []).findAll { String path -> path.contains('*') }
+                includes: (config.minify?.includes ?: []).findAll { String path -> path.contains('*') },
+                excludes: config.minify?.excludes
             )
             scanner.scan()
             w.addAll(scanner.includedFiles.collect {
