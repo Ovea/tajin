@@ -105,5 +105,5 @@ class TajinConfig {
         }
     }
 
-    def propertyMissing(String name) { cfg.get()[name] ?: [:] }
+    def propertyMissing(String name) { cfg.get()[name] }
 }

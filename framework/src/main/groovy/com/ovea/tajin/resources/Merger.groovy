@@ -22,60 +22,56 @@ import com.yahoo.platform.yui.compressor.JavaScriptCompressor
 import org.mozilla.javascript.ErrorReporter
 import org.mozilla.javascript.EvaluatorException
 
-import static com.ovea.tajin.io.FileWatcher.Event.Kind.ENTRY_DELETE
-import static com.ovea.tajin.io.FileWatcher.Event.Kind.ENTRY_MODIFY
-
 /**
  * @author Mathieu Carbou (mathieu.carbou@gmail.com)
  * @date 2013-02-20
  */
-class Minifier implements ResourceBuilder {
+class Merger implements ResourceBuilder {
 
     final TajinConfig config
 
-    Minifier(TajinConfig config) {
+    Merger(TajinConfig config) {
         this.config = config
     }
 
     @Override
     Work build() {
-        return complete(Work.incomplete(this, watchables))
+        return complete(Work.incomplete(this, (config.merge ?: [:]).keySet()))
     }
 
     @Override
     Work complete(Work work) {
         Collection<File> incompletes = work.data
         def missing = []
-        incompletes.each { if (!minify(it)) missing << it }
+        incompletes.each { if (!merge(it)) missing << it }
         return missing ? Work.incomplete(this, missing) : Work.COMPLETED
     }
 
     @Override
-    Collection<File> getWatchables() { (config.minify ?: []).collect { String path -> new File(config.webapp, path) } }
+    Collection<File> getWatchables() { (config.merge ?: [:]).values().collect { String m, Collection<String> files -> files }.flatten().unique().collect { new File(config.webapp, it) } }
 
     @Override
     boolean modified(FileWatcher.Event e) {
-        if (e.kind in [ENTRY_DELETE, ENTRY_MODIFY] && e.target in watchables) {
-            if (e.kind == ENTRY_DELETE) {
-                File min = minFile(e.target)
-                if (min) {
-                    min.delete()
-                    config.log('[%s] Removed: %s', getClass().simpleName, min.name)
-                }
-            } else {
-                minify(e.target)
+        (config.merge ?: [:]).each { String m, Collection<String> files ->
+            if (files.find { e.target == new File(config.webapp, it) }) {
+
             }
         }
+
+        merge(e.target)
         // do not need a client-json regeneration
         return false
     }
 
-    boolean minify(File src) {
+    boolean merge(File dest) {
         if (src.exists()) {
-            File min = minFile(src)
-            if (!min) {
+            config.log('[%s] Processing: %s', getClass().simpleName, src)
+            int pos = src.name.lastIndexOf('.')
+            if (pos == -1) {
+                // invalid extension
                 return false
             }
+            File min = new File(src.parentFile, "${src.name.substring(0, pos)}.min${src.name.substring(pos)}")
             if (src.name.endsWith('.css')) {
                 min.withWriter { Writer w ->
                     src.withReader { Reader r ->
@@ -83,7 +79,6 @@ class Minifier implements ResourceBuilder {
                         compressor.compress(w, -1)
                     }
                 }
-                config.log('[%s] %s => %s', getClass().simpleName, src.name, min.name)
                 return true
             } else if (src.name.endsWith('.js')) {
                 boolean error = [:]
@@ -127,17 +122,11 @@ class Minifier implements ResourceBuilder {
                 if (error) {
                     throw new EvaluatorException(error.message as String, src.absolutePath, error.line as int, error.lineSource as String, error.lineOffset as int);
                 }
-                config.log('[%s] %s => %s', getClass().simpleName, src.name, min.name)
                 return true
             }
         } else {
             config.log('[%s] File not found: %s', getClass().simpleName, src)
         }
         return false
-    }
-
-    private static File minFile(File src) {
-        int pos = src.name.lastIndexOf('.')
-        return pos == -1 ? null : new File(src.parentFile, "${src.name.substring(0, pos)}.min${src.name.substring(pos)}")
     }
 }

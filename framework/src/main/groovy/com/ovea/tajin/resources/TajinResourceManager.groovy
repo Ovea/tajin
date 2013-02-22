@@ -33,7 +33,8 @@ class TajinResourceManager {
         this.config = config
         resourceBuilders = [
             new I18N(config),
-            new Minifier(config)
+            new Minifier(config),
+            //new Merger(config)
         ]
     }
 
@@ -61,7 +62,7 @@ class TajinResourceManager {
     }
 
     void modified(FileWatcher.Event event) {
-        config.log("Modified: %s", event)
+        config.trace("%s %s", event.kind, event.target.name)
         boolean modified = false
         resourceBuilders.each { modified |= it.modified(event) }
         if (modified) {

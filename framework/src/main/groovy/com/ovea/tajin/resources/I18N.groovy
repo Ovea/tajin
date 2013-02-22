@@ -49,7 +49,7 @@ class I18N implements ResourceBuilder {
     }
 
     @Override
-    Collection<File> getWatchables() { bundles.collect { bundle, cfg -> new File(config.webapp, cfg.location ?: '.').absoluteFile } }
+    Collection<File> getWatchables() { bundles.collect { bundle, cfg -> new File(config.webapp, cfg.location ?: '.') } }
 
     @Override
     boolean modified(FileWatcher.Event event) {
@@ -67,7 +67,7 @@ class I18N implements ResourceBuilder {
     }
 
     private def findVariants(String bundle, def cfg) {
-        File dir = new File(config.webapp, cfg.location ?: '.').absoluteFile
+        File dir = new File(config.webapp, cfg.location ?: '.')
         def variants = []
         dir.eachFile { File f ->
             def matcher = f.name =~ "${bundle}${BUNDLE_FORMAT}"
