@@ -34,7 +34,7 @@ class TajinResourceManager {
         resourceBuilders = [
             new I18N(config),
             new Minifier(config),
-            //new Merger(config)
+            new Merger(config)
         ]
     }
 

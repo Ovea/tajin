@@ -17,10 +17,11 @@ package com.ovea.tajin.resources
 
 import com.ovea.tajin.TajinConfig
 import com.ovea.tajin.io.FileWatcher
-import com.yahoo.platform.yui.compressor.CssCompressor
-import com.yahoo.platform.yui.compressor.JavaScriptCompressor
-import org.mozilla.javascript.ErrorReporter
-import org.mozilla.javascript.EvaluatorException
+
+import static com.ovea.tajin.io.FileWatcher.Event.Kind.ENTRY_DELETE
+import static com.ovea.tajin.io.FileWatcher.Event.Kind.ENTRY_MODIFY
+import static com.ovea.tajin.resources.Work.Status.COMPLETED
+import static com.ovea.tajin.resources.Work.Status.INCOMPLETE
 
 /**
  * @author Mathieu Carbou (mathieu.carbou@gmail.com)
@@ -41,91 +42,50 @@ class Merger implements ResourceBuilder {
 
     @Override
     Work complete(Work work) {
-        Collection<File> incompletes = work.data
+        Collection<String> incompletes = work.data
         def missing = []
         incompletes.each { if (!merge(it)) missing << it }
         return missing ? Work.incomplete(this, missing) : Work.COMPLETED
     }
 
     @Override
-    Collection<File> getWatchables() { (config.merge ?: [:]).values().collect { String m, Collection<String> files -> files }.flatten().unique().collect { new File(config.webapp, it) } }
+    Collection<File> getWatchables() { (config.merge ?: [:]).values().flatten().unique().collect { new File(config.webapp, it) } }
 
     @Override
     boolean modified(FileWatcher.Event e) {
-        (config.merge ?: [:]).each { String m, Collection<String> files ->
-            if (files.find { e.target == new File(config.webapp, it) }) {
-
+        if (e.kind in [ENTRY_MODIFY, ENTRY_DELETE]) {
+            (config.merge ?: [:]).each { String m, Collection<String> files ->
+                if (files.find { e.target == new File(config.webapp, it) }) {
+                    merge(m)
+                }
             }
         }
-
-        merge(e.target)
         // do not need a client-json regeneration
         return false
     }
 
-    boolean merge(File dest) {
-        if (src.exists()) {
-            config.log('[%s] Processing: %s', getClass().simpleName, src)
-            int pos = src.name.lastIndexOf('.')
-            if (pos == -1) {
-                // invalid extension
-                return false
-            }
-            File min = new File(src.parentFile, "${src.name.substring(0, pos)}.min${src.name.substring(pos)}")
-            if (src.name.endsWith('.css')) {
-                min.withWriter { Writer w ->
-                    src.withReader { Reader r ->
-                        CssCompressor compressor = new CssCompressor(r)
-                        compressor.compress(w, -1)
+    boolean merge(String m) {
+        Collection<File> files = ((config.merge ?: [:])[m] ?: [:]).collect { new File(config.webapp, it as String) }
+        if (files) {
+            boolean complete = true
+            File big = new File(config.webapp, m)
+            Class<?> c = getClass()
+            big.withWriter { w ->
+                files.each { File f ->
+                    if (f.exists()) {
+                        f.withReader {
+                            w << it
+                            w << '\n'
+                        }
+                        config.log('[%s] + %s', c.simpleName, f.name)
+                    } else {
+                        config.log('[%s] File not found: %s', c.simpleName, f)
+                        complete = false
                     }
                 }
-                return true
-            } else if (src.name.endsWith('.js')) {
-                boolean error = [:]
-                min.withWriter { Writer w ->
-                    src.withReader { Reader r ->
-                        JavaScriptCompressor compressor = new JavaScriptCompressor(r, new ErrorReporter() {
-                            @Override
-                            public void warning(String message, String sourceName, int line, String lineSource, int lineOffset) {
-                                if (line < 0) {
-                                    config.trace('[%s] WARN %s : %s', getClass().simpleName, src, message)
-                                } else {
-                                    config.trace('[%s] WARN %s (%s,%s) : %s', getClass().simpleName, src, line, lineOffset, message)
-                                }
-                            }
-
-                            @Override
-                            public void error(String message, String sourceName, int line, String lineSource, int lineOffset) {
-                                if (!error) {
-                                    error << [
-                                        message: message,
-                                        line: line,
-                                        lineSource: lineSource,
-                                        lineOffset: lineOffset
-                                    ]
-                                }
-                                if (line < 0) {
-                                    config.log('[%s] ERROR %s : %s', getClass().simpleName, src, message)
-                                } else {
-                                    config.log('[%s] ERROR %s (%s,%s) : %s', getClass().simpleName, src, line, lineOffset, message)
-                                }
-                            }
-
-                            @Override
-                            public EvaluatorException runtimeError(String message, String sourceName, int line, String lineSource, int lineOffset) {
-                                return new EvaluatorException(message, src.absolutePath, line, lineSource, lineOffset);
-                            }
-                        })
-                        compressor.compress(w, -1, false, true, false, false)
-                    }
-                }
-                if (error) {
-                    throw new EvaluatorException(error.message as String, src.absolutePath, error.line as int, error.lineSource as String, error.lineOffset as int);
-                }
-                return true
             }
-        } else {
-            config.log('[%s] File not found: %s', getClass().simpleName, src)
+            config.log('[%s] %s %s', getClass().simpleName, complete ? COMPLETED : INCOMPLETE, big.name)
+            return complete
         }
         return false
     }

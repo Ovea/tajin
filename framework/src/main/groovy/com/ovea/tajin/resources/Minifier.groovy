@@ -86,7 +86,7 @@ class Minifier implements ResourceBuilder {
                 config.log('[%s] %s => %s', getClass().simpleName, src.name, min.name)
                 return true
             } else if (src.name.endsWith('.js')) {
-                boolean error = [:]
+                def error = [:]
                 min.withWriter { Writer w ->
                     src.withReader { Reader r ->
                         JavaScriptCompressor compressor = new JavaScriptCompressor(r, new ErrorReporter() {

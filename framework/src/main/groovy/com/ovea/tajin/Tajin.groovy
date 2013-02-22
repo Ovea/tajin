@@ -63,8 +63,8 @@ class Tajin {
                             if (config.modified()) {
                                 unwatch()
                                 config.reload()
-                                watch()
                                 build()
+                                watch()
                             }
                         } catch (e) {
                             LOGGER.log(Level.SEVERE, 'Error loading JSON configuration ' + config + ' : ' + e.message)
