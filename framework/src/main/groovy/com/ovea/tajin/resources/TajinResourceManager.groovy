@@ -62,7 +62,7 @@ class TajinResourceManager {
     }
 
     void modified(FileWatcher.Event event) {
-        config.trace("%s %s", event.kind, event.target.name)
+        config.log("%s %s", event.kind, event.target.name)
         boolean modified = false
         resourceBuilders.each { modified |= it.modified(event) }
         if (modified) {

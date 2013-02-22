@@ -18,6 +18,8 @@ package com.ovea.tajin.resources
 import com.ovea.tajin.TajinConfig
 import com.ovea.tajin.io.FileWatcher
 
+import java.util.concurrent.ConcurrentHashMap
+
 import static com.ovea.tajin.io.FileWatcher.Event.Kind.ENTRY_DELETE
 import static com.ovea.tajin.io.FileWatcher.Event.Kind.ENTRY_MODIFY
 import static com.ovea.tajin.resources.Work.Status.COMPLETED
@@ -30,14 +32,23 @@ import static com.ovea.tajin.resources.Work.Status.INCOMPLETE
 class Merger implements ResourceBuilder {
 
     final TajinConfig config
+    private final Map<String, Collection<File>> merges = new ConcurrentHashMap<>()
 
     Merger(TajinConfig config) {
         this.config = config
+        Class<?> c = getClass()
+        config.onConfig {
+            config.log("[%s] Tajin configuration changed", c.simpleName)
+            merges.clear()
+            (config.merge ?: [:]).each { String m, Collection<String> paths ->
+                merges.put(m, paths.collect { new File(config.webapp, it as String) }.findAll { !it.directory }.unique())
+            }
+        }
     }
 
     @Override
     Work build() {
-        return complete(Work.incomplete(this, (config.merge ?: [:]).keySet()))
+        return complete(Work.incomplete(this, merges.keySet()))
     }
 
     @Override
@@ -49,14 +60,14 @@ class Merger implements ResourceBuilder {
     }
 
     @Override
-    Collection<File> getWatchables() { watchables() }
+    Collection<File> getWatchables() { merges.values().flatten().unique() }
 
     @Override
     boolean modified(FileWatcher.Event e) {
         if (e.kind in [ENTRY_MODIFY, ENTRY_DELETE]) {
-            (config.merge ?: [:]).each { String m, Collection<String> files ->
-                if (files.find { e.target == new File(config.webapp, it) }) {
-                    merge(m)
+            merges.each { k, v ->
+                if (v.find { e.target == it }) {
+                    merge(k)
                 }
             }
         }
@@ -65,7 +76,7 @@ class Merger implements ResourceBuilder {
     }
 
     boolean merge(String m) {
-        Collection<File> files = watchables(m)
+        Collection<File> files = merges[m]
         if (files) {
             boolean complete = true
             File big = new File(config.webapp, m)
@@ -91,7 +102,4 @@ class Merger implements ResourceBuilder {
         return false
     }
 
-    private Collection<File> watchables(String m = null) {
-        return (m ? ((config.merge ?: [:])[m] ?: []) : (config.merge ?: [:]).values().flatten()).collect { new File(config.webapp, it as String) }.findAll { !it.directory }.unique()
-    }
 }

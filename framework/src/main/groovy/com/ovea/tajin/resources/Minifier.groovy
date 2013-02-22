@@ -37,7 +37,9 @@ class Minifier implements ResourceBuilder {
 
     Minifier(TajinConfig config) {
         this.config = config
+        Class<?> c = getClass()
         config.onConfig {
+            config.log("[%s] Tajin configuration changed", c.simpleName)
             Collection<String> w = new TreeSet((config.minify?.includes ?: []).findAll { String path -> !path.contains('*') })
             DirectoryScanner scanner = new DirectoryScanner(
                 basedir: config.webapp,

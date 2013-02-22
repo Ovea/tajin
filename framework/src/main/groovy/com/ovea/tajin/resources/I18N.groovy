@@ -34,8 +34,9 @@ class I18N implements ResourceBuilder {
 
     I18N(TajinConfig config) {
         this.config = config
+        Class<?> c = getClass()
         config.onConfig {
-            config.trace("[%s] Tajin configuration changed", getClass().simpleName)
+            config.log("[%s] Tajin configuration changed", c.simpleName)
             watchables = bundles.collect { bundle, cfg -> new File(config.webapp, cfg.location ?: '.') }.findAll { it && it.exists() }
         }
     }
