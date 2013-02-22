@@ -36,10 +36,16 @@ class I18N implements ResourceBuilder {
     }
 
     @Override
-    void build() {
+    Work build() {
         bundles.each { String bundle, cfg ->
             cfg.variants = findVariants(bundle, cfg)
         }
+        return Work.COMPLETED
+    }
+
+    @Override
+    Work complete(Work work) {
+        return Work.COMPLETED
     }
 
     @Override
@@ -48,7 +54,7 @@ class I18N implements ResourceBuilder {
     @Override
     boolean modified(FileWatcher.Event event) {
         if (event.kind in [ENTRY_CREATE, ENTRY_DELETE]) {
-            def e = bundles.find { String bundle, cfg -> event.target.name =~ "${bundle}${BUNDLE_FORMAT}" && event.folder == new File(config.webapp, cfg.location ?: '.').absoluteFile }
+            def e = bundles.find { String bundle, cfg -> event.target.name =~ "${bundle}${BUNDLE_FORMAT}" && event.target.parentFile == new File(config.webapp, cfg.location ?: '.').absoluteFile }
             if (e) {
                 def variants = findVariants(e.key, e.value)
                 if (e.value.variants != variants) {
@@ -73,7 +79,7 @@ class I18N implements ResourceBuilder {
                 }
             }
         }
-        config.log("Variants found for bundle %s: %s", bundle, variants)
+        config.log("[%s] Variants found for bundle %s: %s", getClass().simpleName, bundle, variants)
         return variants
     }
 

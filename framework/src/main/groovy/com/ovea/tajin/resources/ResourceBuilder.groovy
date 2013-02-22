@@ -18,7 +18,10 @@ package com.ovea.tajin.resources
 import com.ovea.tajin.io.FileWatcher.Event
 
 public interface ResourceBuilder {
-    void build()
+
+    Work build()
+
+    Work complete(Work work)
 
     Collection<File> getWatchables()
 

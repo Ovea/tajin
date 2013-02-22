@@ -91,8 +91,16 @@ class TajinConfig {
 
     boolean getDebug() { cfg.get().debug ?: false }
 
+    boolean getTrace() { cfg.get().trace ?: false }
+
     void log(String msg, Object... args) {
         if (debug) {
+            println "[tajin] ${String.format(msg, args)}"
+        }
+    }
+
+    void trace(String msg, Object... args) {
+        if (trace) {
             println "[tajin] ${String.format(msg, args)}"
         }
     }

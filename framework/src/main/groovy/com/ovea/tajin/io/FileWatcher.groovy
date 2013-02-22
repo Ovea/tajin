@@ -65,8 +65,8 @@ class FileWatcher {
                             }
                             if (key.valid && desc) {
                                 key.pollEvents().each { WatchEvent<Path> evt ->
-                                    def f = evt.context().toFile()
-                                    ((desc.listeners[f.name] ?: []) + (desc.listeners['*'] ?: []))*.call(new Event(evt.kind().name(), f, desc.folder))
+                                    def f = evt.context().toFile().name
+                                    ((desc.listeners[f] ?: []) + (desc.listeners['*'] ?: []))*.call(new Event(evt.kind().name(), new File(desc.folder, f).absoluteFile))
                                 }
                             }
                             key.reset()
@@ -134,23 +134,20 @@ class FileWatcher {
             UNKNOWN,
         }
 
-        final File folder
         final Kind kind
         final File target
 
-        Event(String type, File target, File folder) {
+        Event(String type, File target) {
             this.kind = Kind.values().find { it.name() == type } ?: Kind.UNKNOWN
             this.target = target
-            this.folder = folder
         }
 
         @Override
         public String toString() {
             return "Event{" +
                 "kind='" + kind + '\'' +
-                ", target=" + target +
-                ", folder=" + folder +
-                '}';
+                ", target=" + target
+            '}';
         }
     }
 }

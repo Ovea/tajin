@@ -40,8 +40,23 @@ class TajinResourceManager {
     Collection<File> getResources() { resourceBuilders.collect { it.watchables }.flatten() }
 
     void buid() {
-        config.log("Building Tajin resources...")
-        resourceBuilders*.build()
+        int n = 1
+        int c = 0
+        config.log("Building Tajin resources: pass %s...", n++)
+        def works = resourceBuilders*.build()
+        def incompletes = works.findAll { it.incomplete }
+        while (c != incompletes.size()) {
+            // keep old size
+            c = incompletes.size()
+            // rebuild
+            config.log("Building Tajin resources: pass %s...", n++)
+            works = incompletes*.complete()
+            // get incompletes
+            incompletes = works.findAll { it.incomplete }
+        }
+        if (incompletes) {
+            config.log("Incomplete Tajin build: %s", incompletes)
+        }
         updateClientConfig()
     }
 
