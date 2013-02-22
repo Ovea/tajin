@@ -19,6 +19,7 @@ import com.ovea.tajin.TajinConfig
 import com.ovea.tajin.io.FileWatcher
 import com.yahoo.platform.yui.compressor.CssCompressor
 import com.yahoo.platform.yui.compressor.JavaScriptCompressor
+import org.apache.tools.ant.DirectoryScanner
 import org.mozilla.javascript.ErrorReporter
 import org.mozilla.javascript.EvaluatorException
 
@@ -32,9 +33,31 @@ import static com.ovea.tajin.io.FileWatcher.Event.Kind.ENTRY_MODIFY
 class Minifier implements ResourceBuilder {
 
     final TajinConfig config
+    Collection<File> watchables = []
 
     Minifier(TajinConfig config) {
         this.config = config
+        config.onConfig {
+            Collection<String> w = new TreeSet((config.minify ?: []).findAll { String path -> !path.contains('*') })
+            DirectoryScanner scanner = new DirectoryScanner(
+                basedir: config.webapp,
+                includes: (config.minify ?: []).findAll { String path -> path.contains('*') }
+            )
+            scanner.scan()
+            w.addAll(scanner.includedFiles.collect {
+                // skip XXX-min.ext and XXX.min.ext
+                int pos = it.lastIndexOf('.')
+                if (pos != -1) {
+                    String part = it.substring(0, pos)
+                    if (!part.endsWith('.min') && !part.endsWith('-min')) {
+                        return it
+                    }
+                }
+                return ''
+            })
+            // get non nulls and tranform to files
+            watchables = w.findAll { it }.collect { new File(config.webapp, it) }
+        }
     }
 
     @Override
@@ -49,9 +72,6 @@ class Minifier implements ResourceBuilder {
         incompletes.each { if (!minify(it)) missing << it }
         return missing ? Work.incomplete(this, missing) : Work.COMPLETED
     }
-
-    @Override
-    Collection<File> getWatchables() { (config.minify ?: []).collect { String path -> new File(config.webapp, path) }.findAll { !it.directory } }
 
     @Override
     boolean modified(FileWatcher.Event e) {

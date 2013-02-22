@@ -32,24 +32,19 @@
     },
 
     "minify": [
-        "js/*.js",
-        "js/jquery/jquery-1.8.3.js",
-        "js/jquery/jquery.fastLiveFilter.js",
-        "js/jquery/jquery.mockjax.js",
-        "js/jquery/jquery.purl-2.2.js",
-        "js/jquery/jquery.tooltip.js",
-        "css/*.css",
+        "js/**/*.js",
+        "css/**/*.css",
         "css/inexisting.css"
     ],
 
     "merge": {
-        "js/lib.js": [
+        "js/lib.min.js": [
             "js/jquery/jquery-1.8.3.min.js",
             "js/jquery/jquery.fastLiveFilter.min.js",
             "js/jquery/jquery.json-2.2.min.js",
             "js/jquery/jquery.purl-2.2.min.js"
         ],
-        "css/big.css": [
+        "css/big.min.css": [
             "css/sample1.min.css",
             "css/sample2.min.css",
             "css/inexisting.min.css"
