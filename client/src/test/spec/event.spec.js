@@ -150,6 +150,25 @@ describe("tajin.event", function () {
                         expect(obj.f).toHaveBeenCalled();
                     });
 
+                    it("can sync stateful topics", function () {
+                        var t1 = tajin.event.add('my/sync/g1');
+                        var t2 = tajin.event.add({
+                            id: 'my/sync/g2',
+                            state: true
+                        });
+                        var d1, d2;
+                        t2.fire('data2');
+                        tajin.event.getAll('my/sync/g1', 'my/sync/g2').sync(function (_d1, _d2) {
+                            d1 = _d1;
+                            d2 = _d2;
+                        });
+                        expect(d1).toBeUndefined();
+                        expect(d2).toBeUndefined();
+                        t1.fire('data1');
+                        expect(d1).toBe('data1');
+                        expect(d2).toBe('data2');
+                    });
+
                     it("calls cb again if at lest one of all events in the list is triggered another time", function () {
                         var c = 0;
                         var all = tajin.event.getAll('my/sync/b1', 'my/sync/b2'),
