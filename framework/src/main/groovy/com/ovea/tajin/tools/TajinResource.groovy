@@ -57,10 +57,10 @@ class TajinResource {
     static class Options {
 
         @Parameter(names = ['-d', '--directory'], required = false, arity = 1, description = 'Base webapp directory. Default to src/main/webapp')
-        File webapp = new File('src/main/webapp').canonicalFile
+        File webapp = new File('src/main/webapp')
 
         @Parameter(names = ['-c', '--config'], required = true, arity = 1, description = 'Tajin JSON configuration file. Default to src/main/resources/META-INF/tajin.json')
-        File config = new File('src/main/webapp', Tajin.DEFAULT_CONFIG_LOCATION).canonicalFile
+        File config = new File('src/main/webapp', Tajin.DEFAULT_CONFIG_LOCATION)
 
         @Parameter(names = ['-w', '--watch'], required = false, arity = 0, description = 'Watch for file change to regenerate resource files')
         boolean watch = false
