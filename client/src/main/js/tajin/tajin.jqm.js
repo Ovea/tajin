@@ -45,6 +45,10 @@
                     }
                 };
             events = {
+                ready: tajin.event.add({
+                    id: 'jqm/ready',
+                    state: true
+                }),
                 beforeshow: tajin.event.add('jqm/beforeshow'),
                 show: tajin.event.add('jqm/show'),
                 beforehide: tajin.event.add('jqm/beforehide'),
@@ -54,6 +58,9 @@
                 count: tajin.event.add('jqm/count'),
                 restore: tajin.event.add('jqm/restore')
             };
+            $(document).on("mobileinit", function () {
+                events.ready.fire(the_tajin.jqm);
+            });
             $(function () {
                 restoreState();
             });

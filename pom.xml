@@ -131,6 +131,12 @@
             <!-- ovea -->
             <dependency>
                 <groupId>com.ovea.tajin</groupId>
+                <artifactId>tajin-client</artifactId>
+                <version>${project.version}</version>
+                <type>war</type>
+            </dependency>
+            <dependency>
+                <groupId>com.ovea.tajin</groupId>
                 <artifactId>tajin-framework</artifactId>
                 <version>${project.version}</version>
             </dependency>

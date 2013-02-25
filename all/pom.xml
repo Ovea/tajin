@@ -17,6 +17,29 @@
         <plugins>
             <plugin>
                 <artifactId>maven-shade-plugin</artifactId>
+                <configuration>
+                    <filters>
+                        <filter>
+                            <artifact>com.ovea.tajin:tajin-client</artifact>
+                            <excludes>
+                                <exclude>WEB-INF/**</exclude>
+                            </excludes>
+                        </filter>
+                        <filter>
+                            <artifact>org.codehaus.groovy:groovy-all</artifact>
+                            <excludes>
+                                <exclude>overview.html</exclude>
+                                <exclude>overviewj.html</exclude>
+                            </excludes>
+                        </filter>
+                        <filter>
+                            <artifact>org.apache.ant:ant</artifact>
+                            <excludes>
+                                <exclude>images/**</exclude>
+                            </excludes>
+                        </filter>
+                    </filters>
+                </configuration>
             </plugin>
         </plugins>
     </build>
@@ -25,6 +48,11 @@
         <dependency>
             <groupId>com.ovea.tajin</groupId>
             <artifactId>tajin-framework</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>com.ovea.tajin</groupId>
+            <artifactId>tajin-client</artifactId>
+            <type>war</type>
         </dependency>
     </dependencies>
 
