@@ -11,17 +11,10 @@ Tajin JS
 Tajin Watcher
 
     * gestion des ressources
-        * plugin maven (build, watch)
-        * tool (build, watch)
-        * servlet filter (watch, unwatch, build at init)
         * supports:
             * sass, less, css => css
             * js, coffescript => js
-            * minification + compilation (UglifyJs)
-        * CF: http://code.google.com/p/wro4j/
-        * descripteur de site website.json genere via config
-        * enabled true/false pour inclure ou pas selon env par exemple
-        * config peut etre templatisée (i.e. expressions groovy)
+        * voir: http://code.google.com/p/wro4j/
 
 Tajin Framework
 

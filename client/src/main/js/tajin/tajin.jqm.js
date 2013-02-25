@@ -34,9 +34,6 @@
         this.name = 'jqm';
         this.requires = 'event,timer,store';
         this.oninstall = function (tajin) {
-            if (!$.mobile) {
-                throw new Error('jQuery Mobile scripts not found ! Please add them before Tajin.');
-            }
             the_tajin = tajin;
             var tevent = tajin.event,
                 fire = function (evt, event) {
@@ -138,7 +135,11 @@
                         }
                     });
                 }
-                $.mobile.changePage(location, jqm_opts || {});
+                if ($.mobile) {
+                    $.mobile.changePage(location, jqm_opts || {});
+                } else {
+                    throw new Error('jQuery Mobile script not found !');
+                }
             },
             redirect: function (location, data) {
                 the_tajin.store.put('tajin.jqm.nav', {
