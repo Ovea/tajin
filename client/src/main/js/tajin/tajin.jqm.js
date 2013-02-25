@@ -58,22 +58,22 @@
                 count: tajin.event.add('jqm/count'),
                 restore: tajin.event.add('jqm/restore')
             };
-            $(document).on("mobileinit", function () {
-                events.ready.fire(the_tajin.jqm);
-            });
             $(function () {
                 restoreState();
             });
-            $(document).on('pagebeforeshow',function (event) {
-                current_page = $(event.target);
-                if (will_change_timer && will_change_timer.isActive()) {
-                    will_change_timer.stop();
-                }
-                if (!restoring) {
-                    restoreState();
-                }
-                fire('beforeshow', event);
-            }).on('pagebeforehide',function (event) {
+            $(document)
+                .on("mobileinit",function () {
+                    events.ready.fire(the_tajin.jqm);
+                }).on('pagebeforeshow',function (event) {
+                    current_page = $(event.target);
+                    if (will_change_timer && will_change_timer.isActive()) {
+                        will_change_timer.stop();
+                    }
+                    if (!restoring) {
+                        restoreState();
+                    }
+                    fire('beforeshow', event);
+                }).on('pagebeforehide',function (event) {
                     fire('beforehide', event);
                 }).on('pageshow',function (event) {
                     fire('show', event);
