@@ -10,11 +10,6 @@ Tajin JS
 
 Tajin Watcher
 
-    * generation config & watch
-        * tajin.json: file, classpath, url, ...
-        * reloadable
-        * generate tajin-client.json
-
     * gestion des ressources
         * plugin maven (build, watch)
         * tool (build, watch)
