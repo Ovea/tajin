@@ -86,6 +86,11 @@ class Merger implements ResourceBuilder {
                 files.each { File f ->
                     if (f.exists()) {
                         f.withReader {
+                            if (f.name.endsWith('.css')) {
+                                w << "/* ${f.name} */\n" as String
+                            } else if (f.name.endsWith('.js')) {
+                                w << "/* ${f.name} */\n" as String
+                            }
                             w << it
                             w << '\n'
                         }
