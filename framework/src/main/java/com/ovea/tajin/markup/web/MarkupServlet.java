@@ -17,8 +17,8 @@ package com.ovea.tajin.markup.web;
 
 import com.ovea.tajin.markup.*;
 import com.ovea.tajin.markup.mvel.MVEL2TemplateCompiler;
-import com.ovea.tajin.markup.util.ExceptionUtil;
-import com.ovea.tajin.markup.util.MimeTypes;
+import com.ovea.tajin.util.ExceptionUtil;
+import com.ovea.tajin.util.MimeTypes;
 
 import javax.servlet.ServletConfig;
 import javax.servlet.ServletException;

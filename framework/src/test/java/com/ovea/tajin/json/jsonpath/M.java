@@ -5,7 +5,7 @@ import com.ovea.tajin.json.JSONObject;
 import com.ovea.tajin.json.JSONType;
 import org.hamcrest.*;
 
-import java.util.ArrayList;
+import java.util.LinkedList;
 import java.util.List;
 
 import static org.hamcrest.core.AllOf.allOf;
@@ -28,7 +28,7 @@ final class M {
     }
 
     public static <T> Matcher<JSONType> hasItems(T... elements) {
-        List<Matcher<? super JSONType>> all = new ArrayList<>(elements.length);
+        List<Matcher<? super JSONType>> all = new LinkedList<>();
         for (T element : elements) {
             all.add(new IsCollectionContaining(equalTo(JSON.valueOf(element))));
         }

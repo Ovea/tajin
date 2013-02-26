@@ -15,7 +15,7 @@
  */
 package com.ovea.tajin.markup;
 
-import com.ovea.tajin.markup.util.Resource;
+import com.ovea.tajin.io.Resource;
 
 import java.io.File;
 import java.io.IOException;
@@ -43,7 +43,7 @@ public final class FileSystemTemplateResolver extends TemplateResolverSkeleton {
                 if (!file.getCanonicalFile().getAbsolutePath().startsWith(webDir.getAbsolutePath())) {
                     throw new TemplateResolverException("Web template folder " + webDir + " cannot serve template " + path);
                 }
-                return Resource.from(file.toURI().toURL());
+                return Resource.url(file.toURI().toURL());
             } catch (MalformedURLException e) {
                 throw new TemplateResolverException("Error getting URL from file " + file + " : " + e.getMessage(), e);
             } catch (IOException e) {

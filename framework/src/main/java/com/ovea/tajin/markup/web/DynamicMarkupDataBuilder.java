@@ -15,10 +15,10 @@
  */
 package com.ovea.tajin.markup.web;
 
+import com.ovea.tajin.io.Resource;
 import com.ovea.tajin.markup.Template;
 import com.ovea.tajin.markup.TemplateCompiler;
 import com.ovea.tajin.markup.TemplateResolver;
-import com.ovea.tajin.markup.util.Resource;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;

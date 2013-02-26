@@ -15,7 +15,7 @@
  */
 package com.ovea.tajin.markup;
 
-import com.ovea.tajin.markup.util.Resource;
+import com.ovea.tajin.io.Resource;
 
 import java.util.Locale;
 import java.util.concurrent.ConcurrentHashMap;

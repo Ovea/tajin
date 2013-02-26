@@ -15,7 +15,7 @@
  */
 package com.ovea.tajin.markup.web;
 
-import com.ovea.tajin.markup.util.Gzip;
+import com.ovea.tajin.io.Gzip;
 import org.apache.commons.codec.digest.DigestUtils;
 
 /**
