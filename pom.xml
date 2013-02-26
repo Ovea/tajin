@@ -272,6 +272,11 @@
                 <version>1.17</version>
             </dependency>
             <dependency>
+                <groupId>com.sun.jersey</groupId>
+                <artifactId>jersey-client</artifactId>
+                <version>1.17</version>
+            </dependency>
+            <dependency>
                 <groupId>com.mycila</groupId>
                 <artifactId>mycila-junit</artifactId>
                 <version>1.4.ga</version>

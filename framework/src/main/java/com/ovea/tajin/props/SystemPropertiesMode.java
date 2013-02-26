@@ -13,13 +13,8 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package com.ovea.tajin.props
+package com.ovea.tajin.props;
 
-/**
- * @author Mathieu Carbou (mathieu.carbou@gmail.com)
- */
-class MissingPropertySettingException extends RuntimeException {
-    MissingPropertySettingException(String key) {
-        super("Property '" + key + "' is missing")
-    }
+public enum SystemPropertiesMode {
+    NEVER, FALLBACK, OVERRIDE
 }

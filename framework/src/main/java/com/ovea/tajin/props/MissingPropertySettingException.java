@@ -15,6 +15,13 @@
  */
 package com.ovea.tajin.props;
 
-enum SystemPropertiesMode {
-    NEVER, FALLBACK, OVERRIDE
+/**
+ * @author Mathieu Carbou (mathieu.carbou@gmail.com)
+ */
+public final class MissingPropertySettingException extends RuntimeException {
+    private static final long serialVersionUID = 15642470124850401L;
+
+    public MissingPropertySettingException(String key) {
+        super("Property '" + key + "' is missing");
+    }
 }
