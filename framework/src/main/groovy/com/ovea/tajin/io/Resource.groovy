@@ -118,6 +118,10 @@ abstract class Resource {
         return new FileResource(file)
     }
 
+    static Resource file(String path) {
+        return new FileResource(new File(path))
+    }
+
     static Resource url(URL url) {
         File f = urlToFile(url)
         return f ? new FileResource(f) : new UrlResource(url)
