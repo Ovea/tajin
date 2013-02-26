@@ -28,7 +28,7 @@ public final class MimeTypes {
 
     static {
         try {
-            MIMES.load(Thread.currentThread().getContextClassLoader().getResourceAsStream("com/ovea/markup/util/mime.properties"));
+            MIMES.load(Thread.currentThread().getContextClassLoader().getResourceAsStream("mime.properties"));
         } catch (IOException e) {
             throw new RuntimeException(e.getMessage(), e);
         }
