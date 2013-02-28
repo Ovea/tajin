@@ -60,19 +60,19 @@ class EclipseLinkLogger extends AbstractSessionLog {
         message.append(getSupplementDetailString(entry))
         message.append(formatMessage(entry))
         switch (getLogLevel(entry.level)) {
-            case com.zimmer.pmp.logging.EclipseLinkLogger.LogLevel.TRACE:
+            case LogLevel.TRACE:
                 getLogger(entry.nameSpace).trace(message.toString())
                 break
-            case com.zimmer.pmp.logging.EclipseLinkLogger.LogLevel.DEBUG:
+            case LogLevel.DEBUG:
                 getLogger(entry.nameSpace).debug(message.toString())
                 break
-            case INFO:
+            case LogLevel.INFO:
                 getLogger(entry.nameSpace).info(message.toString())
                 break
-            case com.zimmer.pmp.logging.EclipseLinkLogger.LogLevel.WARN:
+            case LogLevel.WARN:
                 getLogger(entry.nameSpace).warn(message.toString())
                 break
-            case com.zimmer.pmp.logging.EclipseLinkLogger.LogLevel.ERROR:
+            case LogLevel.ERROR:
                 getLogger(entry.nameSpace).error(message.toString())
                 break
         }
@@ -81,11 +81,11 @@ class EclipseLinkLogger extends AbstractSessionLog {
     @Override
     boolean shouldLog(int level, String category) {
         switch (getLogLevel(level)) {
-            case com.zimmer.pmp.logging.EclipseLinkLogger.LogLevel.TRACE: return getLogger(category).traceEnabled
-            case com.zimmer.pmp.logging.EclipseLinkLogger.LogLevel.DEBUG: return getLogger(category).debugEnabled
-            case INFO: return getLogger(category).infoEnabled
-            case com.zimmer.pmp.logging.EclipseLinkLogger.LogLevel.WARN: return getLogger(category).warnEnabled
-            case com.zimmer.pmp.logging.EclipseLinkLogger.LogLevel.ERROR: return getLogger(category).errorEnabled
+            case LogLevel.TRACE: return getLogger(category).traceEnabled
+            case LogLevel.DEBUG: return getLogger(category).debugEnabled
+            case LogLevel.INFO: return getLogger(category).infoEnabled
+            case LogLevel.WARN: return getLogger(category).warnEnabled
+            case LogLevel.ERROR: return getLogger(category).errorEnabled
         }
         return false
     }
@@ -130,7 +130,7 @@ class EclipseLinkLogger extends AbstractSessionLog {
     /**
      * Return the corresponding Slf4j Level for a given EclipseLink level.
      */
-    private LogLevel getLogLevel(Integer level) {
+    private static LogLevel getLogLevel(Integer level) {
         return mapLevels.get(level) ?: LogLevel.OFF
     }
 
