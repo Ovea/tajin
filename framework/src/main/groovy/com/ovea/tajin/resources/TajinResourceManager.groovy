@@ -38,7 +38,7 @@ class TajinResourceManager {
         ]
     }
 
-    Collection<File> getResources() { resourceBuilders.collect { it.watchables }.flatten() }
+    Collection<File> getResources() { resourceBuilders.collect { it.watchables }.flatten().unique().sort() }
 
     void buid() {
         int n = 1
