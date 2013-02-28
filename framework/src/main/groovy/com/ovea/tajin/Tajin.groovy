@@ -77,6 +77,7 @@ class Tajin {
                 res.each { config.log('Watching: %s', it) }
             }
             watcher.watch(res, { Event evt ->
+                //TODO MATHIEU: test to minify a non workign script
                 resourceManager.modified(evt)
             })
         }
