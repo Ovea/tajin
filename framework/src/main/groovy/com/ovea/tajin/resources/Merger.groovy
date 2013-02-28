@@ -81,7 +81,7 @@ class Merger implements ResourceBuilder {
             boolean complete = true
             File big = new File(config.webapp, m)
             Class<?> c = getClass()
-            config.log('[%s] PROCESSING %s', getClass().simpleName, big.name)
+            config.log('[%s] PROCESSING %s', getClass().simpleName, m)
             big.withWriter { w ->
                 files.each { File f ->
                     if (f.exists()) {
@@ -101,7 +101,7 @@ class Merger implements ResourceBuilder {
                     }
                 }
             }
-            config.log('[%s] %s %s', getClass().simpleName, complete ? COMPLETED : INCOMPLETE, big.name)
+            config.log('[%s] %s %s', getClass().simpleName, complete ? COMPLETED : INCOMPLETE, m)
             return complete
         }
         return false
