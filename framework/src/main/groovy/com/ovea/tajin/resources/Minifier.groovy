@@ -100,57 +100,58 @@ class Minifier implements ResourceBuilder {
                 return false
             }
             if (src.name.endsWith('.css')) {
-                min.withWriter { Writer w ->
-                    src.withReader { Reader r ->
-                        CssCompressor compressor = new CssCompressor(r)
-                        compressor.compress(w, -1)
-                    }
+                def out = new StringWriter()
+                src.withInputStream { InputStream is ->
+                    CssCompressor compressor = new CssCompressor(new InputStreamReader(is, 'UTF-8'))
+                    compressor.compress(out, -1)
                 }
                 config.log('[%s] + %s', getClass().simpleName, min.name)
+                min.bytes = out.toString().getBytes('UTF-8')
                 return true
             } else if (src.name.endsWith('.js')) {
                 def error = [:]
-                min.withOutputStream { OutputStream os ->
-                    src.withInputStream { InputStream is ->
-                        JavaScriptCompressor compressor = new JavaScriptCompressor(new InputStreamReader(is, 'UTF-8'), new ErrorReporter() {
-                            @Override
-                            public void warning(String message, String sourceName, int line, String lineSource, int lineOffset) {
-                                if (line < 0) {
-                                    config.trace('[%s] WARN %s : %s', getClass().simpleName, src, message)
-                                } else {
-                                    config.trace('[%s] WARN %s (%s,%s) : %s', getClass().simpleName, src, line, lineOffset, message)
-                                }
+                def out = new StringWriter()
+                src.withInputStream { InputStream is ->
+                    JavaScriptCompressor compressor = new JavaScriptCompressor(new InputStreamReader(is, 'UTF-8'), new ErrorReporter() {
+                        @Override
+                        public void warning(String message, String sourceName, int line, String lineSource, int lineOffset) {
+                            if (line < 0) {
+                                config.trace('[%s] WARN %s : %s', getClass().simpleName, src, message)
+                            } else {
+                                config.trace('[%s] WARN %s (%s,%s) : %s', getClass().simpleName, src, line, lineOffset, message)
                             }
+                        }
 
-                            @Override
-                            public void error(String message, String sourceName, int line, String lineSource, int lineOffset) {
-                                if (!error) {
-                                    error << [
-                                        message: message,
-                                        line: line,
-                                        lineSource: lineSource,
-                                        lineOffset: lineOffset
-                                    ]
-                                }
-                                if (line < 0) {
-                                    config.log('[%s] ERROR %s : %s', getClass().simpleName, src, message)
-                                } else {
-                                    config.log('[%s] ERROR %s (%s,%s) : %s', getClass().simpleName, src, line, lineOffset, message)
-                                }
+                        @Override
+                        public void error(String message, String sourceName, int line, String lineSource, int lineOffset) {
+                            if (!error) {
+                                error << [
+                                    message: message,
+                                    line: line,
+                                    lineSource: lineSource,
+                                    lineOffset: lineOffset
+                                ]
                             }
+                            if (line < 0) {
+                                config.log('[%s] ERROR %s : %s', getClass().simpleName, src, message)
+                            } else {
+                                config.log('[%s] ERROR %s (%s,%s) : %s', getClass().simpleName, src, line, lineOffset, message)
+                            }
+                        }
 
-                            @Override
-                            public EvaluatorException runtimeError(String message, String sourceName, int line, String lineSource, int lineOffset) {
-                                return new EvaluatorException(message, src.absolutePath, line, lineSource, lineOffset);
-                            }
-                        })
-                        compressor.compress(new OutputStreamWriter(os, 'UTF-8'), -1, false, true, false, false)
-                    }
-                }
-                if (error) {
-                    throw new EvaluatorException(error.message as String, src.absolutePath, error.line as int, error.lineSource as String, error.lineOffset as int);
+                        @Override
+                        public EvaluatorException runtimeError(String message, String sourceName, int line, String lineSource, int lineOffset) {
+                            return new EvaluatorException(message, src.absolutePath, line, lineSource, lineOffset);
+                        }
+                    })
+                    compressor.compress(out, -1, false, true, false, false)
                 }
                 config.log('[%s] + %s', getClass().simpleName, min.name)
+                if (error) {
+                    throw new EvaluatorException(error.message as String, src.absolutePath, error.line as int, error.lineSource as String, error.lineOffset as int);
+                } else {
+                    min.bytes = out.toString().getBytes('UTF-8')
+                }
                 return true
             }
         } else {
