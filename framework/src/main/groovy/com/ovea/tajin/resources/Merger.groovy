@@ -82,18 +82,14 @@ class Merger implements ResourceBuilder {
             File big = new File(config.webapp, m)
             Class<?> c = getClass()
             config.log('[%s] PROCESSING %s', getClass().simpleName, m)
-            big.withWriter { w ->
+            big.withOutputStream { os ->
                 files.each { File f ->
                     if (f.exists()) {
-                        f.withReader {
-                            if (f.name.endsWith('.css')) {
-                                w << "/* ${f.name} */\n" as String
-                            } else if (f.name.endsWith('.js')) {
-                                w << "/* ${f.name} */\n" as String
-                            }
-                            w << it
-                            w << '\n'
+                        if (f.name.endsWith('.css') || f.name.endsWith('.js')) {
+                            os << "/* ${f.name} */\n".getBytes('UTF-8')
                         }
+                        f.withInputStream { InputStream is -> os << is }
+                        os << '\n'.getBytes('UTF-8')
                         config.log('[%s] + %s', c.simpleName, f.name)
                     } else {
                         config.log('[%s] File not found: %s', c.simpleName, f)

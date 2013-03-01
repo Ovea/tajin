@@ -67,7 +67,7 @@ class Tajin {
                                 watch()
                             }
                         } catch (e) {
-                            LOGGER.log(Level.SEVERE, 'Error loading JSON configuration ' + config + ' : ' + e.message)
+                            LOGGER.log(Level.SEVERE, 'Error loading JSON configuration ' + config + ' : ' + e.message, e)
                         }
                     }
                 })
@@ -78,7 +78,11 @@ class Tajin {
             }
             watcher.watch(res, { Event evt ->
                 //TODO MATHIEU: test to minify a non workign script
-                resourceManager.modified(evt)
+                try {
+                    resourceManager.modified(evt)
+                } catch (e) {
+                    LOGGER.log(Level.SEVERE, 'Error processing modified file ' + evt.target + ' : ' + e.message, e)
+                }
             })
         }
     }

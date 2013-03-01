@@ -72,7 +72,7 @@ class TajinResourceManager {
 
     private void updateClientConfig() {
         if (config.hasClientConfig()) {
-            config.clientFile.text = new JsonBuilder(config.clientConfig)
+            config.clientFile.bytes = new JsonBuilder(config.clientConfig).toString().getBytes('UTF-8')
             config.log("Wrote client config %s", config.clientFile)
         } else {
             config.clientFile.delete()

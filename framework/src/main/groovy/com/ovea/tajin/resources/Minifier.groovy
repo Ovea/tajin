@@ -110,9 +110,9 @@ class Minifier implements ResourceBuilder {
                 return true
             } else if (src.name.endsWith('.js')) {
                 def error = [:]
-                min.withWriter { Writer w ->
-                    src.withReader { Reader r ->
-                        JavaScriptCompressor compressor = new JavaScriptCompressor(r, new ErrorReporter() {
+                min.withOutputStream { OutputStream os ->
+                    src.withInputStream { InputStream is ->
+                        JavaScriptCompressor compressor = new JavaScriptCompressor(new InputStreamReader(is, 'UTF-8'), new ErrorReporter() {
                             @Override
                             public void warning(String message, String sourceName, int line, String lineSource, int lineOffset) {
                                 if (line < 0) {
@@ -144,7 +144,7 @@ class Minifier implements ResourceBuilder {
                                 return new EvaluatorException(message, src.absolutePath, line, lineSource, lineOffset);
                             }
                         })
-                        compressor.compress(w, -1, false, true, false, false)
+                        compressor.compress(new OutputStreamWriter(os, 'UTF-8'), -1, false, true, false, false)
                     }
                 }
                 if (error) {
