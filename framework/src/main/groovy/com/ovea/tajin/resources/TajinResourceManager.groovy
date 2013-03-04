@@ -32,9 +32,9 @@ class TajinResourceManager {
     TajinResourceManager(TajinConfig config) {
         this.config = config
         resourceBuilders = [
-            new I18N(config),
-            new Minifier(config),
-            new Merger(config)
+            new I18NResourceBuilder(config),
+            new MinifierMinifier(config),
+            new MergerResourceBuilder(config)
         ]
     }
 

@@ -17,24 +17,23 @@ package com.ovea.tajin.resources
 
 import com.ovea.tajin.TajinConfig
 import com.ovea.tajin.io.FileWatcher
+import com.ovea.tajin.io.Merger
 
 import java.util.concurrent.ConcurrentHashMap
 
 import static com.ovea.tajin.io.FileWatcher.Event.Kind.ENTRY_DELETE
 import static com.ovea.tajin.io.FileWatcher.Event.Kind.ENTRY_MODIFY
-import static com.ovea.tajin.resources.Work.Status.COMPLETED
-import static com.ovea.tajin.resources.Work.Status.INCOMPLETE
 
 /**
  * @author Mathieu Carbou (mathieu.carbou@gmail.com)
  * @date 2013-02-20
  */
-class Merger implements ResourceBuilder {
+class MergerResourceBuilder implements ResourceBuilder {
 
     final TajinConfig config
     private final Map<String, Collection<File>> merges = new ConcurrentHashMap<>()
 
-    Merger(TajinConfig config) {
+    MergerResourceBuilder(TajinConfig config) {
         this.config = config
         Class<?> c = getClass()
         config.onConfig {
@@ -75,32 +74,6 @@ class Merger implements ResourceBuilder {
         return false
     }
 
-    boolean merge(String m) {
-        Collection<File> files = merges[m]
-        if (files) {
-            boolean complete = true
-            File big = new File(config.webapp, m)
-            Class<?> c = getClass()
-            config.log('[%s] PROCESSING %s', getClass().simpleName, m)
-            big.withOutputStream { os ->
-                files.each { File f ->
-                    if (f.exists()) {
-                        if (f.name.endsWith('.css') || f.name.endsWith('.js')) {
-                            os << "/* ${f.name} */\n".getBytes('UTF-8')
-                        }
-                        f.withInputStream { InputStream is -> os << is }
-                        os << '\n'.getBytes('UTF-8')
-                        config.log('[%s] + %s', c.simpleName, f.name)
-                    } else {
-                        config.log('[%s] File not found: %s', c.simpleName, f)
-                        complete = false
-                    }
-                }
-            }
-            config.log('[%s] %s %s', getClass().simpleName, complete ? COMPLETED : INCOMPLETE, m)
-            return complete
-        }
-        return false
-    }
+    boolean merge(String m) { Merger.merge(new File(config.webapp, m), merges[m]) }
 
 }

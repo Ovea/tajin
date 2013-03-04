@@ -25,14 +25,14 @@ import static com.ovea.tajin.io.FileWatcher.Event.Kind.ENTRY_DELETE
  * @author Mathieu Carbou (mathieu.carbou@gmail.com)
  * @date 2013-02-18
  */
-class I18N implements ResourceBuilder {
+class I18NResourceBuilder implements ResourceBuilder {
 
     private static final String BUNDLE_FORMAT = '((_([a-z]{2}))|(_([a-z]{2}_[A-Z]{2})))?\\.json'
 
     final TajinConfig config
     Collection<File> watchables = []
 
-    I18N(TajinConfig config) {
+    I18NResourceBuilder(TajinConfig config) {
         this.config = config
         Class<?> c = getClass()
         config.onConfig {
