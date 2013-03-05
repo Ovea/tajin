@@ -25,14 +25,14 @@ class Merger {
         boolean complete = true
         elements.each { Element el ->
             try {
-                if (out.name.endsWith('.css') || out.name.endsWith('.js')) {
-                    sb << "/* ${el.location} */\n" as String
-                }
                 String data = new String(el.resource.bytes, 'UTF-8')
                 if (el.min && out.name.endsWith('.css')) {
                     data = Minifier.minifyCSS(data)
                 } else if (el.min && out.name.endsWith('.js')) {
                     data = Minifier.minifyJS(el.location, data)
+                }
+                if (out.name.endsWith('.css') || out.name.endsWith('.js')) {
+                    sb << "/* ${el.location} */\n" as String
                 }
                 sb << data
                 sb << '\n'

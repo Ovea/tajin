@@ -18,6 +18,7 @@ package com.ovea.tajin.resources
 import com.ovea.tajin.TajinConfig
 import com.ovea.tajin.io.FileWatcher
 import com.ovea.tajin.io.Merger
+import com.ovea.tajin.io.Minifier
 import com.ovea.tajin.io.Resource
 
 import static com.ovea.tajin.io.FileWatcher.Event.Kind.ENTRY_DELETE
@@ -78,21 +79,27 @@ class MergerResourceBuilder implements ResourceBuilder {
     }
 
     boolean merge(String m) {
-        config.log('[Merge] %s', m)
-        return Merger.mergeElements(new File(config.webapp, m), ((config.merge ?: [:])[m] ?: []).findAll { it.file || it.url }.collect {
+        Collection<Merger.Element> els = ((config.merge ?: [:])[m] ?: []).findAll { it.file || it.url }.collect {
             new Merger.Element(
                 location: it.file ?: it.url,
                 resource: it.file ? Resource.file(new File(config.webapp, it.file as String)) : Resource.url(new URL(it.url as String)),
-                min: it.min
+                min: it.min ?: false
             )
-        }, { Merger.Element el, Throwable e ->
+        }
+        def cb = { Merger.Element el, Throwable e ->
             if (e) {
-                config.log('[Merge] ERR: %s (%s)', e.message, el.resource)
+                config.log('[Merge] ERROR %s: %s', el.location, e.message)
             } else {
-                config.log('[Merge] + %s', el.resource)
+                config.log('[Merge] + %s', el.location)
             }
             return true
-        })
+        }
+        config.log('[Merge] %s', Minifier.getFilename(m))
+        def out = new File(config.webapp, m)
+        def min = Minifier.getFilename(out)
+        def complete = Merger.mergeElements(min, els, cb)
+        config.log('[Merge] %s', m)
+        return complete & Merger.mergeElements(out, els.collect { it.min = false; it }, cb)
     }
 
 }

@@ -102,4 +102,9 @@ class Minifier {
         int pos = src.name.lastIndexOf('.')
         return pos == -1 ? null : new File(src.parentFile, "${src.name.substring(0, pos)}.min${src.name.substring(pos)}")
     }
+
+    static String getFilename(String name) {
+        int pos = name.lastIndexOf('.')
+        return pos == -1 ? null : "${name.substring(0, pos)}.min${name.substring(pos)}"
+    }
 }
