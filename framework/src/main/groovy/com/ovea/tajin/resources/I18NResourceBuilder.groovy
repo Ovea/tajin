@@ -29,16 +29,27 @@ class I18NResourceBuilder implements ResourceBuilder {
 
     private static final String BUNDLE_FORMAT = '((_([a-z]{2}))|(_([a-z]{2}_[A-Z]{2})))?\\.json'
 
-    final TajinConfig config
-    Collection<File> watchables = []
+    private final TajinConfig config
+    private final Collection<File> watchables = new HashSet<>()
+    private final Collection<File> folders = new HashSet<>()
 
     I18NResourceBuilder(TajinConfig config) {
         this.config = config
         Class<?> c = getClass()
         config.onConfig {
             config.log("[%s] Tajin configuration changed", c.simpleName)
-            watchables = bundles.collect { bundle, cfg -> new File(config.webapp, cfg.location ?: '.') }.findAll { it && it.exists() }
+            synchronized (watchables) {
+                watchables.clear()
+                watchables << bundles.collect { bundle, cfg -> new File(config.webapp, cfg.location ?: '.') }.findAll { it && it.exists() }
+                folders.clear()
+                folders << watchables.collect { it.parentFile }
+            }
         }
+    }
+
+    @Override
+    synchronized Collection<File> getWatchables() {
+        return new HashSet<File>(watchables)
     }
 
     @Override
@@ -58,8 +69,9 @@ class I18NResourceBuilder implements ResourceBuilder {
 
     @Override
     boolean modified(FileWatcher.Event event) {
-        if (event.kind in [ENTRY_CREATE, ENTRY_DELETE]) {
-            def e = bundles.find { String bundle, cfg -> event.target.name =~ "${bundle}${BUNDLE_FORMAT}" && event.target.parentFile == new File(config.webapp, cfg.location ?: '.').absoluteFile }
+        Collection<File> w = getWatchables()
+        if (event.kind == ENTRY_DELETE && event.target in w || event.kind == ENTRY_CREATE && event.target.parentFile in folders) {
+            def e = bundles.find { String bundle, cfg -> event.target.name =~ "${bundle}${BUNDLE_FORMAT}" }
             if (e) {
                 def variants = findVariants(e.key, e.value)
                 if (e.value.variants != variants) {
