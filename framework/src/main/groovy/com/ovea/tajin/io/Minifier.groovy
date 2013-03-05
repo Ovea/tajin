@@ -26,11 +26,11 @@ import org.mozilla.javascript.EvaluatorException
  */
 class Minifier {
 
-    static boolean minify(File src) {
+    static File minify(File src) {
         if (src.exists()) {
             File min = getFilename(src)
             if (!min) {
-                return false
+                return null
             }
             if (src.name.endsWith('.css')) {
                 def out = new StringWriter()
@@ -39,7 +39,7 @@ class Minifier {
                     compressor.compress(out, -1)
                 }
                 min.bytes = out.toString().getBytes('UTF-8')
-                return true
+                return min
             } else if (src.name.endsWith('.js')) {
                 def error = [:]
                 def out = new StringWriter()
@@ -73,10 +73,10 @@ class Minifier {
                 } else {
                     min.bytes = out.toString().getBytes('UTF-8')
                 }
-                return true
+                return min
             }
         }
-        return false
+        return null
     }
 
     static File getFilename(File src) {

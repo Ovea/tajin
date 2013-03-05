@@ -31,13 +31,37 @@
         }
     },
 
-    "minify": {
-        "includes": [
-            "js/**/*.js",
-            "css/**/*.css",
-            "css/inexisting.css"
+    "merge": {
+        "js/lib.js": [
+            {
+                "url": "http://code.jquery.com/jquery-1.9.1.min.js"
+            },
+            {
+                "file": "js/jquery/jquery.fastLiveFilter.js",
+                "min": true
+            },
+            {
+                "file": "js/jquery/jquery.json-2.2.min.js"
+            },
+            {
+                "file": "js/jquery/jquery.purl-2.2.min.js",
+                "min": true
+            }
         ],
-        "excludes": []
-    }
+        "css/big.css": [
+            {
+                "file": "css/sample1.css",
+                "min": true
+            },
+            {
+                "file": "css/sample2.css",
+                "min": true
+            },
+            {
+                "file": "css/inexisting.css",
+                "min": true
+            }
+        ]
 
+    }
 }

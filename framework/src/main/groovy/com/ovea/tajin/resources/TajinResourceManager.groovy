@@ -35,7 +35,7 @@ class TajinResourceManager {
             //TODO MATHIEU: process *.t.js
             //new JsResourceBuilder(config),
             new I18NResourceBuilder(config),
-            new MinifierMinifier(config),
+            new MinifierResourceBuilder(config),
             new MergerResourceBuilder(config)
         ]
     }

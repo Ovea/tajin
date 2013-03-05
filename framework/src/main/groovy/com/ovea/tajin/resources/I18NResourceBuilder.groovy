@@ -18,6 +18,9 @@ package com.ovea.tajin.resources
 import com.ovea.tajin.TajinConfig
 import com.ovea.tajin.io.FileWatcher
 
+import java.util.concurrent.locks.ReadWriteLock
+import java.util.concurrent.locks.ReentrantReadWriteLock
+
 import static com.ovea.tajin.io.FileWatcher.Event.Kind.ENTRY_CREATE
 import static com.ovea.tajin.io.FileWatcher.Event.Kind.ENTRY_DELETE
 
@@ -30,26 +33,32 @@ class I18NResourceBuilder implements ResourceBuilder {
     private static final String BUNDLE_FORMAT = '((_([a-z]{2}))|(_([a-z]{2}_[A-Z]{2})))?\\.json'
 
     private final TajinConfig config
-    private final Collection<File> watchables = new HashSet<>()
     private final Collection<File> folders = new HashSet<>()
+    private final ReadWriteLock lock = new ReentrantReadWriteLock()
 
     I18NResourceBuilder(TajinConfig config) {
         this.config = config
         Class<?> c = getClass()
         config.onConfig {
             config.log("[%s] Tajin configuration changed", c.simpleName)
-            synchronized (watchables) {
-                watchables.clear()
-                watchables << bundles.collect { bundle, cfg -> new File(config.webapp, cfg.location ?: '.') }.findAll { it && it.exists() }
+            lock.writeLock().lock()
+            try {
                 folders.clear()
-                folders << watchables.collect { it.parentFile }
+                folders.addAll(bundles.collect { bundle, cfg -> new File(config.webapp, cfg.location ?: '.') }.findAll { it && it.exists() }.collect {it.absoluteFile})
+            } finally {
+                lock.writeLock().unlock()
             }
         }
     }
 
     @Override
     synchronized Collection<File> getWatchables() {
-        return new HashSet<File>(watchables)
+        lock.readLock().lock()
+        try {
+            return new HashSet<File>(folders)
+        } finally {
+            lock.readLock().unlock()
+        }
     }
 
     @Override
@@ -69,8 +78,14 @@ class I18NResourceBuilder implements ResourceBuilder {
 
     @Override
     boolean modified(FileWatcher.Event event) {
-        Collection<File> w = getWatchables()
-        if (event.kind == ENTRY_DELETE && event.target in w || event.kind == ENTRY_CREATE && event.target.parentFile in folders) {
+        boolean mustHandle = false
+        lock.readLock().lock()
+        try {
+            mustHandle = event.kind in [ENTRY_DELETE, ENTRY_CREATE] && event.target.parentFile in folders
+        } finally {
+            lock.readLock().unlock()
+        }
+        if (mustHandle) {
             def e = bundles.find { String bundle, cfg -> event.target.name =~ "${bundle}${BUNDLE_FORMAT}" }
             if (e) {
                 def variants = findVariants(e.key, e.value)

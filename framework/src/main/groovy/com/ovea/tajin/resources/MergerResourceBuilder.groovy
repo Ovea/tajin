@@ -17,9 +17,6 @@ package com.ovea.tajin.resources
 
 import com.ovea.tajin.TajinConfig
 import com.ovea.tajin.io.FileWatcher
-import com.ovea.tajin.io.Merger
-
-import java.util.concurrent.ConcurrentHashMap
 
 import static com.ovea.tajin.io.FileWatcher.Event.Kind.ENTRY_DELETE
 import static com.ovea.tajin.io.FileWatcher.Event.Kind.ENTRY_MODIFY
@@ -30,24 +27,32 @@ import static com.ovea.tajin.io.FileWatcher.Event.Kind.ENTRY_MODIFY
  */
 class MergerResourceBuilder implements ResourceBuilder {
 
-    final TajinConfig config
-    private final Map<String, Collection<File>> merges = new ConcurrentHashMap<>()
+    private final TajinConfig config
+    private final Map<File, Collection<String>> files = new HashMap<>()
 
     MergerResourceBuilder(TajinConfig config) {
         this.config = config
         Class<?> c = getClass()
         config.onConfig {
             config.log("[%s] Tajin configuration changed", c.simpleName)
-            merges.clear()
-            (config.merge ?: [:]).each { String m, Collection<String> paths ->
-                merges.put(m, paths.collect { new File(config.webapp, it as String) }.findAll { !it.directory }.unique())
+            synchronized (files) {
+                files.clear()
+                (config.merge ?: [:]).each { String m, resources ->
+                    resources.findAll { it.file }.collect { new File(config.webapp, it.file as String) }.findAll { !it.directory }.unique().each {
+                        if (files[it]) {
+                            files[it] << m
+                        } else {
+                            files[it] = new HashSet<String>([m])
+                        }
+                    }
+                }
             }
         }
     }
 
     @Override
     Work build() {
-        return complete(Work.incomplete(this, merges.keySet()))
+        return complete(Work.incomplete(this, (config.merge ?: [:]).keySet()))
     }
 
     @Override
@@ -59,21 +64,21 @@ class MergerResourceBuilder implements ResourceBuilder {
     }
 
     @Override
-    Collection<File> getWatchables() { merges.values().flatten().unique() }
+    Collection<File> getWatchables() { files.keySet() }
 
     @Override
     boolean modified(FileWatcher.Event e) {
-        if (e.kind in [ENTRY_MODIFY, ENTRY_DELETE]) {
-            merges.each { k, v ->
-                if (v.find { e.target == it }) {
-                    merge(k)
-                }
-            }
+        Collection<File> w = getWatchables()
+        if (e.kind in [ENTRY_MODIFY, ENTRY_DELETE] && e.target in w) {
+            files[e.target]?.each { merge(it) }
         }
         // do not need a client-json regeneration
         return false
     }
 
-    boolean merge(String m) { Merger.merge(new File(config.webapp, m), merges[m]) }
+    boolean merge(String m) {
+        //Merger.merge(new File(config.webapp, m), watchables[m])
+        return true
+    }
 
 }

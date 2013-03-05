@@ -27,12 +27,12 @@ import static com.ovea.tajin.io.FileWatcher.Event.Kind.ENTRY_MODIFY
  * @author Mathieu Carbou (mathieu.carbou@gmail.com)
  * @date 2013-02-20
  */
-class MinifierMinifier implements ResourceBuilder {
+class MinifierResourceBuilder implements ResourceBuilder {
 
     private final TajinConfig config
-    private final Collection<File> watchables = new HashSet<>()
+    private final Collection<File> files = new HashSet<>()
 
-    MinifierMinifier(TajinConfig config) {
+    MinifierResourceBuilder(TajinConfig config) {
         this.config = config
         Class<?> c = getClass()
         config.onConfig {
@@ -56,35 +56,42 @@ class MinifierMinifier implements ResourceBuilder {
                 return ''
             })
             // get non nulls and tranform to files
-            synchronized (watchables) {
-                watchables.clear()
-                watchables << w.findAll { it }.collect { new File(config.webapp, it) }
+            synchronized (files) {
+                files.clear()
+                files.addAll(w.findAll { it }.collect { new File(config.webapp, it) })
             }
         }
     }
 
     @Override
     synchronized Collection<File> getWatchables() {
-        return new HashSet<File>(watchables)
+        return new HashSet<File>(files)
     }
 
     @Override
     Work build() {
-        return complete(Work.incomplete(this, getWatchables()))
+        return complete(Work.incomplete(this, watchables))
     }
 
     @Override
     Work complete(Work work) {
         Collection<File> incompletes = work.data
         def missing = []
-        incompletes.each { if (!Minifier.minify(it)) missing << it }
+        Class<?> c = getClass()
+        incompletes.each {
+            File min = Minifier.minify(it)
+            if (min) {
+                config.log('[%s] + %s', c.simpleName, min.name)
+            } else {
+                missing << it
+            }
+        }
         return missing ? Work.incomplete(this, missing) : Work.COMPLETED
     }
 
     @Override
     boolean modified(FileWatcher.Event e) {
-        Collection<File> w = getWatchables()
-        if (e.kind in [ENTRY_DELETE, ENTRY_MODIFY] && e.target in w) {
+        if (e.kind in [ENTRY_DELETE, ENTRY_MODIFY] && e.target in watchables) {
             if (e.kind == ENTRY_DELETE) {
                 File min = Minifier.getFilename(e.target)
                 if (min) {
@@ -92,7 +99,7 @@ class MinifierMinifier implements ResourceBuilder {
                     config.log('[%s] Removed: %s', getClass().simpleName, min.name)
                 }
             } else {
-                Minifier.minify(e.target)
+                config.log('[%s] + %s', getClass().simpleName, Minifier.minify(e.target).name)
             }
         }
         // do not need a client-json regeneration
