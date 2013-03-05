@@ -29,8 +29,8 @@ import static com.ovea.tajin.io.FileWatcher.Event.Kind.ENTRY_MODIFY
  */
 class MinifierMinifier implements ResourceBuilder {
 
-    final TajinConfig config
-    Collection<File> watchables = []
+    private final TajinConfig config
+    private final Collection<File> watchables = new HashSet<>()
 
     MinifierMinifier(TajinConfig config) {
         this.config = config
@@ -56,13 +56,21 @@ class MinifierMinifier implements ResourceBuilder {
                 return ''
             })
             // get non nulls and tranform to files
-            watchables = w.findAll { it }.collect { new File(config.webapp, it) }
+            synchronized (watchables) {
+                watchables.clear()
+                watchables << w.findAll { it }.collect { new File(config.webapp, it) }
+            }
         }
     }
 
     @Override
+    synchronized Collection<File> getWatchables() {
+        return new HashSet<File>(watchables)
+    }
+
+    @Override
     Work build() {
-        return complete(Work.incomplete(this, watchables))
+        return complete(Work.incomplete(this, getWatchables()))
     }
 
     @Override
@@ -75,7 +83,8 @@ class MinifierMinifier implements ResourceBuilder {
 
     @Override
     boolean modified(FileWatcher.Event e) {
-        if (e.kind in [ENTRY_DELETE, ENTRY_MODIFY] && e.target in watchables) {
+        Collection<File> w = getWatchables()
+        if (e.kind in [ENTRY_DELETE, ENTRY_MODIFY] && e.target in w) {
             if (e.kind == ENTRY_DELETE) {
                 File min = Minifier.getFilename(e.target)
                 if (min) {
