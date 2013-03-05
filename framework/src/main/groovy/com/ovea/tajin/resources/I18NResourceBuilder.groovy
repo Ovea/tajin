@@ -112,9 +112,9 @@ class I18NResourceBuilder implements ResourceBuilder {
                     }
                 }
             }
-            config.log("[%s] Variants found for bundle %s: %s", getClass().simpleName, bundle, variants)
+            config.log("[I18N] Variants found for bundle %s: %s", bundle, variants)
         } else {
-            config.log("[%s] Not a local bundle: %s", getClass().simpleName, bundle)
+            config.log("[I18N] Not a local bundle: %s", bundle)
         }
         return variants
     }

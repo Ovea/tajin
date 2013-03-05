@@ -20,21 +20,52 @@ package com.ovea.tajin.io
  */
 class Merger {
 
-    static boolean merge(File out, Collection<File> files) {
+    static boolean mergeElements(File out, Collection<Element> elements, Closure<Boolean> callback) {
         StringBuilder sb = new StringBuilder()
         boolean complete = true
-        files.each { File f ->
-            if (f.exists()) {
-                if (f.name.endsWith('.css') || f.name.endsWith('.js')) {
-                    sb.append("/* ${f.name} */\n" as String)
+        elements.each { Element el ->
+            try {
+                if (out.name.endsWith('.css') || out.name.endsWith('.js')) {
+                    sb << "/* ${el.location} */\n" as String
                 }
-                sb.append(new String(f.bytes, 'UTF-8')).append('\n')
-            } else {
+                String data = new String(el.resource.bytes, 'UTF-8')
+                if (el.min && out.name.endsWith('.css')) {
+                    data = Minifier.minifyCSS(data)
+                } else if (el.min && out.name.endsWith('.js')) {
+                    data = Minifier.minifyJS(el.location, data)
+                }
+                sb << data
+                sb << '\n'
+                if (callback.call(el, null) == Boolean.FALSE) return
+            } catch (e) {
                 complete = false
+                if (callback.call(el, e) == Boolean.FALSE) return
             }
         }
         out.bytes = sb.toString().getBytes('UTF-8')
         return complete
     }
 
+    static boolean mergeElements(File out, Collection<Element> elements) {
+        return mergeElements(out, elements, { true })
+    }
+
+    static boolean mergeResources(File out, Collection<Resource> resources) {
+        return mergeElements(out, resources.collect {
+            new Element(
+                resource: it,
+                min: false
+            )
+        })
+    }
+
+    static boolean mergeFiles(File out, Collection<File> files) {
+        return mergeResources(out, files.collect { Resource.file(it) })
+    }
+
+    static class Element {
+        String location
+        Resource resource
+        boolean min
+    }
 }

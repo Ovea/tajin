@@ -17,6 +17,8 @@ package com.ovea.tajin.resources
 
 import com.ovea.tajin.TajinConfig
 import com.ovea.tajin.io.FileWatcher
+import com.ovea.tajin.io.Merger
+import com.ovea.tajin.io.Resource
 
 import static com.ovea.tajin.io.FileWatcher.Event.Kind.ENTRY_DELETE
 import static com.ovea.tajin.io.FileWatcher.Event.Kind.ENTRY_MODIFY
@@ -32,9 +34,8 @@ class MergerResourceBuilder implements ResourceBuilder {
 
     MergerResourceBuilder(TajinConfig config) {
         this.config = config
-        Class<?> c = getClass()
         config.onConfig {
-            config.log("[%s] Tajin configuration changed", c.simpleName)
+            config.log("[Merge] Tajin configuration changed")
             synchronized (files) {
                 files.clear()
                 (config.merge ?: [:]).each { String m, resources ->
@@ -77,8 +78,21 @@ class MergerResourceBuilder implements ResourceBuilder {
     }
 
     boolean merge(String m) {
-        //Merger.merge(new File(config.webapp, m), watchables[m])
-        return true
+        config.log('[Merge] %s', m)
+        return Merger.mergeElements(new File(config.webapp, m), ((config.merge ?: [:])[m] ?: []).findAll { it.file || it.url }.collect {
+            new Merger.Element(
+                location: it.file ?: it.url,
+                resource: it.file ? Resource.file(new File(config.webapp, it.file as String)) : Resource.url(new URL(it.url as String)),
+                min: it.min
+            )
+        }, { Merger.Element el, Throwable e ->
+            if (e) {
+                config.log('[Merge] ERR: %s (%s)', e.message, el.resource)
+            } else {
+                config.log('[Merge] + %s', el.resource)
+            }
+            return true
+        })
     }
 
 }

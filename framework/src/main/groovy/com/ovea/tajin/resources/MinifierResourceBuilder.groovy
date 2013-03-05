@@ -36,7 +36,7 @@ class MinifierResourceBuilder implements ResourceBuilder {
         this.config = config
         Class<?> c = getClass()
         config.onConfig {
-            config.log("[%s] Tajin configuration changed", c.simpleName)
+            config.log("[Minify] Tajin configuration changed")
             Collection<String> w = new TreeSet((config.minify?.includes ?: []).findAll { String path -> !path.contains('*') })
             DirectoryScanner scanner = new DirectoryScanner(
                 basedir: config.webapp,
@@ -77,11 +77,10 @@ class MinifierResourceBuilder implements ResourceBuilder {
     Work complete(Work work) {
         Collection<File> incompletes = work.data
         def missing = []
-        Class<?> c = getClass()
         incompletes.each {
             File min = Minifier.minify(it)
             if (min) {
-                config.log('[%s] + %s', c.simpleName, min.name)
+                config.log('[Minify] + %s', min.name)
             } else {
                 missing << it
             }
@@ -96,10 +95,10 @@ class MinifierResourceBuilder implements ResourceBuilder {
                 File min = Minifier.getFilename(e.target)
                 if (min) {
                     min.delete()
-                    config.log('[%s] Removed: %s', getClass().simpleName, min.name)
+                    config.log('[Minify] Removed: %s', min.name)
                 }
             } else {
-                config.log('[%s] + %s', getClass().simpleName, Minifier.minify(e.target).name)
+                config.log('[Minify] + %s', Minifier.minify(e.target).name)
             }
         }
         // do not need a client-json regeneration

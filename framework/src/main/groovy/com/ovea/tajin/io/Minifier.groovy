@@ -26,6 +26,61 @@ import org.mozilla.javascript.EvaluatorException
  */
 class Minifier {
 
+    static String minifyCSS(String src) {
+        return minifyCSS(new StringReader(src))
+    }
+
+    static String minifyCSS(Reader r) {
+        def out = new StringWriter()
+        minifyCSS(r, out)
+        return out.toString()
+    }
+
+    static void minifyCSS(Reader r, Writer w) {
+        CssCompressor compressor = new CssCompressor(r)
+        compressor.compress(w, -1)
+    }
+
+    static String minifyJS(String path, String src) {
+        return minifyJS(path, new StringReader(src))
+    }
+
+    static String minifyJS(String path, Reader r) {
+        def out = new StringWriter()
+        minifyJS(path, r, out)
+        return out.toString()
+    }
+
+    static void minifyJS(String path, Reader r, Writer w) {
+        def error = [:]
+        JavaScriptCompressor compressor = new JavaScriptCompressor(r, new ErrorReporter() {
+            @Override
+            public void warning(String message, String sourceName, int line, String lineSource, int lineOffset) {
+            }
+
+            @Override
+            public void error(String message, String sourceName, int line, String lineSource, int lineOffset) {
+                if (!error) {
+                    error << [
+                        message: message,
+                        line: line,
+                        lineSource: lineSource,
+                        lineOffset: lineOffset
+                    ]
+                }
+            }
+
+            @Override
+            public EvaluatorException runtimeError(String message, String sourceName, int line, String lineSource, int lineOffset) {
+                return new EvaluatorException(message, path, line, lineSource, lineOffset);
+            }
+        })
+        compressor.compress(w, -1, false, true, false, false)
+        if (error) {
+            throw new EvaluatorException(error.message as String, path, error.line as int, error.lineSource as String, error.lineOffset as int)
+        }
+    }
+
     static File minify(File src) {
         if (src.exists()) {
             File min = getFilename(src)
@@ -33,46 +88,10 @@ class Minifier {
                 return null
             }
             if (src.name.endsWith('.css')) {
-                def out = new StringWriter()
-                src.withInputStream { InputStream is ->
-                    CssCompressor compressor = new CssCompressor(new InputStreamReader(is, 'UTF-8'))
-                    compressor.compress(out, -1)
-                }
-                min.bytes = out.toString().getBytes('UTF-8')
+                src.withInputStream { min.bytes = minifyCSS(new InputStreamReader(it, 'UTF-8')).getBytes('UTF-8') }
                 return min
             } else if (src.name.endsWith('.js')) {
-                def error = [:]
-                def out = new StringWriter()
-                src.withInputStream { InputStream is ->
-                    JavaScriptCompressor compressor = new JavaScriptCompressor(new InputStreamReader(is, 'UTF-8'), new ErrorReporter() {
-                        @Override
-                        public void warning(String message, String sourceName, int line, String lineSource, int lineOffset) {
-                        }
-
-                        @Override
-                        public void error(String message, String sourceName, int line, String lineSource, int lineOffset) {
-                            if (!error) {
-                                error << [
-                                    message: message,
-                                    line: line,
-                                    lineSource: lineSource,
-                                    lineOffset: lineOffset
-                                ]
-                            }
-                        }
-
-                        @Override
-                        public EvaluatorException runtimeError(String message, String sourceName, int line, String lineSource, int lineOffset) {
-                            return new EvaluatorException(message, src.absolutePath, line, lineSource, lineOffset);
-                        }
-                    })
-                    compressor.compress(out, -1, false, true, false, false)
-                }
-                if (error) {
-                    throw new EvaluatorException(error.message as String, src.absolutePath, error.line as int, error.lineSource as String, error.lineOffset as int);
-                } else {
-                    min.bytes = out.toString().getBytes('UTF-8')
-                }
+                src.withInputStream { min.bytes = minifyJS(src.absolutePath, new InputStreamReader(it, 'UTF-8')).getBytes('UTF-8') }
                 return min
             }
         }
