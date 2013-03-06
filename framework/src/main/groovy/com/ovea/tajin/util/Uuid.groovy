@@ -48,7 +48,7 @@ public final class Uuid implements Serializable, Comparable<Uuid> {
 
     @Override
     public boolean equals(Object o) {
-        if (this == o) return true;
+        if (this.is(o)) return true;
         if (o == null || getClass() != o.getClass()) return false;
         Uuid uuid = (Uuid) o;
         return internal.equals(uuid.internal);

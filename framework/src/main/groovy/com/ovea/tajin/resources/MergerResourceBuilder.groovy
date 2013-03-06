@@ -21,6 +21,9 @@ import com.ovea.tajin.io.Merger
 import com.ovea.tajin.io.Minifier
 import com.ovea.tajin.io.Resource
 
+import java.util.concurrent.locks.ReadWriteLock
+import java.util.concurrent.locks.ReentrantReadWriteLock
+
 import static com.ovea.tajin.io.FileWatcher.Event.Kind.ENTRY_DELETE
 import static com.ovea.tajin.io.FileWatcher.Event.Kind.ENTRY_MODIFY
 
@@ -32,29 +35,50 @@ class MergerResourceBuilder implements ResourceBuilder {
 
     private final TajinConfig config
     private final Map<File, Collection<String>> files = new HashMap<>()
+    private final Collection<String> merges = []
+    private final ReadWriteLock lock = new ReentrantReadWriteLock()
 
     MergerResourceBuilder(TajinConfig config) {
         this.config = config
         config.onConfig {
             config.log("[Merge] Tajin configuration changed")
-            synchronized (files) {
+            lock.writeLock().lock()
+            try {
                 files.clear()
                 (config.merge ?: [:]).each { String m, resources ->
-                    resources.findAll { it.file }.collect { new File(config.webapp, it.file as String) }.findAll { !it.directory }.unique().each {
-                        if (files[it]) {
-                            files[it] << m
-                        } else {
-                            files[it] = new HashSet<String>([m])
+                    if (Collection.isInstance(resources)) {
+                        merges << m
+                        resources.findAll { it.f }.collect {
+                            Resource dev = Resource.resource(config.webapp, it.f as String)
+                            Resource prod = Resource.resource(config.webapp, (String.isInstance(it.min) ? it.min : it.f) as String)
+                            return [dev, prod].findAll { Resource r -> r.file }
+                        }.flatten().unique().each { Resource r ->
+                            File f = r.asFile
+                            if (files[f]) {
+                                files[f] << m
+                            } else {
+                                files[f] = new HashSet<String>([m])
+                            }
                         }
                     }
                 }
+            }
+            finally {
+                lock.writeLock().unlock()
             }
         }
     }
 
     @Override
     Work build() {
-        return complete(Work.incomplete(this, (config.merge ?: [:]).keySet()))
+        Collection<String> m = []
+        lock.readLock().lock()
+        try {
+            m.addAll(merges)
+        } finally {
+            lock.readLock().unlock()
+        }
+        return complete(Work.incomplete(this, m))
     }
 
     @Override
@@ -66,12 +90,18 @@ class MergerResourceBuilder implements ResourceBuilder {
     }
 
     @Override
-    Collection<File> getWatchables() { files.keySet() }
+    Collection<File> getWatchables() {
+        lock.readLock().lock()
+        try {
+            return new HashSet<File>(files.keySet())
+        } finally {
+            lock.readLock().unlock()
+        }
+    }
 
     @Override
     boolean modified(FileWatcher.Event e) {
-        Collection<File> w = getWatchables()
-        if (e.kind in [ENTRY_MODIFY, ENTRY_DELETE] && e.target in w) {
+        if (e.kind in [ENTRY_MODIFY, ENTRY_DELETE] && e.target in watchables) {
             files[e.target]?.each { merge(it) }
         }
         // do not need a client-json regeneration
@@ -79,17 +109,17 @@ class MergerResourceBuilder implements ResourceBuilder {
     }
 
     boolean merge(String m) {
-        Collection<Merger.Element> els = ((config.merge ?: [:])[m] ?: []).findAll { it.file || it.url }.collect {
-            new Merger.Element(
-                location: it.file ?: it.url,
-                resource: it.file ? Resource.file(new File(config.webapp, it.file as String)) : Resource.url(new URL(it.url as String)),
-                min: it.min ?: false
-            )
+        def cfg = config.merge ?: [:]
+        def all = cfg[m] ?: []
+        def existing = all.findAll { it.f }
+        boolean failOnMissing = cfg.failOnMissing ?: false
+        if (failOnMissing && all.size() != existing.size()) {
+            throw new IllegalStateException("Missing resources to merge: ${all.findAll { !it.f }}")
         }
         def cb = { Merger.Element el, Throwable e ->
             if (e) {
                 if (config?.merge?.failOnMissing) {
-                    throw new IllegalStateException("File is missing for minification: ${it}")
+                    throw new IllegalStateException("File is missing for merge: ${el.location}")
                 } else {
                     config.log('[Merge] ERROR %s: %s', el.location, e.message)
                 }
@@ -98,12 +128,27 @@ class MergerResourceBuilder implements ResourceBuilder {
             }
             return true
         }
-        config.log('[Merge] %s', Minifier.getFilename(m))
-        def out = new File(config.webapp, m)
-        def min = Minifier.getFilename(out)
-        def complete = Merger.mergeElements(min, els, cb)
+        // create DEV version
         config.log('[Merge] %s', m)
-        return complete & Merger.mergeElements(out, els.collect { it.min = false; it }, cb)
+        def out = new File(config.webapp, m)
+        def complete = Merger.mergeElements(out, existing.collect {
+            return new Merger.Element(
+                location: it.f,
+                resource: Resource.resource(config.webapp, it.f as String),
+                min: false
+            )
+        }, cb)
+        // create PROD version
+        config.log('[Merge] %s', Minifier.getFilename(m))
+        def min = Minifier.getFilename(out)
+        return complete & Merger.mergeElements(min, existing.collect {
+            String loc = String.isInstance(it.min) ? it.min : it.f
+            return new Merger.Element(
+                location: loc,
+                resource: Resource.resource(config.webapp, loc),
+                min: Boolean.isInstance(it.min) ? it.min : false
+            )
+        }, cb)
     }
 
 }

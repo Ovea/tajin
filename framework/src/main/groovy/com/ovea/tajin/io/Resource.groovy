@@ -71,13 +71,6 @@ abstract class Resource {
         }
     }
 
-    /**
-     * classpath:<path>
-     * <br>
-     * file:<path>
-     * <br>
-     * http://...
-     */
     static Resource resource(String pattern) {
         return resource(new File('.'), pattern)
     }
@@ -89,21 +82,25 @@ abstract class Resource {
      * <br>
      * http://...
      */
-    static Resource resource(File basedir, String pattern) {
+    static Resource resource(File webapp, String pattern) {
         if (!pattern)
             throw new IllegalArgumentException("Missing parameter")
-        if (pattern.startsWith("classpath:"))
+        if (pattern.startsWith("classpath:") && !pattern.startsWith("classpath://"))
             return classpath(Thread.currentThread().contextClassLoader, pattern.substring(10))
-        if (pattern.startsWith("web:"))
-            return new FileResource(new File(basedir, pattern.substring(4)))
-        if (pattern.startsWith("file:")) {
+        if (pattern.startsWith("web:") && !pattern.startsWith("web://"))
+            return new FileResource(new File(webapp, pattern.substring(4)))
+        if (pattern.startsWith("file:") && !pattern.startsWith("file://")) {
             return new FileResource(new File(pattern.substring(5)))
         }
-        try {
-            return new UrlResource(new URL(pattern))
-        } catch (MalformedURLException e) {
-            throw new IllegalArgumentException("Invalid resource " + pattern + " : " + e.message, e)
+        if (pattern =~ /(?i)[a-z]:\/\/.+/) {
+            try {
+                return new UrlResource(new URL(pattern))
+            } catch (MalformedURLException e) {
+                throw new IllegalArgumentException("Invalid resource " + pattern + " : " + e.message, e)
+            }
         }
+        File f = new File(pattern)
+        return new FileResource(f.absolute ? f : new File(webapp, pattern))
     }
 
     static Resource classpath(ClassLoader classloader, String pattern) {
@@ -213,7 +210,7 @@ abstract class Resource {
 
         @Override
         boolean equals(Object o) {
-            if (this == o) return true
+            if (this.is(o)) return true
             if (o == null || getClass() != o.getClass()) return false
             ByteResource that = (ByteResource) o
             return Arrays.equals(buffer, that.buffer)
@@ -244,7 +241,7 @@ abstract class Resource {
 
         @Override
         boolean equals(Object o) {
-            if (this == o) return true
+            if (this.is(o)) return true
             if (o == null || getClass() != o.getClass()) return false
             CharResource that = (CharResource) o
             return Arrays.equals(buffer, that.buffer)
@@ -275,7 +272,7 @@ abstract class Resource {
 
         @Override
         boolean equals(Object o) {
-            if (this == o) return true
+            if (this.is(o)) return true
             if (o == null || getClass() != o.getClass()) return false
             StringResource that = (StringResource) o
             return buffer == that.buffer
@@ -386,7 +383,7 @@ abstract class Resource {
 
         @Override
         boolean equals(Object o) {
-            if (this == o) return true
+            if (this.is(o)) return true
             if (o == null || getClass() != o.getClass()) return false
             ClassPathResource that = (ClassPathResource) o
             return path.equals(that.path)
@@ -422,7 +419,7 @@ abstract class Resource {
 
         @Override
         boolean equals(Object o) {
-            if (this == o) return true
+            if (this.is(o)) return true
             if (o == null || getClass() != o.getClass()) return false
             UrlResource that = (UrlResource) o
             return url.equals(that.url)
@@ -463,7 +460,7 @@ abstract class Resource {
 
         @Override
         boolean equals(Object o) {
-            if (this == o) return true
+            if (this.is(o)) return true
             if (o == null || getClass() != o.getClass()) return false
             FileResource that = (FileResource) o
             return file.equals(that.file)

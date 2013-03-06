@@ -52,7 +52,7 @@ class I18NResourceBuilder implements ResourceBuilder {
     }
 
     @Override
-    synchronized Collection<File> getWatchables() {
+    Collection<File> getWatchables() {
         lock.readLock().lock()
         try {
             return new HashSet<File>(folders)

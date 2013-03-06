@@ -32,7 +32,7 @@
     },
 
     "merge": {
-        "failOnMissing": true,
+        "failOnMissing": false,
         "js/lib.js": [
             {
                 "f": "http://code.jquery.com/jquery-1.9.1.js",
@@ -53,25 +53,28 @@
                 "f": "js/jquery/jquery.json-2.2.min.js"
             },
             {
-                "f": "js/jquery/jquery.purl-2.2.js",
+                "f": "js/jquery/jquery.purl-2.2.js"
+            },
+            {
+                "f": "js/jquery/jquery.tooltip.js",
                 "min": true
             }
         ],
         "css/big.css": [
             {
-                "dev": "css/sample1.css",
+                "f": "css/sample1.css",
                 "min": true
             },
             {
-                "dev": "css/sample2.css",
+                "f": "css/sample2.css",
                 "min": true
             },
             {
-                "dev": "css/inexisting.css",
+                "f": "css/inexisting.css",
                 "min": true
             },
             {
-                "dev": "css/foundation.css",
+                "f": "css/foundation.css",
                 "min": "css/foundation.min.css"
             }
         ]

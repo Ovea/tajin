@@ -14,6 +14,9 @@
  * limitations under the License.
  */
 package com.ovea.tajin.io
+
+import groovy.transform.ToString
+
 /**
  * @author Mathieu Carbou (mathieu.carbou@gmail.com)
  * @date 2013-02-20
@@ -42,6 +45,9 @@ class Merger {
                 if (callback.call(el, e) == Boolean.FALSE) return
             }
         }
+        if (out.parentFile.exists()) {
+            out.parentFile.mkdirs()
+        }
         out.bytes = sb.toString().getBytes('UTF-8')
         return complete
     }
@@ -63,6 +69,7 @@ class Merger {
         return mergeResources(out, files.collect { Resource.file(it) })
     }
 
+    @ToString(includes = ['location'])
     static class Element {
         String location
         Resource resource
