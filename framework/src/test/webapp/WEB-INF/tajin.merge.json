@@ -34,34 +34,47 @@
     "merge": {
         "js/lib.js": [
             {
-                "url": "http://code.jquery.com/jquery-1.9.1.min.js"
+                "f": "http://code.jquery.com/jquery-1.9.1.js",
+                "min": "http://code.jquery.com/jquery-1.9.1.min.js"
             },
             {
-                "file": "js/jquery/jquery.fastLiveFilter.js",
+                "f": "js/jquery/jquery.fastLiveFilter.js",
+                "min": "js/jquery/jquery.fastLiveFilter.min.js"
+            },
+            {
+                "f": "js/inexisting.js",
                 "min": true
             },
             {
-                "file": "js/jquery/jquery.json-2.2.min.js"
+                "invalid": "js/jquery/jquery.json-2.2.min.js"
             },
             {
-                "file": "js/jquery/jquery.purl-2.2.min.js",
+                "f": "js/jquery/jquery.json-2.2.min.js"
+            },
+            {
+                "f": "js/jquery/jquery.purl-2.2.js",
                 "min": true
             }
         ],
         "css/big.css": [
             {
-                "file": "css/sample1.css",
+                "dev": "css/sample1.css",
                 "min": true
             },
             {
-                "file": "css/sample2.css",
+                "dev": "css/sample2.css",
                 "min": true
             },
             {
-                "file": "css/inexisting.css",
+                "dev": "css/inexisting.css",
                 "min": true
+            },
+            {
+                "dev": "css/foundation.css",
+                "min": "css/foundation.min.css"
             }
         ]
 
     }
+
 }

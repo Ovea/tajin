@@ -88,7 +88,11 @@ class MergerResourceBuilder implements ResourceBuilder {
         }
         def cb = { Merger.Element el, Throwable e ->
             if (e) {
-                config.log('[Merge] ERROR %s: %s', el.location, e.message)
+                if (config?.merge?.failOnMissing) {
+                    throw new IllegalStateException("File is missing for minification: ${it}")
+                } else {
+                    config.log('[Merge] ERROR %s: %s', el.location, e.message)
+                }
             } else {
                 config.log('[Merge] + %s', el.location)
             }

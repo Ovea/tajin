@@ -81,6 +81,8 @@ class MinifierResourceBuilder implements ResourceBuilder {
             File min = Minifier.minify(it)
             if (min) {
                 config.log('[Minify] + %s', min.name)
+            } else if (config.minify?.failOnMissing) {
+                throw new IllegalStateException("File is missing for minification: ${it}")
             } else {
                 missing << it
             }

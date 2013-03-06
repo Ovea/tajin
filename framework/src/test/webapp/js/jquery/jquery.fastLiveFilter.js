@@ -19,11 +19,10 @@ jQuery.fn.fastLiveFilter = function(list, options) {
     // NOTE: because we cache lis & len here, users would need to re-init the plugin
     // if they modify the list in the DOM later.  This doesn't give us that much speed
     // boost, so perhaps it's not worth putting it here.
-    var lis = list.children();
+    var lis = list.find('tr');
     var len = lis.length;
     var oldDisplay = len > 0 ? lis[0].style.display : "block";
     callback(len); // do a one-time callback on initialization to make sure everything's in sync
-
     input.change(function() {
         // var startTime = new Date().getTime();
         var filter = input.val().toLowerCase();
@@ -54,4 +53,4 @@ jQuery.fn.fastLiveFilter = function(list, options) {
             keyTimeout = setTimeout(function() { input.change(); }, timeout);
         });
     return this; // maintain jQuery chainability
-}
+};
