@@ -39,7 +39,8 @@ class MergerResourceBuilder implements ResourceBuilder {
     private final Collection<String> merges = []
     private final ReadWriteLock lock = new ReentrantReadWriteLock()
     private final AtomicBoolean defaultWatch = new AtomicBoolean(true)
-    private final AtomicBoolean defaultFailOnMissing = new AtomicBoolean(true)
+    private final AtomicBoolean defaultFailOnMissing = new AtomicBoolean(false)
+    private final AtomicBoolean defaultMin = new AtomicBoolean(false)
 
     MergerResourceBuilder(TajinConfig config) {
         this.config = config
@@ -50,14 +51,15 @@ class MergerResourceBuilder implements ResourceBuilder {
                 def cfg = config.merge ?: [:]
                 defaultFailOnMissing.set(cfg.failOnMissing ?: false)
                 defaultWatch.set(cfg.watch ?: false)
+                defaultMin.set(cfg.min ?: false)
                 files.clear()
                 cfg.each { String m, resources ->
                     if (Collection.isInstance(resources)) {
                         merges << m
-                        resources.findAll { it.f && (Boolean.isInstance(it.watch) ? it.watch : defaultWatch.get()) }.collect {
-                            Resource dev = Resource.resource(config.webapp, it.f as String)
-                            Resource prod = Resource.resource(config.webapp, (String.isInstance(it.min) ? it.min : it.f) as String)
-                            return [dev, prod].findAll { Resource r -> r.file }
+                        resources.findAll { String.isInstance(it) || it.f && (Boolean.isInstance(it.watch) ? it.watch : defaultWatch.get()) }.collect {
+                            String f = String.isInstance(it) ? it : it.f
+                            String min = String.isInstance(it) || !String.isInstance(it.min) ? f : it.min
+                            return [Resource.resource(config.webapp, f), Resource.resource(config.webapp, min)].findAll { Resource r -> r.file }
                         }.flatten().unique().each { Resource r ->
                             File f = r.asFile
                             if (files[f]) {
@@ -116,9 +118,9 @@ class MergerResourceBuilder implements ResourceBuilder {
 
     boolean merge(String m) {
         def all = (config.merge ?: [:])[m] ?: []
-        def existing = all.findAll { it.f }
+        def existing = all.findAll { String.isInstance(it) || it.f }
         if (defaultFailOnMissing.get() && all.size() != existing.size()) {
-            throw new IllegalStateException("Missing resources to merge: ${all.findAll { !it.f }}")
+            throw new IllegalStateException("Missing resources to merge: ${all.findAll { !String.isInstance(it) && !it.f }}")
         }
         def cb = { Merger.Element el, Throwable e ->
             if (e) {
@@ -136,9 +138,10 @@ class MergerResourceBuilder implements ResourceBuilder {
         config.log('[Merge] %s', m)
         def out = new File(config.webapp, m)
         def complete = Merger.mergeElements(out, existing.collect {
+            String f = String.isInstance(it) ? it : it.f
             return new Merger.Element(
-                location: it.f,
-                resource: Resource.resource(config.webapp, it.f as String),
+                location: f,
+                resource: Resource.resource(config.webapp, f),
                 min: false
             )
         }, cb)
@@ -146,12 +149,20 @@ class MergerResourceBuilder implements ResourceBuilder {
         config.log('[Merge] %s', Minifier.getFilename(m))
         def min = Minifier.getFilename(out)
         return complete & Merger.mergeElements(min, existing.collect {
-            String loc = String.isInstance(it.min) ? it.min : it.f
-            return new Merger.Element(
-                location: loc,
-                resource: Resource.resource(config.webapp, loc),
-                min: Boolean.isInstance(it.min) ? it.min : false
-            )
+            if (String.isInstance(it)) {
+                return new Merger.Element(
+                    location: it,
+                    resource: Resource.resource(config.webapp, it as String),
+                    min: defaultMin.get()
+                )
+            } else {
+                String loc = String.isInstance(it.min) ? it.min : it.f
+                return new Merger.Element(
+                    location: loc,
+                    resource: Resource.resource(config.webapp, loc),
+                    min: Boolean.isInstance(it.min) ? it.min : defaultMin.get()
+                )
+            }
         }, cb)
     }
 

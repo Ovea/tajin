@@ -34,6 +34,7 @@
     "merge": {
         "failOnMissing": false,
         "watch": false,
+        "min":true,
         "js/lib.js": [
             {
                 "f": "http://code.jquery.com/jquery-1.9.1.js",
@@ -43,40 +44,29 @@
                 "f": "js/jquery/jquery.fastLiveFilter.js",
                 "min": "js/jquery/jquery.fastLiveFilter.min.js"
             },
+            "js/inexisting.js",
             {
-                "f": "js/inexisting.js",
-                "min": true
-            },
-            {
-                "invalid": "js/jquery/jquery.json-2.2.min.js"
+                "invalid": "js/jquery/jquery.json-2.2.min.js",
+                "min": false
             },
             {
                 "f": "js/jquery/jquery.json-2.2.min.js",
-                "watch": true
+                "watch": true,
+                "min": false
             },
-            {
-                "f": "js/jquery/jquery.purl-2.2.js"
-            },
+            "js/jquery/jquery.purl-2.2.js",
             {
                 "f": "js/jquery/jquery.tooltip.js",
-                "min": true,
                 "watch": true
             }
         ],
         "css/big.css": [
-            {
-                "f": "css/sample1.css",
-                "min": true
-            },
+            "css/sample1.css",
             {
                 "f": "css/sample2.css",
-                "min": true,
                 "watch": true
             },
-            {
-                "f": "css/inexisting.css",
-                "min": true
-            },
+            "css/inexisting.css",
             {
                 "f": "css/foundation.css",
                 "min": "css/foundation.min.css"

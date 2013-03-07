@@ -7,5 +7,5 @@ engine.put('tajin', [
     merge: { println it }
 ])
 
-engine.eval('tajin.merge({"toto.js":{min:true}})')
+engine.eval('tajin.merge({"toto.js":[""]})')
 
