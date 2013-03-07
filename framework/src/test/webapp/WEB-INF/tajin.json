@@ -33,6 +33,7 @@
 
     "merge": {
         "failOnMissing": false,
+        "watch": false,
         "js/lib.js": [
             {
                 "f": "http://code.jquery.com/jquery-1.9.1.js",
@@ -50,14 +51,16 @@
                 "invalid": "js/jquery/jquery.json-2.2.min.js"
             },
             {
-                "f": "js/jquery/jquery.json-2.2.min.js"
+                "f": "js/jquery/jquery.json-2.2.min.js",
+                "watch": true
             },
             {
                 "f": "js/jquery/jquery.purl-2.2.js"
             },
             {
                 "f": "js/jquery/jquery.tooltip.js",
-                "min": true
+                "min": true,
+                "watch": true
             }
         ],
         "css/big.css": [
@@ -67,7 +70,8 @@
             },
             {
                 "f": "css/sample2.css",
-                "min": true
+                "min": true,
+                "watch": true
             },
             {
                 "f": "css/inexisting.css",

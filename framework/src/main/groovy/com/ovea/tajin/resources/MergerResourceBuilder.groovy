@@ -21,6 +21,7 @@ import com.ovea.tajin.io.Merger
 import com.ovea.tajin.io.Minifier
 import com.ovea.tajin.io.Resource
 
+import java.util.concurrent.atomic.AtomicBoolean
 import java.util.concurrent.locks.ReadWriteLock
 import java.util.concurrent.locks.ReentrantReadWriteLock
 
@@ -37,6 +38,8 @@ class MergerResourceBuilder implements ResourceBuilder {
     private final Map<File, Collection<String>> files = new HashMap<>()
     private final Collection<String> merges = []
     private final ReadWriteLock lock = new ReentrantReadWriteLock()
+    private final AtomicBoolean defaultWatch = new AtomicBoolean(true)
+    private final AtomicBoolean defaultFailOnMissing = new AtomicBoolean(true)
 
     MergerResourceBuilder(TajinConfig config) {
         this.config = config
@@ -44,11 +47,14 @@ class MergerResourceBuilder implements ResourceBuilder {
             config.log("[Merge] Tajin configuration changed")
             lock.writeLock().lock()
             try {
+                def cfg = config.merge ?: [:]
+                defaultFailOnMissing.set(cfg.failOnMissing ?: false)
+                defaultWatch.set(cfg.watch ?: false)
                 files.clear()
-                (config.merge ?: [:]).each { String m, resources ->
+                cfg.each { String m, resources ->
                     if (Collection.isInstance(resources)) {
                         merges << m
-                        resources.findAll { it.f }.collect {
+                        resources.findAll { it.f && (Boolean.isInstance(it.watch) ? it.watch : defaultWatch.get()) }.collect {
                             Resource dev = Resource.resource(config.webapp, it.f as String)
                             Resource prod = Resource.resource(config.webapp, (String.isInstance(it.min) ? it.min : it.f) as String)
                             return [dev, prod].findAll { Resource r -> r.file }
@@ -109,16 +115,14 @@ class MergerResourceBuilder implements ResourceBuilder {
     }
 
     boolean merge(String m) {
-        def cfg = config.merge ?: [:]
-        def all = cfg[m] ?: []
+        def all = (config.merge ?: [:])[m] ?: []
         def existing = all.findAll { it.f }
-        boolean failOnMissing = cfg.failOnMissing ?: false
-        if (failOnMissing && all.size() != existing.size()) {
+        if (defaultFailOnMissing.get() && all.size() != existing.size()) {
             throw new IllegalStateException("Missing resources to merge: ${all.findAll { !it.f }}")
         }
         def cb = { Merger.Element el, Throwable e ->
             if (e) {
-                if (config?.merge?.failOnMissing) {
+                if (defaultFailOnMissing.get()) {
                     throw new IllegalStateException("File is missing for merge: ${el.location}")
                 } else {
                     config.log('[Merge] ERROR %s: %s', el.location, e.message)
