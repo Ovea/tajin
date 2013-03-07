@@ -56,7 +56,7 @@ class MergerResourceBuilder implements ResourceBuilder {
                 cfg.each { String m, resources ->
                     if (Collection.isInstance(resources)) {
                         merges << m
-                        resources.findAll { String.isInstance(it) || it.f && (Boolean.isInstance(it.watch) ? it.watch : defaultWatch.get()) }.collect {
+                        resources.findAll { String.isInstance(it) && defaultWatch.get() || Map.isInstance(it) && it.f && (Boolean.isInstance(it.watch) ? it.watch : defaultWatch.get()) }.collect {
                             String f = String.isInstance(it) ? it : it.f
                             String min = String.isInstance(it) || !String.isInstance(it.min) ? f : it.min
                             return [Resource.resource(config.webapp, f), Resource.resource(config.webapp, min)].findAll { Resource r -> r.file }
@@ -160,7 +160,7 @@ class MergerResourceBuilder implements ResourceBuilder {
                 return new Merger.Element(
                     location: loc,
                     resource: Resource.resource(config.webapp, loc),
-                    min: Boolean.isInstance(it.min) ? it.min : defaultMin.get()
+                    min: it.min == null ? defaultMin.get() : Boolean.isInstance(it.min) ? it.min : false
                 )
             }
         }, cb)
