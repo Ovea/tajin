@@ -10,7 +10,7 @@
 
     <groupId>com.ovea.tajin</groupId>
     <artifactId>tajin</artifactId>
-    <version>1.1.b10-SNAPSHOT</version>
+    <version>1.0.b11-SNAPSHOT</version>
     <packaging>pom</packaging>
     <name>Tajin</name>
     <description>Tajin Web Framework</description>
