@@ -130,7 +130,7 @@ class MergerResourceBuilder implements ResourceBuilder {
                     config.log('[Merge] ERROR %s: %s', el.location, e.message)
                 }
             } else {
-                config.log('[Merge]   + %s', el.location)
+                config.log('[Merge]   + %s (min=%s)', el.location, el.min)
             }
             return true
         }
