@@ -38,7 +38,7 @@ class MergerResourceBuilder implements ResourceBuilder {
     private final Map<File, Collection<String>> files = new HashMap<>()
     private final Collection<String> merges = []
     private final ReadWriteLock lock = new ReentrantReadWriteLock()
-    private final AtomicBoolean defaultWatch = new AtomicBoolean(true)
+    private final AtomicBoolean defaultWatch = new AtomicBoolean(false)
     private final AtomicBoolean defaultFailOnMissing = new AtomicBoolean(false)
     private final AtomicBoolean defaultMin = new AtomicBoolean(false)
 
