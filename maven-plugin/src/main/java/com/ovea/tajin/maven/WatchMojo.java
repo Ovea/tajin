@@ -17,6 +17,7 @@ package com.ovea.tajin.maven;
 
 import com.ovea.tajin.Tajin;
 
+import java.io.File;
 import java.util.concurrent.CountDownLatch;
 
 /**
@@ -28,6 +29,15 @@ import java.util.concurrent.CountDownLatch;
  * @threadSafe
  */
 public final class WatchMojo extends TajinMavenPlugin {
+
+    /**
+     * Base directory used to find resources defined in JSON config
+     *
+     * @parameter expression="${tajin.webapp}" default-value="${basedir}/src/main/webapp"
+     * @required
+     */
+    protected File webapp;
+
     @Override
     void execute(final Tajin tajin) {
         tajin.build();
@@ -43,5 +53,10 @@ public final class WatchMojo extends TajinMavenPlugin {
         } catch (InterruptedException e) {
             Thread.currentThread().interrupt();
         }
+    }
+
+    @Override
+    File webapp() {
+        return webapp;
     }
 }

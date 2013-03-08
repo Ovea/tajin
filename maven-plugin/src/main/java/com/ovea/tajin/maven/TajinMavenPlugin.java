@@ -32,14 +32,6 @@ import java.util.Properties;
 public abstract class TajinMavenPlugin extends AbstractMojo {
 
     /**
-     * Base directory used to find resources defined in JSON config
-     *
-     * @parameter expression="${tajin.webapp}" default-value="${basedir}/src/main/webapp"
-     * @required
-     */
-    protected File webapp;
-
-    /**
      * JSON configuration
      *
      * @parameter expression="${tajin.config}" default-value="${basedir}/src/main/webapp/WEB-INF/tajin.json"
@@ -70,8 +62,10 @@ public abstract class TajinMavenPlugin extends AbstractMojo {
         for (Map.Entry<Object, Object> entry : p.entrySet()) {
             ctx.put(String.valueOf(entry.getKey()), entry.getValue());
         }
-        execute(Tajin.load(webapp, Resource.file(config), ctx));
+        execute(Tajin.load(webapp(), Resource.file(config), ctx));
     }
 
     abstract void execute(Tajin tajin);
+
+    abstract File webapp();
 }

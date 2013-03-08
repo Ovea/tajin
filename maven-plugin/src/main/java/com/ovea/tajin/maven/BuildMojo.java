@@ -17,18 +17,34 @@ package com.ovea.tajin.maven;
 
 import com.ovea.tajin.Tajin;
 
+import java.io.File;
+
 /**
  * Build resources
  *
  * @author Mathieu Carbou (mathieu.carbou@gmail.com)
  * @date 2012-11-27
- * @goal resources
- * @phase generate-resources
+ * @goal build
+ * @phase prepare-package
  * @threadSafe
  */
 public final class BuildMojo extends TajinMavenPlugin {
+
+    /**
+     * Base directory used to find resources defined in JSON config
+     *
+     * @parameter expression="${tajin.webapp}" default-value="${project.build.directory}/${project.build.finalName}"
+     * @required
+     */
+    protected File webapp;
+
     @Override
     void execute(Tajin tajin) {
         tajin.build();
+    }
+
+    @Override
+    File webapp() {
+        return webapp;
     }
 }
