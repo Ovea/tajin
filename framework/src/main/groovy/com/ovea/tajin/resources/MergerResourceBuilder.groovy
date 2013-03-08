@@ -127,7 +127,7 @@ class MergerResourceBuilder implements ResourceBuilder {
                 if (defaultFailOnMissing.get()) {
                     throw new IllegalStateException("File is missing for merge: ${el.location}")
                 } else {
-                    config.log('[Merge] ERROR %s: %s', el.location, e.message)
+                    config.log('[Merge] WARNING %s: %s', el.location, e.message)
                 }
             } else {
                 config.log('[Merge]   + %s (min=%s)', el.location, el.min)
