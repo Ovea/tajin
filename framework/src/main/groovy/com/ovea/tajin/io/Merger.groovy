@@ -45,7 +45,7 @@ class Merger {
                 if (callback.call(el, e) == Boolean.FALSE) return
             }
         }
-        if (out.parentFile.exists()) {
+        if (!out.parentFile.exists()) {
             out.parentFile.mkdirs()
         }
         out.bytes = sb.toString().getBytes('UTF-8')

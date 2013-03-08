@@ -39,7 +39,7 @@ class MergerResourceBuilder implements ResourceBuilder {
     private final Collection<String> merges = []
     private final ReadWriteLock lock = new ReentrantReadWriteLock()
     private final AtomicBoolean defaultWatch = new AtomicBoolean(false)
-    private final AtomicBoolean defaultFailOnMissing = new AtomicBoolean(false)
+    private final AtomicBoolean defaultFailOnMissing = new AtomicBoolean(true)
     private final AtomicBoolean defaultMin = new AtomicBoolean(false)
 
     MergerResourceBuilder(TajinConfig config) {
@@ -49,9 +49,9 @@ class MergerResourceBuilder implements ResourceBuilder {
             lock.writeLock().lock()
             try {
                 def cfg = config.merge ?: [:]
-                defaultFailOnMissing.set(cfg.failOnMissing ?: false)
-                defaultWatch.set(cfg.watch ?: false)
-                defaultMin.set(cfg.min ?: false)
+                defaultFailOnMissing.set(Boolean.isInstance(cfg.failOnMissing) ? cfg.failOnMissing : defaultFailOnMissing.get())
+                defaultWatch.set(Boolean.isInstance(cfg.watch) ? cfg.watch : defaultWatch.get())
+                defaultMin.set(Boolean.isInstance(cfg.min) ? cfg.min : defaultMin.get())
                 files.clear()
                 cfg.each { String m, resources ->
                     if (Collection.isInstance(resources)) {
