@@ -1,5 +1,6 @@
 {
     "debug": true,
+    "cache": true,
 
     "client": {
         "modules": {
@@ -34,7 +35,7 @@
     "merge": {
         "failOnMissing": false,
         "watch": false,
-        "min":true,
+        "min": true,
         "js/lib.js": [
             {
                 "f": "http://code.jquery.com/jquery-1.9.1.js",
