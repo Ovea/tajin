@@ -165,7 +165,7 @@ class MergerResourceBuilder implements ResourceBuilder {
                     min: defaultMin.get()
                 )
             } else {
-                String loc = String.isInstance(it.min) ? it.min : it.f
+                String loc = defaultMin.get() && String.isInstance(it.min) ? it.min : it.f
                 return new Merger.Element(
                     location: loc,
                     resource: resolver.resolve(Resource.resource(config.webapp, loc)),
