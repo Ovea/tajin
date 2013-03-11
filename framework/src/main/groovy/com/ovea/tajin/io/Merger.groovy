@@ -24,6 +24,17 @@ import groovy.transform.ToString
 class Merger {
 
     static boolean mergeElements(File out, Collection<Element> elements, Closure<Boolean> callback) {
+        if (!out.parentFile.exists()) {
+            out.parentFile.mkdirs()
+        }
+        return out.withOutputStream { mergeElements(it, elements, callback) } as boolean
+    }
+
+    static boolean mergeElements(OutputStream out, Collection<Element> elements, Closure<Boolean> callback) {
+        return mergeElements(new OutputStreamWriter(out, 'UTF-8'), elements, callback)
+    }
+
+    static boolean mergeElements(Writer out, Collection<Element> elements, Closure<Boolean> callback) {
         StringBuilder sb = new StringBuilder()
         boolean complete = true
         elements.each { Element el ->
@@ -45,28 +56,8 @@ class Merger {
                 if (callback.call(el, e) == Boolean.FALSE) return
             }
         }
-        if (!out.parentFile.exists()) {
-            out.parentFile.mkdirs()
-        }
-        out.bytes = sb.toString().getBytes('UTF-8')
+        out << sb.toString()
         return complete
-    }
-
-    static boolean mergeElements(File out, Collection<Element> elements) {
-        return mergeElements(out, elements, { true })
-    }
-
-    static boolean mergeResources(File out, Collection<Resource> resources) {
-        return mergeElements(out, resources.collect {
-            new Element(
-                resource: it,
-                min: false
-            )
-        })
-    }
-
-    static boolean mergeFiles(File out, Collection<File> files) {
-        return mergeResources(out, files.collect { Resource.file(it) })
     }
 
     @ToString(includes = ['location'])
