@@ -23,29 +23,37 @@ import groovy.transform.ToString
  */
 class Merger {
 
-    static boolean mergeElements(File out, Collection<Element> elements, Closure<Boolean> callback) {
+    final Collection<Element> elements
+    final Closure<Boolean> callback
+
+    Merger(Collection<Element> elements, Closure<Boolean> callback) {
+        this.elements = elements
+        this.callback = callback
+    }
+
+    boolean mergeTo(File out) {
         if (!out.parentFile.exists()) {
             out.parentFile.mkdirs()
         }
-        return out.withOutputStream { mergeElements(it, elements, callback) } as boolean
+        return out.withOutputStream { mergeTo(out.name, it) } as boolean
     }
 
-    static boolean mergeElements(OutputStream out, Collection<Element> elements, Closure<Boolean> callback) {
-        return mergeElements(new OutputStreamWriter(out, 'UTF-8'), elements, callback)
+    boolean mergeTo(String name, OutputStream out) {
+        return mergeTo(name, new OutputStreamWriter(out, 'UTF-8'))
     }
 
-    static boolean mergeElements(Writer out, Collection<Element> elements, Closure<Boolean> callback) {
+    boolean mergeTo(String name, Writer out) {
         StringBuilder sb = new StringBuilder()
         boolean complete = true
         elements.each { Element el ->
             try {
                 String data = new String(el.resource.bytes, 'UTF-8')
-                if (el.min && out.name.endsWith('.css')) {
+                if (el.min && name.endsWith('.css')) {
                     data = Minifier.minifyCSS(data)
-                } else if (el.min && out.name.endsWith('.js')) {
+                } else if (el.min && name.endsWith('.js')) {
                     data = Minifier.minifyJS(el.location, data)
                 }
-                if (out.name.endsWith('.css') || out.name.endsWith('.js')) {
+                if (name.endsWith('.css') || name.endsWith('.js')) {
                     sb << "/* ${el.location} */\n" as String
                 }
                 sb << data
@@ -57,6 +65,7 @@ class Merger {
             }
         }
         out << sb.toString()
+        out.flush()
         return complete
     }
 

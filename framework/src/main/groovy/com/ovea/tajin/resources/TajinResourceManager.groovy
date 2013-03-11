@@ -32,8 +32,6 @@ class TajinResourceManager {
     TajinResourceManager(TajinConfig config) {
         this.config = config
         resourceBuilders = [
-            //TODO MATHIEU: process *.t.js
-            //new JsResourceBuilder(config),
             new I18NResourceBuilder(config),
             new MinifierResourceBuilder(config),
             new MergerResourceBuilder(config)
@@ -81,4 +79,5 @@ class TajinResourceManager {
             config.log("Removed client config %s", config.clientFile)
         }
     }
+
 }

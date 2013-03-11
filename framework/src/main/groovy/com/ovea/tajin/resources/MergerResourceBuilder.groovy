@@ -16,10 +16,7 @@
 package com.ovea.tajin.resources
 
 import com.ovea.tajin.TajinConfig
-import com.ovea.tajin.io.FileWatcher
-import com.ovea.tajin.io.Merger
-import com.ovea.tajin.io.Minifier
-import com.ovea.tajin.io.Resource
+import com.ovea.tajin.io.*
 
 import java.util.concurrent.atomic.AtomicBoolean
 import java.util.concurrent.locks.ReadWriteLock
@@ -41,6 +38,7 @@ class MergerResourceBuilder implements ResourceBuilder {
     private final AtomicBoolean defaultWatch = new AtomicBoolean(false)
     private final AtomicBoolean defaultFailOnMissing = new AtomicBoolean(true)
     private final AtomicBoolean defaultMin = new AtomicBoolean(false)
+    private ResourceResolver resolver = ResourceResolver.DEFAULT
 
     MergerResourceBuilder(TajinConfig config) {
         this.config = config
@@ -52,6 +50,15 @@ class MergerResourceBuilder implements ResourceBuilder {
                 defaultFailOnMissing.set(Boolean.isInstance(cfg.failOnMissing) ? cfg.failOnMissing : defaultFailOnMissing.get())
                 defaultWatch.set(Boolean.isInstance(cfg.watch) ? cfg.watch : defaultWatch.get())
                 defaultMin.set(Boolean.isInstance(cfg.min) ? cfg.min : defaultMin.get())
+                // caching ?
+                resolver = ResourceResolver.DEFAULT
+                if (String.isInstance(cfg.cache)) {
+                    resolver = new CacheResourceResolver(new File(cfg.cache as String))
+                }
+                if (Boolean.isInstance(cfg.cache) && cfg.cache) {
+                    resolver = new CacheResourceResolver(new File(System.properties['user.home'] as String, '.tajin/cache'))
+                }
+                // watched files
                 files.clear()
                 cfg.each { String m, resources ->
                     if (Collection.isInstance(resources)) {
@@ -136,34 +143,36 @@ class MergerResourceBuilder implements ResourceBuilder {
         }
         // create DEV version
         config.log('[Merge] %s', m)
-        def out = new File(config.webapp, m)
-        def complete = Merger.mergeElements(out, existing.collect {
+        File out = new File(config.webapp, m)
+        Merger merger = new Merger(existing.collect {
             String f = String.isInstance(it) ? it : it.f
             return new Merger.Element(
                 location: f,
-                resource: Resource.resource(config.webapp, f),
+                resource: resolver.resolve(Resource.resource(config.webapp, f)),
                 min: false
             )
         }, cb)
+        boolean complete = merger.mergeTo(out)
         // create PROD version
         config.log('[Merge] %s', Minifier.getFilename(m))
-        def min = Minifier.getFilename(out)
-        return complete & Merger.mergeElements(min, existing.collect {
+        File min = Minifier.getFilename(out)
+        merger = new Merger(existing.collect {
             if (String.isInstance(it)) {
                 return new Merger.Element(
                     location: it,
-                    resource: Resource.resource(config.webapp, it as String),
+                    resource: resolver.resolve(Resource.resource(config.webapp, it as String)),
                     min: defaultMin.get()
                 )
             } else {
                 String loc = String.isInstance(it.min) ? it.min : it.f
                 return new Merger.Element(
                     location: loc,
-                    resource: Resource.resource(config.webapp, loc),
+                    resource: resolver.resolve(Resource.resource(config.webapp, loc)),
                     min: it.min == null ? defaultMin.get() : Boolean.isInstance(it.min) ? it.min : false
                 )
             }
         }, cb)
+        return complete & merger.mergeTo(min)
     }
 
 }
