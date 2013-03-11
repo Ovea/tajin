@@ -23,7 +23,7 @@
         onconfigure: function (next, opts, tajin) {
             var url = opts.url;
             if (!url) {
-                url = tajin.util.path('tajin-client.json');
+                url = tajin.util.path('/tajin-client.json');
                 opts.url = url;
             }
             $.getJSON(url,function (cfg) {
