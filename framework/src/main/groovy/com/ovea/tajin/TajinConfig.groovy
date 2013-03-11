@@ -80,9 +80,10 @@ class TajinConfig {
     }
 
     private def readCfg() {
-        def newCfg = new JsonSlurper().parseText(new SimpleTemplateEngine().createTemplate(config.text).make(context + System.getenv() + System.properties + [web: webapp.canonicalPath]) as String)
-        def newCfgStr = new JsonBuilder(newCfg).toString()
-        def oldCfgStr = cfgStr.get()
+        Map ctx = (context + System.getenv() + System.properties + [web: webapp.canonicalPath]) as TreeMap
+        def newCfg = new JsonSlurper().parseText(new SimpleTemplateEngine().createTemplate(config.text).make(ctx) as String)
+        String newCfgStr = new JsonBuilder(newCfg).toString()
+        String oldCfgStr = cfgStr.get()
         return [
             newCfg: newCfg,
             newCfgStr: newCfgStr,
