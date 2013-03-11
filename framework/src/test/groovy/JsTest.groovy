@@ -3,9 +3,16 @@ import javax.script.ScriptEngineManager
 def manager = new ScriptEngineManager()
 def engine = manager.getEngineByName("JavaScript")
 
-engine.put('tajin', [
-    merge: { println it }
-])
+class TajinFacade {
+    void merge(def data) {
+        println data.a
+        println data.a[0]
+        println data.a[1]
+        println data.a[3]
+    }
+}
 
-engine.eval('tajin.merge({"toto.js":[""]})')
+engine.put('tajin', new TajinFacade())
+
+engine.eval('tajin.merge({a:[1, 2, 3, true]})')
 
