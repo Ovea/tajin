@@ -1,3 +1,15 @@
+* fichiers lin.t.js, mocking.t.js
+
+* faire sauter config json et tajin client
+* faire sauter onready
+* trouver comment avec juste un init.js filtre avec maven ou autre
+
+* dossier .tajine/lib dans le home du user pour caching. Cache true false ou folder.
+
+* au lieu de event.getAll et event.get faire event.on('') pour tous les cas et gerer une liste d events
+
+----
+
 Tajin Event
 
     * support event server-side & client transparent a travers comnetd ou autre
@@ -15,10 +27,6 @@ Tajin Watcher
             * sass, less, css => css
             * js, coffescript => js
         * voir: http://code.google.com/p/wro4j/
-
-Tajin Framework
-
-    * Import stuff from old ovea tajin-util
 
 Tajin Tools
 
