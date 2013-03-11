@@ -51,12 +51,13 @@ class MergerResourceBuilder implements ResourceBuilder {
                 defaultWatch.set(Boolean.isInstance(cfg.watch) ? cfg.watch : defaultWatch.get())
                 defaultMin.set(Boolean.isInstance(cfg.min) ? cfg.min : defaultMin.get())
                 // caching ?
-                resolver = ResourceResolver.DEFAULT
                 if (String.isInstance(cfg.cache)) {
                     resolver = new CacheResourceResolver(new File(cfg.cache as String))
                 }
-                if (Boolean.isInstance(cfg.cache) && cfg.cache) {
+                else if (Boolean.isInstance(cfg.cache) && cfg.cache) {
                     resolver = new CacheResourceResolver(new File(System.properties['user.home'] as String, '.tajin/cache'))
+                } else {
+                    resolver = ResourceResolver.DEFAULT
                 }
                 // watched files
                 files.clear()
