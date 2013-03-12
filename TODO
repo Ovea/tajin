@@ -8,6 +8,8 @@
 
 * au lieu de event.getAll et event.get faire event.on('') pour tous les cas et gerer une liste d events
 
+* config idem que virtual resources (file, web, url)
+
 ----
 
 Tajin Event
