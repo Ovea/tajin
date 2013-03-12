@@ -130,11 +130,11 @@
                                     return;
                                 }
                             }
-                            if(!$.isFunction(events.syncReset)) {
-                                events.syncReset = function() {
+                            if (!$.isFunction(events.syncReset)) {
+                                events.syncReset = function () {
                                     args = [];
                                     triggered = {};
-                                }
+                                };
                             }
                             cb.apply(events, args);
                         });
