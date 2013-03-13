@@ -206,9 +206,8 @@
                 ready.fire();
             });
         };
-        this.onconfigure = function (next, opts, tajin) {
+        this.onconfigure = function (tajin, opts) {
             //TODO MATHIEU - add remote features here with cometd if opts.remote
-            next();
         };
         this.exports = {
             get: function (id, opts) {

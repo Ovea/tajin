@@ -21,40 +21,10 @@
     var origin = document.location.origin || (document.location.protocol + '//' + document.location.host),
         pathname = document.location.pathname || '/',
         uri = origin + pathname,
-        filename = pathname.substring(pathname.lastIndexOf('/') + 1) || '',
-        fdup = function (el) {
-            var ids = {}, total = 0, deleted = 0, id;
-            $(el).find('[id]').each(function () {
-                ids[this.id] = ids[this.id] ? ids[this.id] + 1 : 1;
-            });
-            for (id in ids) {
-                if (ids.hasOwnProperty(id)) {
-                    total++;
-                    if (ids[id] === 1) {
-                        deleted++;
-                        delete ids[id];
-                    }
-                }
-            }
-            return total !== deleted ? ids : undefined;
-        };
+        filename = pathname.substring(pathname.lastIndexOf('/') + 1) || '';
 
     w.tajin.install({
         name: 'util',
-        onconfigure: function (next, opts, tajin) {
-            if (opts.check_ids !== false) {
-                $(function () {
-                    if (opts.debug) {
-                        console.log('[tajin.util] checking for duplicate ids');
-                    }
-                    var dups = fdup(document);
-                    if (dups) {
-                        throw new Error('Duplicate IDS found: ' + JSON.stringify(dups));
-                    }
-                });
-            }
-            next();
-        },
         exports: {
             path: function (loc) {
                 loc = loc || '';
@@ -68,8 +38,7 @@
             },
             filename: function () {
                 return filename;
-            },
-            find_duplicate_ids: fdup
+            }
         }
     });
 }(window, jQuery));

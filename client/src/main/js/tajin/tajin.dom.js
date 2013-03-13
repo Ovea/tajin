@@ -17,6 +17,24 @@
 /*global window, jQuery, console*/
 (function (w, $) {
     "use strict";
+
+    var fdup = function (el) {
+        var ids = {}, total = 0, deleted = 0, id;
+        $(el).find('[id]').each(function () {
+            ids[this.id] = ids[this.id] ? ids[this.id] + 1 : 1;
+        });
+        for (id in ids) {
+            if (ids.hasOwnProperty(id)) {
+                total++;
+                if (ids[id] === 1) {
+                    deleted++;
+                    delete ids[id];
+                }
+            }
+        }
+        return total !== deleted ? ids : undefined;
+    };
+
     w.tajin.install({
         name: 'dom',
         requires: 'event',
@@ -28,6 +46,23 @@
             $(function () {
                 evt.fire();
             });
+        },
+        onconfigure: function (tajin, opts) {
+            if (opts.check_ids !== false) {
+                $(function () {
+                    if (opts.debug) {
+                        console.log('[tajin.dom] checking for duplicate ids');
+                    }
+                    var dups = fdup(document);
+                    if (dups) {
+                        throw new Error('Duplicate IDS found: ' + JSON.stringify(dups));
+                    }
+                });
+            }
+            next();
+        },
+        exports: {
+            find_duplicate_ids: fdup
         }
     });
 }(window, jQuery));

@@ -85,11 +85,10 @@
         };
 
         this.name = 'log';
-        this.onconfigure = function (next, opts, tajin) {
+        this.onconfigure = function (tajin, opts) {
             var l = (opts.level || root_level).toLowerCase();
             root_level = loggers[l] ? l : root_level;
             opts.level = root_level;
-            next();
         };
         this.exports = {
             debug: function () {

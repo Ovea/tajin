@@ -239,11 +239,9 @@
                 image: tajin.event.add('i18n/image/loaded')
             };
         };
-        m.onconfigure = function (next, opts) {
+        m.onconfigure = function (tajin, opts) {
             var b, v = 0, bnds = [], pre = function () {
-                if (b >= bnds.length) {
-                    next();
-                } else {
+                if (b < bnds.length) {
                     var variants = opts.bundles[bnds[b]].preload || [];
                     if (v >= variants.length) {
                         v = 0;

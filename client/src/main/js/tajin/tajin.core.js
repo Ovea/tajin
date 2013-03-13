@@ -17,8 +17,29 @@
 /*global jQuery, window, console*/
 (function (w, $) {
     "use strict";
+
+    var configure = function (t, m) {
+        var n = m.name;
+        t.options[n] = t.options[n] || {};
+        if (t.options.debug) {
+            console.log('[tajin.core] configure', n, t.options[n]);
+        }
+        try {
+            if ($.isFunction(m.onconfigure)) {
+                m.onconfigure(t, t.options[n]);
+            }
+            m.tajin_init = 'success';
+        } catch (e) {
+            m.tajin_init = e;
+            if ($.isFunction(t.options.onerror)) {
+                t.options.onerror(t, e);
+            }
+            throw e;
+        }
+    };
+
     w.Tajin = function () {
-        var self = this, status = 'new', listeners = [], modules = [];
+        var self = this, status = 'new', modules = [];
         this.options = {};
         $.extend(self, {
             status: function () {
@@ -69,63 +90,33 @@
                     module.oninstall(self);
                 }
                 if (status === 'ready') {
-                    if($.isFunction(module.onconfigure)) {
-                        module.onconfigure($.noop, self.options[module.name], self);
-                    } else {
-                        module.tajin_init = 'success';
-                    }
+                    configure(self, module);
                 }
                 modules.push(module);
             },
             configure: function (opts) {
                 if (status === 'new' || status === 'initializing') {
                     if (status === 'new') {
+                        //noinspection JSUnusedAssignment
+                        status = 'initializing';
                         self.options = $.extend(true, {
                             debug: false,
                             onready: $.noop
                         }, self.options || {}, w.tajin_init || {}, opts || {});
                     }
-                    status = 'initializing';
-                    var n, i = -1,
-                        inits = $.grep(modules, function (m) {
-                            return m.tajin_init !== 'success' && $.isFunction(m.onconfigure);
-                        }),
-                        next = function () {
-                            i++;
-                            if (i > 0 && i <= inits.length) {
-                                // exports previously suceed module
-                                self[n] = inits[i - 1].exports;
-                                inits[i - 1].tajin_init = 'success';
-                            }
-                            if (i < inits.length) {
-                                n = inits[i].name;
-                                self.options[n] = self.options[n] || {};
-                                if (self.options.debug) {
-                                    console.log('[tajin.core] init', n, self.options[n]);
-                                }
-                                try {
-                                    inits[i].onconfigure(next, self.options[n], self);
-                                } catch (e) {
-                                    inits[i].tajin_init = e;
-                                    if ($.isFunction(self.options.onerror)) {
-                                        self.options.onerror(self, e);
-                                    }
-                                    throw e;
-                                }
-                            } else if (i === inits.length) {
-                                if (self.options.debug) {
-                                    console.log('[tajin.core] onready - init completed with options', self.options);
-                                }
-                                status = 'ready';
-                                if ($.isFunction(self.options.onready)) {
-                                    self.options.onready(self);
-                                }
-                                while (listeners.length) {
-                                    listeners.shift()(self);
-                                }
-                            }
-                        };
-                    next();
+                    var i, inits = $.grep(modules, function (m) {
+                        return m.tajin_init !== 'success' && $.isFunction(m.onconfigure);
+                    });
+                    for (i = 0; i < inits.length; i++) {
+                        configure(self, inits[i]);
+                    }
+                    if (self.options.debug) {
+                        console.log('[tajin.core] configure - completed with options', self.options);
+                    }
+                    status = 'ready';
+                    if ($.isFunction(self.options.onready)) {
+                        self.options.onready(self);
+                    }
                 }
             },
             toString: function () {
@@ -135,15 +126,6 @@
                 return $.map(modules, function (e) {
                     return e.name;
                 });
-            },
-            ready: function (fn) {
-                if ($.isFunction(fn)) {
-                    if (status === 'ready') {
-                        fn(this);
-                    } else {
-                        listeners.push(fn);
-                    }
-                }
             }
         });
     };

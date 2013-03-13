@@ -36,19 +36,17 @@ describe("tajin", function () {
             var steps = [],
                 m1 = {
                     name: 'mod1',
-                    onconfigure: function (next) {
+                    onconfigure: function () {
                         steps.push(1);
-                        next();
                     }
                 }, m2 = {
                     name: 'mod2',
-                    onconfigure: function (next) {
+                    onconfigure: function () {
                         steps.push(2);
-                        next();
                     }
                 }, failing = {
                     name: 'failing',
-                    onconfigure: function (next) {
+                    onconfigure: function () {
                         steps.push(3);
                         throw new Error('exception');
                     }
@@ -102,8 +100,7 @@ describe("tajin", function () {
             var passed = 0;
             var m = {
                 name: 'module-2',
-                onconfigure: function (next, opts, tajin) {
-                    expect(typeof next).toBe('function');
+                onconfigure: function (tajin, opts) {
                     expect(typeof opts).toBe('object');
                     expect(opts.myopt).toBe('myvalue');
                     expect(window.tajin).toBe(tajin);
