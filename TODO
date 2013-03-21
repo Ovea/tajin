@@ -23,12 +23,16 @@ TAJIN-ALL + CONTAINER
     * http://groovy.dzone.com/news/domain-specific-language-unit-
     * http://docs.codehaus.org/display/GROOVY/TMPGroovy+Categories
 
+I18N
+    * utiliser data-i18n au lie ude rel loclize
+
 ----
 
 Tajin Event
 
     * support event server-side & client transparent a travers comnetd ou autre
     * batchs sur un event
+    * RIA
 
 Tajin JS
 
