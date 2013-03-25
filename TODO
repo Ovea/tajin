@@ -26,6 +26,10 @@ TAJIN-ALL + CONTAINER
 I18N
     * utiliser data-i18n au lie ude rel loclize
 
+W3C
+    * html
+    * css
+
 ----
 
 Tajin Event
