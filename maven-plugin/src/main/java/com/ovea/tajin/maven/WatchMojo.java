@@ -21,7 +21,7 @@ import java.io.File;
 import java.util.concurrent.CountDownLatch;
 
 /**
- * Watch for resoruce change to rebuild resources
+ * Watch for resource change to rebuild resources
  *
  * @author Mathieu Carbou (mathieu.carbou@gmail.com)
  * @date 2012-11-27
