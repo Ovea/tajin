@@ -1,67 +1,57 @@
-MERGE
+PLUGIN MERGE
     * fichiers lin.t.js, mocking.t.js
     * config idem que virtual resources (file, web, url)
 
-CONFIG
-* faire sauter module config et tajin client (plutot utiliser init d un module)
-* faire sauter tajin.ready()
+PLUGIN CONFIG
+    * faire sauter module config et tajin client (plutot utiliser init d un module)
+    * faire sauter tajin.ready()
 
-REFAC
-    * .tajin/cache
-    * code min et merge et gestion ressources
-
-EVENT
+PLUGIN EVENT
     * au lieu de event.getAll et event.get faire event.on('') pour tous les cas et gerer une liste d events
 
-TAJIN-ALL + CONTAINER
-* new DSL testatoo groovy
-    * http://groovy.dzone.com/news/groovy-dsl-scratch-2-hours
-    * http://java.dzone.com/articles/groovy-dsl-simple-example
-    * http://www.slideshare.net/glaforge/practical-groovy-dsl
-    * http://docs.codehaus.org/display/GROOVY/BuilderSupport
-    * http://docs.codehaus.org/display/GROOVY/Operator+Overloading
-    * http://groovy.dzone.com/news/domain-specific-language-unit-
-    * http://docs.codehaus.org/display/GROOVY/TMPGroovy+Categories
+PLUGIN I18N
+    * utiliser data-i18n au lieu de rel loclize
 
-I18N
-    * utiliser data-i18n au lie ude rel loclize
+PLUGIN JQM
+    * faire sauter plugin
 
-W3C
-    * html
-    * css
+PLUGIN CORS
+    * ajouter
 
-----
+PLUGIN CRYPTO
+    * ajouter
 
-Tajin Event
+PLUGIN DYNAMICFORM
+    * https://github.com/thedersen/backbone.validation
+    * https://github.com/powmedia/backbone-forms
 
+REMOTE EVENTS
     * support event server-side & client transparent a travers comnetd ou autre
     * batchs sur un event
     * RIA
 
-Tajin JS
+RESOURCES + WATCHER
+    * .tajin/cache
+    * refac / clean code min et merge et gestion ressources
+    * supports: sass, less, css => css / js, coffescript => js
+    * voir: http://code.google.com/p/wro4j/
 
-    * cors
-    * crypto
-
-Tajin Watcher
-
-    * gestion des ressources
-        * supports:
-            * sass, less, css => css
-            * js, coffescript => js
-        * voir: http://code.google.com/p/wro4j/
-
-Tajin Tools
+FRAMEWORK TOOLS
 
     * script pour verifier l i18n rel localize vs bundles configures dans tajin.json
+    * W3C validation  pour html / css
 
-DynamicForm
+TESTATOO
+    * groovy DSL
+        * http://groovy.dzone.com/news/groovy-dsl-scratch-2-hours
+        * http://java.dzone.com/articles/groovy-dsl-simple-example
+        * http://www.slideshare.net/glaforge/practical-groovy-dsl
+        * http://docs.codehaus.org/display/GROOVY/BuilderSupport
+        * http://docs.codehaus.org/display/GROOVY/Operator+Overloading
+        * http://groovy.dzone.com/news/domain-specific-language-unit-
+        * http://docs.codehaus.org/display/GROOVY/TMPGroovy+Categories
 
-    * https://github.com/thedersen/backbone.validation
-    * https://github.com/powmedia/backbone-forms
-
-Security
-
+SECURITY
     * shiro integration
     * rememberme settings
     * anti-replay
