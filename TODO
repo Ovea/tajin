@@ -8,6 +8,12 @@ PLUGIN CONFIG
 
 PLUGIN EVENT
     * au lieu de event.getAll et event.get faire event.on('') pour tous les cas et gerer une liste d events
+    *
+
+PLUGIN MODEL
+    * creation a partir d un objet array ou json
+    * extends systeme evenementiel
+    * ajout callbacks
 
 PLUGIN I18N
     * utiliser data-i18n au lieu de rel loclize
