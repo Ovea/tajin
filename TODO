@@ -1,5 +1,6 @@
 TAJIN
     * Plusieurs projets: tajin.js / framework / container / tajin (framework + container + autoexec) / dist (framework + source + tajin.js outpus + tajin) / testing (testatoo) ?
+    * https://github.com/github/maven-plugins
 
 TAJIN.JS -- PLUGIN MERGE
     * fichiers lin.t.js, mocking.t.js
