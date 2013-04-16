@@ -20,7 +20,7 @@
         <developerConnection>scm:git:git@github.com:Ovea/tajin.git</developerConnection>
         <url>http://github.com/Ovea/tajin</url>
         <tag>HEAD</tag>
-  </scm>
+    </scm>
 
     <properties>
         <jdk.version>1.7</jdk.version>

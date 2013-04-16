@@ -15,6 +15,13 @@
     <packaging>pom</packaging>
     <name>Tajin :: Servers</name>
 
+    <scm>
+        <connection>scm:git:git@github.com:Ovea/tajin.git</connection>
+        <developerConnection>scm:git:git@github.com:Ovea/tajin.git</developerConnection>
+        <url>http://github.com/Ovea/tajin</url>
+        <tag>HEAD</tag>
+    </scm>
+
     <modules>
         <module>core</module>
         <module>jetty8</module>

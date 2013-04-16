@@ -11,8 +11,14 @@
 
     <artifactId>tajin-maven-plugin</artifactId>
     <packaging>maven-plugin</packaging>
-
     <name>Tajin :: Maven Plugin</name>
+
+    <scm>
+        <connection>scm:git:git@github.com:Ovea/tajin.git</connection>
+        <developerConnection>scm:git:git@github.com:Ovea/tajin.git</developerConnection>
+        <url>http://github.com/Ovea/tajin</url>
+        <tag>HEAD</tag>
+    </scm>
 
     <build>
         <plugins>
