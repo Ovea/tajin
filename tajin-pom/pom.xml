@@ -9,7 +9,7 @@
     </parent>
 
     <groupId>com.ovea.tajin</groupId>
-    <artifactId>pom</artifactId>
+    <artifactId>tajin-pom</artifactId>
     <version>1.0.b13-SNAPSHOT</version>
     <packaging>pom</packaging>
     <name>Tajin :: POM</name>
