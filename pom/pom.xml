@@ -9,31 +9,21 @@
     </parent>
 
     <groupId>com.ovea.tajin</groupId>
-    <artifactId>tajin</artifactId>
+    <artifactId>pom</artifactId>
     <version>1.0.b12-SNAPSHOT</version>
     <packaging>pom</packaging>
-    <name>Tajin</name>
-    <description>Tajin Web Framework</description>
+    <name>Tajin :: POM</name>
+    <description>Tajin Web Framework Parent POM</description>
 
     <scm>
         <connection>scm:git:git@github.com:Ovea/tajin.git</connection>
         <developerConnection>scm:git:git@github.com:Ovea/tajin.git</developerConnection>
         <url>http://github.com/Ovea/tajin</url>
-        <tag>HEAD</tag>
     </scm>
 
     <properties>
         <jdk.version>1.7</jdk.version>
     </properties>
-
-    <modules>
-        <module>server</module>
-        <module>client</module>
-        <module>framework</module>
-        <module>all</module>
-        <module>maven-plugin</module>
-        <module>samples</module>
-    </modules>
 
     <build>
         <pluginManagement>
@@ -128,49 +118,6 @@
 
     <dependencyManagement>
         <dependencies>
-            <!-- ovea -->
-            <dependency>
-                <groupId>com.ovea.tajin</groupId>
-                <artifactId>tajin-client</artifactId>
-                <version>${project.version}</version>
-                <type>war</type>
-            </dependency>
-            <dependency>
-                <groupId>com.ovea.tajin</groupId>
-                <artifactId>tajin-framework</artifactId>
-                <version>${project.version}</version>
-            </dependency>
-            <dependency>
-                <groupId>com.ovea.tajin.server</groupId>
-                <artifactId>tajin-server-jetty8</artifactId>
-                <version>${project.version}</version>
-            </dependency>
-            <dependency>
-                <groupId>com.ovea.tajin.server</groupId>
-                <artifactId>tajin-server-jetty9</artifactId>
-                <version>${project.version}</version>
-            </dependency>
-            <dependency>
-                <groupId>com.ovea.tajin.server</groupId>
-                <artifactId>tajin-server-tomcat6</artifactId>
-                <version>${project.version}</version>
-            </dependency>
-            <dependency>
-                <groupId>com.ovea.tajin.server</groupId>
-                <artifactId>tajin-server-tomcat7</artifactId>
-                <version>${project.version}</version>
-            </dependency>
-            <dependency>
-                <groupId>com.ovea.tajin.server</groupId>
-                <artifactId>tajin-server-core</artifactId>
-                <version>${project.version}</version>
-            </dependency>
-            <dependency>
-                <groupId>com.ovea.tajin</groupId>
-                <artifactId>tajin-client</artifactId>
-                <version>${project.version}</version>
-                <type>war</type>
-            </dependency>
             <!-- apis -->
             <dependency>
                 <groupId>javax.inject</groupId>
