@@ -4,13 +4,13 @@
 
     <parent>
         <groupId>com.ovea.tajin</groupId>
-        <artifactId>tajin</artifactId>
-        <version>1.0.b12-SNAPSHOT</version>
-        <relativePath>..</relativePath>
+        <artifactId>tajin-pom</artifactId>
+        <version>1.0.b13</version>
+        <relativePath>../tajin-pom</relativePath>
     </parent>
 
     <groupId>com.ovea.tajin.server</groupId>
-    <artifactId>server</artifactId>
+    <artifactId>tajin-server</artifactId>
     <packaging>pom</packaging>
     <name>Tajin :: Servers</name>
 

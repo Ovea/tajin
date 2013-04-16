@@ -4,14 +4,15 @@
 
     <parent>
         <groupId>com.ovea.tajin</groupId>
-        <artifactId>tajin</artifactId>
-        <version>1.0.b12-SNAPSHOT</version>
-        <relativePath>..</relativePath>
+        <artifactId>tajin-pom</artifactId>
+        <version>1.0.b13</version>
+        <relativePath>../tajin-pom</relativePath>
     </parent>
 
-    <artifactId>tajin-client</artifactId>
+    <artifactId>tajin-js</artifactId>
+    <version>1.0.b12-SNAPSHOT</version>
     <packaging>war</packaging>
-    <name>Tajin :: Client</name>
+    <name>Tajin :: Javascript library</name>
 
     <build>
         <outputDirectory>${project.build.directory}/${project.build.finalName}</outputDirectory>
