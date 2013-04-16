@@ -41,7 +41,7 @@
         <dependency>
             <groupId>com.ovea.tajin</groupId>
             <artifactId>tajin-client</artifactId>
-            <version>${project.version}</version>
+            <version>1.0.b12-SNAPSHOT</version>
             <type>war</type>
             <scope>runtime</scope>
         </dependency>
@@ -52,9 +52,10 @@
             <scope>provided</scope>
         </dependency>
         <dependency>
-            <groupId>com.ovea.tajin.server</groupId>
+            <groupId>com.ovea.tajin.servers</groupId>
             <artifactId>tajin-server-jetty9</artifactId>
             <scope>provided</scope>
+            <version>1.0.b12-SNAPSHOT</version>
         </dependency>
     </dependencies>
 

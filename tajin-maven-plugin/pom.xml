@@ -4,9 +4,9 @@
 
     <parent>
         <groupId>com.ovea.tajin</groupId>
-        <artifactId>tajin</artifactId>
-        <version>1.0.b12-SNAPSHOT</version>
-        <relativePath>..</relativePath>
+        <artifactId>tajin-pom</artifactId>
+        <version>2</version>
+        <relativePath>../tajin-pom</relativePath>
     </parent>
 
     <artifactId>tajin-maven-plugin</artifactId>

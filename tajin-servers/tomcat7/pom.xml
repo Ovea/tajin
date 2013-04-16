@@ -3,8 +3,8 @@
     <modelVersion>4.0.0</modelVersion>
 
     <parent>
-        <groupId>com.ovea.tajin.server</groupId>
-        <artifactId>server</artifactId>
+        <groupId>com.ovea.tajin.servers</groupId>
+        <artifactId>tajin-servers</artifactId>
         <version>1.0.b12-SNAPSHOT</version>
         <relativePath>..</relativePath>
     </parent>
@@ -42,7 +42,7 @@
 
     <dependencies>
         <dependency>
-            <groupId>com.ovea.tajin.server</groupId>
+            <groupId>com.ovea.tajin.servers</groupId>
             <artifactId>tajin-server-core</artifactId>
         </dependency>
 

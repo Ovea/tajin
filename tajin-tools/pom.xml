@@ -4,14 +4,15 @@
 
     <parent>
         <groupId>com.ovea.tajin</groupId>
-        <artifactId>tajin</artifactId>
-        <version>1.0.b12-SNAPSHOT</version>
-        <relativePath>..</relativePath>
+        <artifactId>tajin-pom</artifactId>
+        <version>2</version>
+        <relativePath>../tajin-pom</relativePath>
     </parent>
 
-    <artifactId>tajin-all</artifactId>
+    <artifactId>tajin-tools</artifactId>
+    <version>1.0.b12-SNAPSHOT</version>
     <packaging>jar</packaging>
-    <name>Tajin :: All</name>
+    <name>Tajin :: Tools</name>
 
     <build>
         <plugins>
@@ -53,10 +54,12 @@
         <dependency>
             <groupId>com.ovea.tajin</groupId>
             <artifactId>tajin-framework</artifactId>
+            <version>1.0.b12-SNAPSHOT</version>
         </dependency>
         <dependency>
             <groupId>com.ovea.tajin</groupId>
-            <artifactId>tajin-client</artifactId>
+            <artifactId>tajin-js</artifactId>
+            <version>1.0.b12-SNAPSHOT</version>
             <type>war</type>
         </dependency>
     </dependencies>
