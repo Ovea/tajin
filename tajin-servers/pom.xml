@@ -11,16 +11,9 @@
 
     <groupId>com.ovea.tajin.servers</groupId>
     <artifactId>tajin-servers</artifactId>
-    <version>1.0.b12</version>
+    <version>1.0.b12-SNAPSHOT</version>
     <packaging>pom</packaging>
     <name>Tajin :: Servers</name>
-
-    <scm>
-        <connection>scm:git:git@github.com:Ovea/tajin.git</connection>
-        <developerConnection>scm:git:git@github.com:Ovea/tajin.git</developerConnection>
-        <url>http://github.com/Ovea/tajin</url>
-        <tag>HEAD</tag>
-    </scm>
 
     <modules>
         <module>core</module>
