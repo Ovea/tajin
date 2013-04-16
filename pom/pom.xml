@@ -10,7 +10,7 @@
 
     <groupId>com.ovea.tajin</groupId>
     <artifactId>pom</artifactId>
-    <version>1.0.b12</version>
+    <version>1.0.b12-SNAPSHOT</version>
     <packaging>pom</packaging>
     <name>Tajin :: POM</name>
     <description>Tajin Web Framework Parent POM</description>
@@ -19,8 +19,7 @@
         <connection>scm:git:git@github.com:Ovea/tajin.git</connection>
         <developerConnection>scm:git:git@github.com:Ovea/tajin.git</developerConnection>
         <url>http://github.com/Ovea/tajin</url>
-      <tag>pom-1.0.b12</tag>
-  </scm>
+    </scm>
 
     <properties>
         <jdk.version>1.7</jdk.version>
@@ -74,7 +73,7 @@
                     <artifactId>gmaven-plugin</artifactId>
                     <version>1.5</version>
                     <configuration>
-                        <source />
+                        <source/>
                         <providerSelection>2.0</providerSelection>
                         <sourceEncoding>UTF-8</sourceEncoding>
                         <targetBytecode>${jdk.version}</targetBytecode>
