@@ -1,51 +1,53 @@
-PLUGIN MERGE
+TAJIN
+    * Plusieurs projets: tajin.js / framework / container / tajin (framework + container + autoexec) / dist (framework + source + tajin.js outpus + tajin) / testing (testatoo) ?
+
+TAJIN.JS -- PLUGIN MERGE
     * fichiers lin.t.js, mocking.t.js
     * config idem que virtual resources (file, web, url)
 
-PLUGIN CONFIG
+TAJIN.JS -- PLUGIN CONFIG
     * faire sauter module config et tajin client (plutot utiliser init d un module)
     * faire sauter tajin.ready()
 
-PLUGIN EVENT
+TAJIN.JS -- PLUGIN EVENT
     * au lieu de event.getAll et event.get faire event.on('') pour tous les cas et gerer une liste d events
-    *
 
-PLUGIN MODEL
+TAJIN.JS -- PLUGIN MODEL
     * creation a partir d un objet array ou json
     * extends systeme evenementiel
     * ajout callbacks
 
-PLUGIN I18N
+TAJIN.JS -- PLUGIN I18N
     * utiliser data-i18n au lieu de rel loclize
 
-PLUGIN JQM
+TAJIN.JS -- PLUGIN JQM
     * faire sauter plugin
 
-PLUGIN CORS
+TAJIN.JS -- PLUGIN CORS
     * ajouter
 
-PLUGIN CRYPTO
+TAJIN.JS -- PLUGIN CRYPTO
     * ajouter
 
-PLUGIN DYNAMICFORM
+TAJIN.JS -- PLUGIN DYNAMICFORM
     * https://github.com/thedersen/backbone.validation
     * https://github.com/powmedia/backbone-forms
 
-REMOTE EVENTS
-    * support event server-side & client transparent a travers comnetd ou autre
-    * batchs sur un event
-    * RIA
-
-RESOURCES + WATCHER
+FRAMEWORK -- RESOURCES + WATCHER
     * .tajin/cache
     * refac / clean code min et merge et gestion ressources
     * supports: sass, less, css => css / js, coffescript => js
     * voir: http://code.google.com/p/wro4j/
 
-FRAMEWORK TOOLS
+FRAMEWORK -- OTHER TOOLS
 
     * script pour verifier l i18n rel localize vs bundles configures dans tajin.json
     * W3C validation  pour html / css
+
+REMOTE EVENTS
+    * support event server-side & client transparent a travers comnetd ou autre
+    * batchs sur un event
+    * RIA
 
 TESTATOO
     * groovy DSL
