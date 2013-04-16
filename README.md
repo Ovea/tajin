@@ -1,3 +1,11 @@
+# Tajin #
+
+projects:
+  * pom
+  * tajin.js
+  * servers
+  * ...
+
 # Tajin Web Framework #
 
 Tajin helps building web applications. This is a lightweight integration framework providing:

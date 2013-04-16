@@ -73,7 +73,7 @@
                     <artifactId>gmaven-plugin</artifactId>
                     <version>1.5</version>
                     <configuration>
-                        <source/>
+                        <source />
                         <providerSelection>2.0</providerSelection>
                         <sourceEncoding>UTF-8</sourceEncoding>
                         <targetBytecode>${jdk.version}</targetBytecode>
