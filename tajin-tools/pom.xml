@@ -49,7 +49,7 @@
                     </filters>
                     <transformers>
                         <transformer implementation="org.apache.maven.plugins.shade.resource.ManifestResourceTransformer">
-                            <mainClass>com.ovea.tajin.tools.TajinResource</mainClass>
+                            <mainClass>com.ovea.tajin.tool.TajinResource</mainClass>
                         </transformer>
                     </transformers>
                 </configuration>
@@ -61,11 +61,19 @@
         <dependency>
             <groupId>com.ovea.tajin</groupId>
             <artifactId>tajin-framework</artifactId>
-            <version>1.0.b12-SNAPSHOT</version>
+            <version>1.0.b13</version>
         </dependency>
         <dependency>
             <groupId>com.beust</groupId>
             <artifactId>jcommander</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>org.apache.ant</groupId>
+            <artifactId>ant</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>com.yahoo.platform.yui</groupId>
+            <artifactId>yuicompressor</artifactId>
         </dependency>
     </dependencies>
 

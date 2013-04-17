@@ -13,7 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package com.ovea.tajin.tool
+package com.ovea.tajin.resources
 
 import com.ovea.tajin.Tajin
 import com.ovea.tajin.io.Resource

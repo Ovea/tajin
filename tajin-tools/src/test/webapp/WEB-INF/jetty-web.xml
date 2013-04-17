@@ -22,11 +22,11 @@
 <Configure id="webappContext" class="org.eclipse.jetty.webapp.WebAppContext">
 
     <Call name="setInitParameter">
-        <Arg>com.ovea.tajin.tool.TajinResourceContextListener.config</Arg>
+        <Arg>com.ovea.tajin.resources.TajinResourceContextListener.config</Arg>
         <Arg>web:WEB-INF/tajin.json</Arg>
     </Call>
     <Call name="setInitParameter">
-        <Arg>com.ovea.tajin.tool.TajinResourceContextListener.context</Arg>
+        <Arg>com.ovea.tajin.resources.TajinResourceContextListener.context</Arg>
         <Arg>tajin/context</Arg>
     </Call>
 
