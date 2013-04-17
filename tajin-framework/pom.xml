@@ -10,6 +10,7 @@
     </parent>
 
     <artifactId>tajin-framework</artifactId>
+    <version>1.0.b12-SNAPSHOT</version>
     <packaging>jar</packaging>
     <name>Tajin :: Framework</name>
 
@@ -49,14 +50,6 @@
             <artifactId>ant</artifactId>
         </dependency>
         <dependency>
-            <groupId>com.beust</groupId>
-            <artifactId>jcommander</artifactId>
-        </dependency>
-        <dependency>
-            <groupId>com.yahoo.platform.yui</groupId>
-            <artifactId>yuicompressor</artifactId>
-        </dependency>
-        <dependency>
             <groupId>commons-codec</groupId>
             <artifactId>commons-codec</artifactId>
         </dependency>
@@ -64,10 +57,20 @@
             <groupId>commons-lang</groupId>
             <artifactId>commons-lang</artifactId>
         </dependency>
+
+        <!-- for resource management -->
+        <dependency>
+            <groupId>com.yahoo.platform.yui</groupId>
+            <artifactId>yuicompressor</artifactId>
+        </dependency>
+
+        <!-- for templating -->
         <dependency>
             <groupId>org.mvel</groupId>
             <artifactId>mvel2</artifactId>
         </dependency>
+
+        <!-- for i18n message handlers -->
         <dependency>
             <groupId>com.google.guava</groupId>
             <artifactId>guava</artifactId>
@@ -161,8 +164,9 @@
         </dependency>
 
         <dependency>
-            <groupId>com.ovea.tajin.server</groupId>
+            <groupId>com.ovea.tajin.servers</groupId>
             <artifactId>tajin-server-jetty9</artifactId>
+            <version>1.0.b12</version>
             <scope>test</scope>
         </dependency>
         <dependency>

@@ -13,7 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package com.ovea.tajin.tools
+package com.ovea.tajin.tool
 
 import com.beust.jcommander.JCommander
 import com.beust.jcommander.Parameter

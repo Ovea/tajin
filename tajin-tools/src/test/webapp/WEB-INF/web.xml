@@ -33,7 +33,7 @@
     </context-param>
 
     <listener>
-        <listener-class>com.ovea.tajin.tools.TajinResourceContextListener</listener-class>
+        <listener-class>com.ovea.tajin.tool.TajinResourceContextListener</listener-class>
     </listener>
 
     <!-- SSI => https://blogs.oracle.com/swchan/entry/server_side_include_in_glassfish-->
