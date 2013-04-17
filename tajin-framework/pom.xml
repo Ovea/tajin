@@ -10,7 +10,7 @@
     </parent>
 
     <artifactId>tajin-framework</artifactId>
-    <version>1.0.b12</version>
+    <version>1.0.b13-SNAPSHOT</version>
     <packaging>jar</packaging>
     <name>Tajin :: Framework</name>
 
@@ -18,7 +18,7 @@
         <connection>scm:git:git@github.com:Ovea/tajin.git</connection>
         <developerConnection>scm:git:git@github.com:Ovea/tajin.git</developerConnection>
         <url>http://github.com/Ovea/tajin</url>
-        <tag>tajin-framework-1.0.b12</tag>
+        <tag>HEAD</tag>
     </scm>
 
     <build>
