@@ -49,7 +49,7 @@
         <dependency>
             <groupId>com.ovea.tajin</groupId>
             <artifactId>tajin-framework</artifactId>
-            <version>1.0.b13-SNAPSHOT</version>
+            <version>1.0.b13</version>
         </dependency>
 
         <!-- for resource management -->

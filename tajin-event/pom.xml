@@ -1,0 +1,41 @@
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
+
+    <modelVersion>4.0.0</modelVersion>
+
+    <parent>
+        <groupId>com.ovea.tajin</groupId>
+        <artifactId>tajin-pom</artifactId>
+        <version>2</version>
+        <relativePath>../tajin-pom</relativePath>
+    </parent>
+
+    <artifactId>tajin-event</artifactId>
+    <version>1.0.b1-SNAPSHOT</version>
+    <packaging>war</packaging>
+    <name>Tajin :: Event application</name>
+
+    <scm>
+        <connection>scm:git:git@github.com:Ovea/tajin.git</connection>
+        <developerConnection>scm:git:git@github.com:Ovea/tajin.git</developerConnection>
+        <url>http://github.com/Ovea/tajin</url>
+        <tag>HEAD</tag>
+    </scm>
+
+    <build>
+        <plugins>
+            <plugin>
+                <groupId>com.mycila.maven-license-plugin</groupId>
+                <artifactId>maven-license-plugin</artifactId>
+                <configuration>
+                    <excludes>
+                        <exclude>src/test/**</exclude>
+                        <exclude>todo/**</exclude>
+                        <exclude>.idea/**</exclude>
+                        <exclude>.gitignore</exclude>
+                    </excludes>
+                </configuration>
+            </plugin>
+        </plugins>
+    </build>
+
+</project>
