@@ -40,11 +40,11 @@
  *
  */
 (function ($) {
-    var _this;
+
     if (!('__jquery_xdomain__' in $)
-        && $.browser.msie // must be IE
+        && /msie/.test(navigator.userAgent.toLowerCase()) // must be IE
         && 'XDomainRequest' in window // and support XDomainRequest (IE8+)
-        && !('XMLHttpRequest' in window && 'withCredentials' in new XMLHttpRequest()) // and must not support CORS (IE10+)
+        && !(window.XMLHttpRequest && 'withCredentials' in new XMLHttpRequest()) // and must not support CORS (IE10+)
         && document.location.href.indexOf("file:///") == -1) { // and must not be local
 
         $['__jquery_xdomain__'] = $.support.cors = true;
@@ -225,10 +225,6 @@
                     document.cookie = cooks[i] + ";Domain=" + document.domain;
                 }
                 _done(ReadyState.DONE, resp[0]);
-
-                if(typeof(_this.success) === "function"){
-                    _this.success(resp[1]);
-                }
                 resp = null;
             };
             this.readyState = ReadyState.UNSENT;
@@ -299,7 +295,6 @@
 
         $.ajaxSettings.xhr = function () {
             var target = parseUrl(this.url).domain;
-            _this = this;
             if (target === "" || target === domain) {
                 return oldxhr.call($.ajaxSettings);
             } else {
@@ -311,5 +306,4 @@
         };
 
     }
-})
-    (jQuery);
+})(jQuery);
