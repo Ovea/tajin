@@ -10,7 +10,7 @@
     </parent>
 
     <groupId>com.ovea.tajin.samples</groupId>
-    <artifactId>samples</artifactId>
+    <artifactId>tajin-samples</artifactId>
     <version>1.0.b12-SNAPSHOT</version>
     <packaging>pom</packaging>
     <name>Tajin :: Samples</name>

@@ -4,7 +4,7 @@
 
     <parent>
         <groupId>com.ovea.tajin.samples</groupId>
-        <artifactId>samples</artifactId>
+        <artifactId>tajin-samples</artifactId>
         <version>1.0.b12-SNAPSHOT</version>
         <relativePath>..</relativePath>
     </parent>
@@ -55,7 +55,7 @@
             <groupId>com.ovea.tajin.servers</groupId>
             <artifactId>tajin-server-jetty9</artifactId>
             <scope>provided</scope>
-            <version>1.0.b12-SNAPSHOT</version>
+            <version>1.0.b12</version>
         </dependency>
     </dependencies>
 
