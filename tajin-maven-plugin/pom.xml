@@ -49,8 +49,19 @@
         <dependency>
             <groupId>com.ovea.tajin</groupId>
             <artifactId>tajin-framework</artifactId>
-            <version>1.0.b12</version>
+            <version>1.0.b13-SNAPSHOT</version>
         </dependency>
+
+        <!-- for resource management -->
+        <dependency>
+            <groupId>org.apache.ant</groupId>
+            <artifactId>ant</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>com.yahoo.platform.yui</groupId>
+            <artifactId>yuicompressor</artifactId>
+        </dependency>
+
         <dependency>
             <groupId>org.apache.maven</groupId>
             <artifactId>maven-plugin-api</artifactId>

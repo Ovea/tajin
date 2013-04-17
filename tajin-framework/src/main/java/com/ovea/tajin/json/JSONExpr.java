@@ -20,16 +20,21 @@ import com.ovea.tajin.json.internal.IOUtils;
 import com.ovea.tajin.json.internal.PathToken;
 import com.ovea.tajin.json.internal.PathTokenizer;
 import com.ovea.tajin.json.internal.filter.PathTokenFilter;
-import org.apache.commons.lang.StringUtils;
 
-import java.io.*;
+import java.io.File;
+import java.io.FileNotFoundException;
+import java.io.FileReader;
+import java.io.IOException;
+import java.io.Reader;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 import java.util.regex.Pattern;
 
+import static com.ovea.tajin.util.Assert.isTrue;
+import static com.ovea.tajin.util.Assert.notEmpty;
+import static com.ovea.tajin.util.Assert.notNull;
 import static java.util.Arrays.asList;
-import static org.apache.commons.lang.Validate.*;
 
 /**
  * <p/>
@@ -107,7 +112,7 @@ public final class JSONExpr {
             throw new InvalidPathException("Invalid path");
         }
 
-        int filterCountInPath = StringUtils.countMatches(jsonPath, "[?]");
+        int filterCountInPath = countMatches(jsonPath, "[?]");
         isTrue(filterCountInPath == filters.length, "Filters in path ([?]) does not match provided filters.");
 
         this.tokenizer = new PathTokenizer(jsonPath);
@@ -324,4 +329,39 @@ public final class JSONExpr {
         return compile(jsonPath, filters).expr(jsonInputStream);
     }
 
+    /**
+     * <p>Counts how many times the substring appears in the larger String.</p>
+     * <p/>
+     * <p>A <code>null</code> or empty ("") String input returns <code>0</code>.</p>
+     * <p/>
+     * <pre>
+     * StringUtils.countMatches(null, *)       = 0
+     * StringUtils.countMatches("", *)         = 0
+     * StringUtils.countMatches("abba", null)  = 0
+     * StringUtils.countMatches("abba", "")    = 0
+     * StringUtils.countMatches("abba", "a")   = 2
+     * StringUtils.countMatches("abba", "ab")  = 1
+     * StringUtils.countMatches("abba", "xxx") = 0
+     * </pre>
+     *
+     * @param str the String to check, may be null
+     * @param sub the substring to count, may be null
+     * @return the number of occurrences, 0 if either String is <code>null</code>
+     */
+    public static int countMatches(String str, String sub) {
+        if (isEmpty(str) || isEmpty(sub)) {
+            return 0;
+        }
+        int count = 0;
+        int idx = 0;
+        while ((idx = str.indexOf(sub, idx)) != -1) {
+            count++;
+            idx += sub.length();
+        }
+        return count;
+    }
+
+    public static boolean isEmpty(String str) {
+        return str == null || str.length() == 0;
+    }
 }

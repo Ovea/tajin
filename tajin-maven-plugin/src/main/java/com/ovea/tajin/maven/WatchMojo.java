@@ -49,6 +49,7 @@ public final class WatchMojo extends TajinMavenPlugin {
             }
         });
         try {
+            System.out.println("[Tajin] Watching for resource change... Hit CTRL+C to exit.");
             new CountDownLatch(1).await();
         } catch (InterruptedException e) {
             Thread.currentThread().interrupt();

@@ -19,8 +19,8 @@ import java.util.*;
 import java.util.regex.Pattern;
 
 import static java.util.Arrays.asList;
-import static org.apache.commons.lang.Validate.notEmpty;
-import static org.apache.commons.lang.Validate.notNull;
+import static com.ovea.tajin.util.Assert.notEmpty;
+import static com.ovea.tajin.util.Assert.notNull;
 
 /**
  * @author Kalle Stenflo

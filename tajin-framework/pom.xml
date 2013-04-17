@@ -48,34 +48,34 @@
             <artifactId>groovy-all</artifactId>
         </dependency>
         <dependency>
-            <groupId>org.apache.ant</groupId>
-            <artifactId>ant</artifactId>
-        </dependency>
-        <dependency>
             <groupId>commons-codec</groupId>
             <artifactId>commons-codec</artifactId>
-        </dependency>
-        <dependency>
-            <groupId>commons-lang</groupId>
-            <artifactId>commons-lang</artifactId>
         </dependency>
 
         <!-- for resource management -->
         <dependency>
+            <groupId>org.apache.ant</groupId>
+            <artifactId>ant</artifactId>
+            <optional>true</optional>
+        </dependency>
+        <dependency>
             <groupId>com.yahoo.platform.yui</groupId>
             <artifactId>yuicompressor</artifactId>
+            <optional>true</optional>
         </dependency>
 
         <!-- for templating -->
         <dependency>
             <groupId>org.mvel</groupId>
             <artifactId>mvel2</artifactId>
+            <optional>true</optional>
         </dependency>
 
         <!-- for i18n message handlers -->
         <dependency>
             <groupId>com.google.guava</groupId>
             <artifactId>guava</artifactId>
+            <optional>true</optional>
         </dependency>
 
         <!-- shiro support-->
