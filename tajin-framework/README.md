@@ -20,4 +20,9 @@
     * https://nealpoole.com/blog/2010/11/preventing-csrf-attacks-with-ajax-and-http-headers/
     * https://www.owasp.org/images/0/08/OWASP_SCP_Quick_Reference_Guide_v2.pdf
 
-  *
+  * APP SERVICE
+    * main class, simple web, config json, ...
+
+  * CLEAN
+    * cleaner inutilisee
+
