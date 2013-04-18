@@ -6,6 +6,5 @@
     * config dans .tajin
     * SSI
     * simpleweb
-
-
+    * fournir une coquille avec systeme de conf json, restlet ou jersey pour dev simple
 
