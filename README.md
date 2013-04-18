@@ -1,51 +1,31 @@
 # Tajin #
 
-projects:
-  * pom
-  * tajin.js
-  * servers
-  * ...
+Tajin is a set of building blocks to help developing applications faster and cleanly. This is not a framework which impose guidelines but much more and clever linked set of tools to solve every-days need in application development
 
-# Tajin Web Framework #
+## Tajin Modules ##
 
-Tajin helps building web applications. This is a lightweight integration framework providing:
+Tajin is built on modules which can be used independently when you need it. Amongst those modules you will find:
 
-Building tools:
-
-  * Minification (CSS, JS)
-  * Merging of resources to improve bandwidth
-  * Watch and rebuild resources in real-time as modifications are detected
-  * Integration tools: Maven, J2EE, Command-Line
-
-A client-side JS library with a modular architecture:
-
-  * Client-side I18N
-  * A complete Event-Driven system to develop Event-Driven applications
-
-A Java API:
-
-  * Backend-side I18N
-  * Jersey / Groovy integration
-  * Cookie management
-  * JNDI configuration
-
-## Tajin Client Javascript library ##
-
-Tajin client is a modular client-side Javascript library.
-
-## Building Tajin ##
-
-
-
-## Tajin Framework Java library ##
-
-
-
+  - [Tajin Javascript library](https://github.com/Ovea/tajin/blob/master/tajin-js)
+  - [Tajin GUI and Toolset](https://github.com/Ovea/tajin/blob/master/tajin-tools)
+  - [Tajin Maven plugin](https://github.com/Ovea/tajin/blob/master/tajin-maven-plugin)
+  - [Tajin Java/Groovy API](https://github.com/Ovea/tajin/blob/master/tajin-framework)
+  - [Tajin Embedded Servers](https://github.com/Ovea/tajin/blob/master/tajin-servers)
+  - [Tajin Event Server](https://github.com/Ovea/tajin/blob/master/tajin-event)
 
 ## Download ##
 
-  * Project on [GitHub](https://github.com/Ovea/tajin)
-  * Libraries in [Maven repository](http://repo1.maven.org/maven2/com/ovea/tajin/)
+  - Project on [GitHub](https://github.com/Ovea/tajin)
+  - Libraries in [Maven repository](http://repo1.maven.org/maven2/com/ovea/tajin/)
 
-Tajin client is uploaded in maven repository in a .WAR file. This is a zip-compatible file containing all Tajin scripts per module and the global one (tajin.js plus its minified version).
+## Documentation ##
 
+Each module has its own documentation:
+
+ | [tajin-js](https://github.com/Ovea/tajin/blob/master/tajin-js/README.md)
+ | [tajin-tools](https://github.com/Ovea/tajin/blob/master/tajin-tools/README.md)
+ | [tajin-maven-plugin](https://github.com/Ovea/tajin/blob/master/tajin-maven-plugin/README.md)
+ | [tajin-framework](https://github.com/Ovea/tajin/blob/master/tajin-framework/README.md)
+ | [tajin-servers](https://github.com/Ovea/tajin/blob/master/tajin-servers/README.md)
+ | [tajin-event](https://github.com/Ovea/tajin/blob/master/tajin-event/README.md)
+ | 

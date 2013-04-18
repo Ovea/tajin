@@ -9,6 +9,7 @@
   * OTHER TOOLS
     * script pour verifier l i18n rel localize vs bundles configures dans tajin.json
     * W3C validation  pour html / css
+    * Tunneling tool
 
   * SECURITY
     * review shiro integration
@@ -26,3 +27,10 @@
   * CLEAN
     * cleaner inutilisee
 
+
+DOC
+
+  * Backend-side I18N
+  * Jersey / Groovy integration
+  * Cookie management
+  * JNDI configuration
