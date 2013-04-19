@@ -1,3 +1,0 @@
-# Tajin Samples #
-
-TODO

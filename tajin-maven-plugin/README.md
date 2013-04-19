@@ -1,3 +1,0 @@
-# Tajin Maven Plugin #
-
-TODO
