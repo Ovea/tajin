@@ -15,7 +15,7 @@ Tajin is built on modules which can be used independently when you need it. Amon
 
 ## Download ##
 
-  - Project on [GitHub](https://github.com/Ovea/tajin/downloads)
+  - Project on [GitHub](https://github.com/Ovea/tajin/)
   - Libraries in [Maven repository](http://repo1.maven.org/maven2/com/ovea/tajin/)
 
 ## Documentation ##
