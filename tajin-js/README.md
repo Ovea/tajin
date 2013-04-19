@@ -1,9 +1,5 @@
 # TODO #
 
-  * PLUGIN MERGE
-    * fichiers lin.t.js, mocking.t.js
-    * config idem que virtual resources (file, web, url)
-
   * PLUGIN CONFIG
     * faire sauter module config et tajin client (plutot utiliser init d un module)
     * faire sauter tajin.ready()
@@ -18,9 +14,6 @@
 
   * PLUGIN I18N
     * utiliser data-i18n au lieu de rel loclize
-
-  * PLUGIN JQM
-    * faire sauter plugin
 
   * PLUGIN CORS
     * ajouter

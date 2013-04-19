@@ -1,5 +1,9 @@
 # TODO #
 
+  * PLUGIN MERGE
+    * fichiers lin.t.js, mocking.t.js
+    * config idem que virtual resources (file, web, url)
+
   * RESOURCES + WATCHER
     * .tajin/cache
     * refac / clean code min et merge et gestion ressources

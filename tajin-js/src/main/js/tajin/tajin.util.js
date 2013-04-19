@@ -17,12 +17,10 @@
 /*global window, jQuery, console*/
 (function (w, $) {
     "use strict";
-
     var origin = document.location.origin || (document.location.protocol + '//' + document.location.host),
         pathname = document.location.pathname || '/',
         uri = origin + pathname,
         filename = pathname.substring(pathname.lastIndexOf('/') + 1) || '';
-
     w.tajin.install({
         name: 'util',
         exports: {

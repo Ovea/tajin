@@ -20,10 +20,9 @@
 
     w.tajin.install({
         name: 'test-module',
-        requires: 'event',
-        onconfigure: function (next, opts) {
+        requires: 'util',
+        onconfigure: function (tajin, opts) {
             opts.init_called = true;
-            next();
         },
         exports: {
         }
