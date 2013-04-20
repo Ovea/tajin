@@ -17,238 +17,195 @@
 /*global window, jQuery, console*/
 (function (w, $) {
     "use strict";
-    var EventModule = function () {
-        var e_uid = 1,
-            e_cb_uid = 1,
-            events = {},
-            t_add = function (opts) {
-                if ($.type(opts) === 'string') {
-                    opts = {
-                        id: opts
-                    };
-                }
-                if (!$.isPlainObject(opts)) {
-                    opts = {};
-                }
-                if ($.type(opts.id) !== 'string') {
-                    opts.id = 'anon-' + e_uid++;
-                }
-                if (events[opts.id]) {
-                    throw new Error('Duplicate event: ' + opts.id);
-                }
-                var listeners = [];
-                events[opts.id] = {
-                    context: opts.context,
-                    id: opts.id,
-                    stateful: opts.state || opts.stateful || false,
-                    remote: opts.remote || false,
-                    data: undefined,
-                    time: undefined,
-                    toString: function () {
-                        return 'Event(id=' + this.id + ', stateful=' + this.stateful + ', remote=' + this.remote + ', time=' + this.time + ')';
-                    },
-                    fire: function (data) {
-                        if (this.stateful && this.data !== undefined) {
-                            throw new Error('fire() cannot be called again on a stateful event. If needed, reset() must be called before or stateful flag must be removed.');
-                        }
-                        if (arguments.length > 1) {
-                            throw new Error('fire() only accept at most one argument');
-                        }
-                        if (data === undefined) {
-                            data = null;
-                        }
-                        if (this.stateful) {
-                            this.data = data;
-                        }
-                        var i;
-                        this.time = (new Date()).getTime();
-                        for (i = 0; i < listeners.length; i++) {
-                            listeners[i].call(this, data);
-                        }
-                    },
-                    listen: function (cb) {
-                        var added = false;
-                        if ($.isFunction(cb)) {
-                            if (!cb.tajin_cb_uid) {
-                                cb.tajin_cb_uid = e_cb_uid++;
-                                listeners.push(cb);
-                                added = true;
-                            } else if (!$.grep(listeners,function (l) {
-                                return l.tajin_cb_uid === cb.tajin_cb_uid;
-                            }).length) {
-                                listeners.push(cb);
-                                added = true;
-                            }
-                            if (added && this.stateful && this.data !== undefined) {
-                                cb.call(this, this.data);
-                            }
-                        }
-                        return added;
-                    },
-                    once: function (cb) {
-                        if ($.isFunction(cb)) {
-                            var self = this, f = function (data) {
-                                self.remove(f);
-                                cb.call(this, data);
-                            };
-                            self.listen(f);
-                        }
-                    },
-                    remove: function (cb) {
-                        if (cb.tajin_cb_uid) {
-                            var i;
-                            for (i = 0; i < listeners.length; i++) {
-                                if (listeners[i].tajin_cb_uid === cb.tajin_cb_uid) {
-                                    listeners.splice(i, 1);
-                                    return true;
-                                }
-                            }
-                        }
-                        return false;
-                    },
-                    destroy: function () {
-                        this.reset();
-                        listeners = [];
-                        delete events[this.id];
-                    },
-                    reset: function () {
-                        this.data = undefined;
-                        this.time = undefined;
-                    }
+    var cb_uid = 1,
+        Topic = function (opts) {
+            if ($.type(opts) === 'string') {
+                opts = {
+                    id: opts
                 };
-                return events[opts.id];
-            },
-            toEventList = function (events) {
-                var syncf = function (call, cb) {
-                    var m = events.length, i, args = [], triggered = {}, f = function (idx) {
-                        events[i][call](function (arg) {
-                            args[idx] = arg;
-                            triggered[idx] = true;
+            }
+            if (!$.isPlainObject(opts)) {
+                opts = {};
+            }
+            if ($.type(opts.id) !== 'string') {
+                throw new Error('Missing Topic ID');
+            }
+            this.listeners = [];
+            this.context = opts.context;
+            this.id = opts.id;
+            this.stateful = opts.state || opts.stateful || false;
+            this.remote = opts.remote || false;
+            this.data = undefined;
+            this.time = undefined;
+            this.toString = function () {
+                return 'Topic(id=' + this.id + ', stateful=' + this.stateful + ', remote=' + this.remote + ', time=' + this.time + ')';
+            };
+        },
+        forward = function (array, fn1, fn2, fnN) {
+            // forward a call to a list to each element of the list
+            var f;
+            for (f = 1; f < arguments.length; f++) {
+                (function (fn) {
+                    array[fn] = function () {
+                        var i;
+                        for (i = 0; i < array.length; i++) {
+                            array[i][fn].apply(array[i], arguments);
+                        }
+                    }
+                }(arguments[f]));
+            }
+        },
+        sync = function (topics, fn) {
+            return function (cb) {
+                var i, args = [], triggered = {};
+                for (i = 0; i < topics.length; i++) {
+                    (function (i) {
+                        topics[i][fn](function (arg) {
+                            args[i] = arg;
+                            triggered[i] = true;
                             var j;
-                            for (j = 0; j < m; j++) {
+                            for (j = 0; j < topics.length; j++) {
                                 if (!triggered[j]) {
                                     return;
                                 }
                             }
-                            if (!$.isFunction(events.syncReset)) {
-                                events.syncReset = function () {
-                                    args = [];
-                                    triggered = {};
-                                };
+                            j = topics.syncReset;
+                            topics.syncReset = function () {
+                                args = [];
+                                triggered = {};
+                            };
+                            try {
+                                cb.apply(topics, args);
+                            } finally {
+                                topics.syncReset = j;
                             }
-                            cb.apply(events, args);
                         });
-                    };
-                    for (i = 0; i < m; i++) {
-                        f(i);
-                    }
-                };
-                $.extend(events, {
-                    toString: function () {
-                        var s = 'EventList(', i;
-                        for (i = 0; i < events.length; i++) {
-                            s += events[i].id + (i === events.length - 1 ? '' : ',');
-                        }
-                        return s + ')';
-                    },
-                    fire: function (data) {
-                        var i;
-                        for (i = 0; i < events.length; i++) {
-                            events[i].fire(data);
-                        }
-                    },
-                    listen: function (cb) {
-                        var i;
-                        for (i = 0; i < events.length; i++) {
-                            events[i].listen(cb);
-                        }
-                    },
-                    once: function (cb) {
-                        var i;
-                        for (i = 0; i < events.length; i++) {
-                            events[i].once(cb);
-                        }
-                    },
-                    remove: function (cb) {
-                        var i;
-                        for (i = 0; i < events.length; i++) {
-                            events[i].remove(cb);
-                        }
-                    },
-                    destroy: function () {
-                        var i;
-                        for (i = 0; i < events.length; i++) {
-                            events[i].destroy();
-                        }
-                    },
-                    reset: function () {
-                        var i;
-                        for (i = 0; i < events.length; i++) {
-                            events[i].reset();
-                        }
-                    },
-                    sync: function (cb) {
-                        syncf('listen', cb);
-                    },
-                    syncOnce: function (cb) {
-                        syncf('once', cb);
-                    }
-                });
-                return events;
+                    }(i));
+                }
             };
-        this.name = 'event';
-        this.onconfigure = function (tajin, opts) {
-            //TODO MATHIEU - add remote features here with cometd if opts.remote
-        };
-        this.exports = {
-            get: function (id, opts) {
-                if (!events[id]) {
-                    this.add($.extend({}, opts, {
-                        id: id
-                    }));
+        },
+        Topics = function (topics) {
+            forward(topics, 'fire', 'listen', 'once', 'remove', 'reset');
+            topics.sync = sync(topics, 'listen');
+            topics.syncOnce = sync(topics, 'once');
+            topics.toString = function () {
+                var s = 'Topics(', i;
+                for (i = 0; i < topics.length; i++) {
+                    s += topics[i].id + (i === topics.length - 1 ? '' : ',');
                 }
-                return events[id];
-            },
-            getAll: function () {
-                var i, m, events = [], g_opts = arguments[arguments.length - 1];
-                if (!$.isPlainObject(g_opts)) {
-                    g_opts = undefined;
-                }
-                for (i = 0, m = g_opts ? arguments.length - 1 : arguments.length; i < m; i++) {
-                    events.push(this.get(arguments[i], g_opts));
-                }
-                return toEventList(events);
-            },
-            has: function (id) {
-                return !!events[id];
-            },
-            addAll: function () {
-                if (arguments.length <= 1) {
-                    return t_add.apply(this, arguments);
-                }
-                var i, m, o, events = [], g_opts = arguments[arguments.length - 1];
-                if (!$.isPlainObject(g_opts)) {
-                    g_opts = undefined;
-                }
-                for (i = 0, m = g_opts ? arguments.length - 1 : arguments.length; i < m; i++) {
-                    o = arguments[i];
-                    if (typeof o === 'string') {
-                        o = {
-                            id: o
-                        };
+                return s + ')';
+            };
+            return topics;
+        },
+        EventModule = function () {
+            var em_topics = {};
+            // module name
+            this.name = 'event';
+            // module config
+            this.onconfigure = function (tajin, opts) {
+                //TODO MATHIEU - add remote features here with cometd if opts.remote
+            };
+            // module exports
+            this.exports = {
+                // tajin.event.on(...)
+                on: function (topic1, topic2, topicN, options) {
+                    // parses arguments: can be a list of topics, an array of topics, and optional args at the end
+                    if (arguments.length === 0) {
+                        throw new Error('Missing topic names');
                     }
-                    events.push(t_add($.extend({}, g_opts || {}, o)));
+                    var i, j,
+                        max = arguments.length - 1,
+                        g_opts = arguments[max],
+                        topics = [],
+                        ids;
+                    if (!$.isPlainObject(g_opts)) {
+                        g_opts = {};
+                        max = arguments.length;
+                    }
+                    for (i = 0; i < max; i++) {
+                        ids = arguments[i];
+                        if (!$.isArray(ids)) {
+                            ids = [ids];
+                        }
+                        for (j = 0; j < ids.length; j++) {
+                            if (!em_topics[ids[j]]) {
+                                // if topic id does not exist, create it
+                                em_topics[ids[j]] = new Topic($.extend({}, g_opts, {
+                                    id: ids[j]
+                                }));
+                            }
+                            topics.push(em_topics[ids[j]]);
+                        }
+                    }
+                    // return enhanced list of topics
+                    return Topics(topics);
                 }
-                return toEventList(events);
-            },
-            add: t_add,
-            reset: function (id) {
-                this.get(id).reset();
-            },
-            destroy: function (id) {
-                this.get(id).destroy();
-            }
+            };
         };
+    Topic.prototype = {
+        fire: function (data) {
+            if (this.stateful && this.data !== undefined) {
+                throw new Error('fire() cannot be called again on a stateful topic. If needed, reset() must be called before or stateful flag must be removed.');
+            }
+            if (arguments.length > 1) {
+                throw new Error('fire() only accept at most one argument');
+            }
+            if (data === undefined) {
+                data = null;
+            }
+            if (this.stateful) {
+                this.data = data;
+            }
+            var i;
+            this.time = (new Date()).getTime();
+            for (i = 0; i < this.listeners.length; i++) {
+                this.listeners[i].call(this, data);
+            }
+        },
+        listen: function (cb) {
+            var added = false;
+            if ($.isFunction(cb)) {
+                if (!cb.tajin_cb_uid) {
+                    cb.tajin_cb_uid = cb_uid++;
+                    this.listeners.push(cb);
+                    added = true;
+                } else if (!$.grep(this.listeners,function (l) {
+                    return l.tajin_cb_uid === cb.tajin_cb_uid;
+                }).length) {
+                    this.listeners.push(cb);
+                    added = true;
+                }
+                if (added && this.stateful && this.data !== undefined) {
+                    cb.call(this, this.data);
+                }
+            }
+            return added;
+        },
+        once: function (cb) {
+            if ($.isFunction(cb)) {
+                var self = this, f = function (data) {
+                    self.remove(f);
+                    cb.call(this, data);
+                };
+                self.listen(f);
+            }
+        },
+        remove: function (cb) {
+            if (cb.tajin_cb_uid) {
+                var i;
+                for (i = 0; i < this.listeners.length; i++) {
+                    if (this.listeners[i].tajin_cb_uid === cb.tajin_cb_uid) {
+                        this.listeners.splice(i, 1);
+                        return true;
+                    }
+                }
+            }
+            return false;
+        },
+        reset: function () {
+            this.data = undefined;
+            this.time = undefined;
+        }
     };
     w.tajin.install(new EventModule());
 }(window, jQuery));

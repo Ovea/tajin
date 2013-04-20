@@ -19,55 +19,37 @@
     <script type="text/javascript" src="lib/handlebars-1.0.rc.1.js"></script>
 
     <script type="text/javascript">
-        (function () {
-            var jasmineEnv = window.jasmineEnv = jasmine.getEnv(),
-                    htmlReporter = new jasmine.HtmlReporter();
-
-            jasmineEnv.updateInterval = 1000;
-            jasmineEnv.addReporter(htmlReporter);
-            jasmineEnv.specFilter = function (spec) {
-                return htmlReporter.specFilter(spec);
-            };
-
-            window.tajin_init = {
-                debug: true,
-                onready: function () {
-                    window.onready_called = true;
-                    $(function () {
-                        jasmineEnv.execute();
-                    });
-                },
-                log: {
-                    level: 'all'
-                },
-                i18n: {
-                    onlocalize: function (bundle, locale, elem, key, value) {
-                        if (value === undefined) {
-                            value = '[' + key + ']';
-                        }
-                        console.info('onlocalize', bundle, locale, key, value);
-                        var type = elem.get(0).tagName.toUpperCase();
-                        if (type === 'INPUT') {
-                            if (elem.attr('placeholder') && value) {
-                                elem.attr('placeholder', value);
-                            } else {
-                                elem.val(value);
-                            }
-                        }
-                        else {
-                            elem.html(value);
+        window.tajin_init = {
+            debug: true,
+            log: {
+                level: 'all'
+            },
+            i18n: {
+                onlocalize: function (bundle, locale, elem, key, value) {
+                    if (value === undefined) {
+                        value = '[' + key + ']';
+                    }
+                    console.info('onlocalize', bundle, locale, key, value);
+                    var type = elem.get(0).tagName.toUpperCase();
+                    if (type === 'INPUT') {
+                        if (elem.attr('placeholder') && value) {
+                            elem.attr('placeholder', value);
+                        } else {
+                            elem.val(value);
                         }
                     }
+                    else {
+                        elem.html(value);
+                    }
                 }
-            };
-
-        })();
+            }
+        };
     </script>
 
     <script type="text/javascript" src="../main/js/tajin/tajin.core.js"></script>
     <script type="text/javascript" src="../main/js/tajin/tajin.util.js"></script>
-    <!--<script type="text/javascript" src="../main/js/tajin/tajin.log.js"></script>-->
-    <!--<script type="text/javascript" src="../main/js/tajin/tajin.event.js"></script>-->
+    <script type="text/javascript" src="../main/js/tajin/tajin.log.js"></script>
+    <script type="text/javascript" src="../main/js/tajin/tajin.event.js"></script>
     <!--<script type="text/javascript" src="../main/js/tajin/tajin.timer.js"></script>-->
     <!--<script type="text/javascript" src="../main/js/tajin/tajin.store.js"></script>-->
     <!--<script type="text/javascript" src="../main/js/tajin/tajin.i18n.js"></script>-->
@@ -79,13 +61,26 @@
     <script type="text/javascript" src="../main/js/tajin/tajin.autoinit.js"></script>
 
     <script type="text/javascript" src="spec/core.spec.js"></script>
-    <!--<script type="text/javascript" src="spec/log.spec.js"></script>-->
-    <!--<script type="text/javascript" src="spec/event.spec.js"></script>-->
+    <script type="text/javascript" src="spec/log.spec.js"></script>
+    <script type="text/javascript" src="spec/event.spec.js"></script>
     <!--<script type="text/javascript" src="spec/timer.spec.js"></script>-->
     <!--<script type="text/javascript" src="spec/store.spec.js"></script>-->
     <!--<script type="text/javascript" src="spec/i18n.spec.js"></script>-->
     <!--<script type="text/javascript" src="spec/dom.spec.js"></script>-->
     <!--<script type="text/javascript" src="spec/jqm.spec.js"></script>-->
+
+    <script type="text/javascript">
+        $(function () {
+            var jasmineEnv = window.jasmineEnv = jasmine.getEnv(),
+                    htmlReporter = new jasmine.HtmlReporter();
+            jasmineEnv.updateInterval = 1000;
+            jasmineEnv.addReporter(htmlReporter);
+            jasmineEnv.specFilter = function (spec) {
+                return htmlReporter.specFilter(spec);
+            };
+            jasmineEnv.execute();
+        });
+    </script>
 
 </head>
 <body>

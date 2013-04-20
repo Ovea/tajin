@@ -32,6 +32,30 @@ describe("tajin", function () {
             expect(tajin.options['test-module'].init_called).toBe(true);
         });
 
+        it("exposes module exports and options and tajin to module init functions", function () {
+            var t = new Tajin();
+            t.configure({
+                'module-2': {
+                    myopt: 'myvalue'
+                }
+            });
+            var passed = 0;
+            var m = {
+                name: 'module-2',
+                onconfigure: function (tajin, opts) {
+                    expect(opts.myopt).toBe('myvalue');
+                    expect(t).toBe(tajin);
+                    passed = 1;
+                },
+                exports: {
+                    dummy: function () {
+                    }
+                }
+            };
+            t.install(m);
+            expect(passed).toBe(1);
+        });
+
         it("restart initialization at failure point when a module initialization fails", function () {
             var steps = [],
                 m1 = {
@@ -94,35 +118,6 @@ describe("tajin", function () {
                 return call_succ;
             }, 600, 'waiting for success');
             expect(steps.length).toBe(3);
-        });
-
-        it("exposes module exports, options and tajin to module init functions", function () {
-            try {
-                var t = new Tajin(),
-                    passed = 0,
-                    m = {
-                        name: 'module-2',
-                        onconfigure: function (tajin, opts) {
-                            expect(opts.myopt).toBe('myvalue');
-                            expect(t).toBe(tajin);
-                            passed = 1;
-                        },
-                        exports: {
-                            dummy: function () {
-                            }
-                        }
-                    };
-                t.configure({
-                    'module-2': {
-                        myopt: 'myvalue'
-                    }
-                });
-                t.install(m);
-                expect(passed).toBe(1);
-            } catch (e) {
-                console.error(e);
-                alert(e.message);
-            }
         });
 
     });

@@ -4,38 +4,17 @@ describe("tajin.event", function () {
         expect(tajin.modules()).toContain('event');
     });
 
-    describe("at initialization", function () {
-
-        it("register event tajin/ready", function () {
-            var obj = {
-                f: function () {
-                }
-            };
-            spyOn(obj, 'f');
-            tajin.event.get('tajin/ready').listen(obj.f);
-            expect(obj.f).toHaveBeenCalled();
-        });
-
-    });
-
     describe("Event creation", function () {
 
-        describe("tajin.event.add()", function () {
-
-            it("adds event with no name", function () {
-                var evt = tajin.event.add();
-                expect(evt.id).toBeDefined();
-                expect(tajin.event.has(evt.id)).toBe(true);
-            });
+        describe("tajin.event.on()", function () {
 
             it("adds event with a name", function () {
-                var evt = tajin.event.add('my/event');
+                var evt = tajin.event.on('my/event');
                 expect(evt.id).toBe('my/event');
-                expect(tajin.event.has('my/event')).toBe(true);
             });
 
             it("adds event with options", function () {
-                var evt = tajin.event.add({
+                var evt = tajin.event.on({
                     id: 'toto',
                     state: true,
                     remote: true,
@@ -45,21 +24,16 @@ describe("tajin.event", function () {
                 expect(evt.remote).toBe(true);
                 expect(evt.stateful).toBe(true);
                 expect(evt.context).toBe(this);
-                expect(tajin.event.has('toto')).toBe(true);
             });
 
             it("fails with a duplicate name", function () {
                 expect(function () {
-                    tajin.event.add('my/event');
+                    tajin.event.on('my/event');
                 }).toThrow(new Error("Duplicate event: my/event"));
             });
 
-        });
-
-        describe("tajin.event.addAll()", function () {
-
             it("adds multiple events with optional options at once", function () {
-                var all = tajin.event.addAll('my/evt1', {
+                var all = tajin.event.on('my/evt1', {
                     id: 'my/evt2',
                     state: false
                 }, 'my/evt3', {
@@ -67,15 +41,15 @@ describe("tajin.event", function () {
                     remote: true,
                     context: this
                 });
-                expect(tajin.event.get('my/evt1')).toBe(all[0]);
-                expect(tajin.event.get('my/evt2')).toBe(all[1]);
-                expect(tajin.event.get('my/evt3')).toBe(all[2]);
-                expect(tajin.event.get('my/evt1').remote).toBe(true);
-                expect(tajin.event.get('my/evt2').remote).toBe(true);
-                expect(tajin.event.get('my/evt3').remote).toBe(true);
-                expect(tajin.event.get('my/evt1').stateful).toBe(true);
-                expect(tajin.event.get('my/evt2').stateful).toBe(false);
-                expect(tajin.event.get('my/evt3').stateful).toBe(true);
+                expect(tajin.event.on('my/evt1')).toBe(all[0]);
+                expect(tajin.event.on('my/evt2')).toBe(all[1]);
+                expect(tajin.event.on('my/evt3')).toBe(all[2]);
+                expect(tajin.event.on('my/evt1').remote).toBe(true);
+                expect(tajin.event.on('my/evt2').remote).toBe(true);
+                expect(tajin.event.on('my/evt3').remote).toBe(true);
+                expect(tajin.event.on('my/evt1').stateful).toBe(true);
+                expect(tajin.event.on('my/evt2').stateful).toBe(false);
+                expect(tajin.event.on('my/evt3').stateful).toBe(true);
             });
 
         });
@@ -84,35 +58,26 @@ describe("tajin.event", function () {
 
     describe("Event accessors", function () {
 
-        describe("tajin.event.has()", function () {
-
-            it("can test event existance", function () {
-                expect(tajin.event.has('my/event')).toBe(true);
-            });
-
-        });
-
-        describe("tajin.event.get()", function () {
+        describe("tajin.event.on()", function () {
 
             it("gets an event object", function () {
-                var e = tajin.event.get('my/event');
+                var e = tajin.event.on('my/event');
                 expect(e).toBeDefined();
                 expect(e.id).toBe('my/event');
             });
 
             it("gets an inexisting event and create it at once", function () {
-                tajin.event.get('inexisting', {
+                tajin.event.on('inexisting', {
                     state: true
                 });
-                expect(tajin.event.has('inexisting')).toBe(true);
             });
 
         });
 
-        describe("var eventList = tajin.event.getAll()", function () {
+        describe("var eventList = tajin.event.on()", function () {
 
             it("gets many event object at once", function () {
-                var all = tajin.event.getAll('my/evt1', 'my/evt2', 'my/evt3');
+                var all = tajin.event.on('my/evt1', 'my/evt2', 'my/evt3');
                 expect(all[0].stateful).toBe(true);
                 expect(all[1].stateful).toBe(false);
                 expect(all[2].stateful).toBe(true);
@@ -122,15 +87,14 @@ describe("tajin.event", function () {
 
             describe("EventList", function () {
 
-                it("it has listen, once, fire, toString, remove, reset, destroy, sync methods with targets all events in the list", function () {
-                    var all = tajin.event.getAll('my/sync/a1', 'my/sync/a2', 'my/sync/a3');
+                it("it has listen, once, fire, toString, remove, reset, sync methods with targets all events in the list", function () {
+                    var all = tajin.event.on('my/sync/a1', 'my/sync/a2', 'my/sync/a3');
                     expect(all.listen).toBeDefined();
                     expect(all.once).toBeDefined();
                     expect(all.fire).toBeDefined();
                     expect(all.toString).toBeDefined();
                     expect(all.remove).toBeDefined();
                     expect(all.reset).toBeDefined();
-                    expect(all.destroy).toBeDefined();
                     expect(all.sync).toBeDefined();
                     expect(all.syncOnce).toBeDefined();
                 });
@@ -138,7 +102,7 @@ describe("tajin.event", function () {
                 describe("eventList.sync(cb)", function () {
 
                     it("calls cb when all events in the list are triggered", function () {
-                        var all = tajin.event.getAll('my/sync/a1', 'my/sync/a2'),
+                        var all = tajin.event.on('my/sync/a1', 'my/sync/a2'),
                             obj = {
                                 f: function (e1, e2) {
                                 }
@@ -158,7 +122,7 @@ describe("tajin.event", function () {
                         });
                         var d1, d2;
                         t2.fire('data2');
-                        tajin.event.getAll('my/sync/g1', 'my/sync/g2').sync(function (_d1, _d2) {
+                        tajin.event.on('my/sync/g1', 'my/sync/g2').sync(function (_d1, _d2) {
                             d1 = _d1;
                             d2 = _d2;
                         });
@@ -171,7 +135,7 @@ describe("tajin.event", function () {
 
                     it("calls cb again if at lest one of all events in the list is triggered another time", function () {
                         var c = 0;
-                        var all = tajin.event.getAll('my/sync/b1', 'my/sync/b2'),
+                        var all = tajin.event.on('my/sync/b1', 'my/sync/b2'),
                             obj = {
                                 f: function (e1, e2) {
                                     c++;
@@ -188,7 +152,7 @@ describe("tajin.event", function () {
                     });
 
                     it("explode parameters to match each event parameter", function () {
-                        var all = tajin.event.getAll('my/sync/c1', 'my/sync/c2', 'my/sync/c3'),
+                        var all = tajin.event.on('my/sync/c1', 'my/sync/c2', 'my/sync/c3'),
                             obj = {
                                 f: function (e1, e2, e3) {
                                 }
@@ -208,7 +172,7 @@ describe("tajin.event", function () {
                 describe("eventList.syncOnce(cb)", function () {
 
                     it("calls cb when all events in the list are triggered", function () {
-                        var all = tajin.event.getAll('my/sync/d1', 'my/sync/d2'),
+                        var all = tajin.event.on('my/sync/d1', 'my/sync/d2'),
                             obj = {
                                 f: function (e1, e2) {
                                 }
@@ -222,7 +186,7 @@ describe("tajin.event", function () {
 
                     it("cb is caled at most one time event if one of all events in the list is triggered another time", function () {
                         var c = 0;
-                        var all = tajin.event.getAll('my/sync/e1', 'my/sync/e2'),
+                        var all = tajin.event.on('my/sync/e1', 'my/sync/e2'),
                             obj = {
                                 f: function (e1, e2) {
                                     c++;
@@ -239,7 +203,7 @@ describe("tajin.event", function () {
                     });
 
                     it("explode parameters to match each event parameter", function () {
-                        var all = tajin.event.getAll('my/sync/f1', 'my/sync/f2', 'my/sync/f3'),
+                        var all = tajin.event.on('my/sync/f1', 'my/sync/f2', 'my/sync/f3'),
                             obj = {
                                 f: function (e1, e2, e3) {
                                 }
@@ -280,38 +244,9 @@ describe("tajin.event", function () {
                     e2 = tajin.event.add('my/e2');
                 spyOn(e1, 'reset');
                 spyOn(e2, 'reset');
-                tajin.event.getAll('my/e1', 'my/e2').reset();
+                tajin.event.on('my/e1', 'my/e2').reset();
                 expect(e1.reset).toHaveBeenCalled();
                 expect(e2.reset).toHaveBeenCalled();
-            });
-
-        });
-
-    });
-
-    describe("Event deletion", function () {
-
-        describe("tajin.event.destroy()", function () {
-
-            it("can destroy an event", function () {
-                var e = tajin.event.add('my/destroyable');
-                spyOn(e, 'destroy');
-                tajin.event.destroy('my/destroyable');
-                expect(e.destroy).toHaveBeenCalled();
-            });
-
-        });
-
-        describe("group.destroy()", function () {
-
-            it("can delete several events at once", function () {
-                var e1 = tajin.event.add('my/e3'),
-                    e2 = tajin.event.add('my/e4');
-                spyOn(e1, 'destroy');
-                spyOn(e2, 'destroy');
-                tajin.event.getAll('my/e3', 'my/e4').destroy();
-                expect(e1.destroy).toHaveBeenCalled();
-                expect(e2.destroy).toHaveBeenCalled();
             });
 
         });
@@ -331,7 +266,6 @@ describe("tajin.event", function () {
             expect(evt.remote).toBe(true);
             expect(evt.stateful).toBe(true);
             expect(evt.context).toBe(this);
-            expect(tajin.event.has('tata')).toBe(true);
         });
         describe("e.time", function () {
 
@@ -409,17 +343,6 @@ describe("tajin.event", function () {
                 evt.reset();
                 evt.fire('data2');
                 expect(evt.data).toBe('data2');
-            });
-
-        });
-
-        describe("e.destroy()", function () {
-
-            it("destroy the event", function () {
-                var evt = tajin.event.add();
-                expect(tajin.event.has(evt.id)).toBe(true);
-                evt.destroy();
-                expect(tajin.event.has(evt.id)).toBe(false);
             });
 
         });
