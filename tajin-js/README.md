@@ -1,12 +1,5 @@
 # TODO #
 
-  * PLUGIN CONFIG
-    * faire sauter module config et tajin client (plutot utiliser init d un module)
-    * faire sauter tajin.ready()
-
-  * PLUGIN EVENT
-    * au lieu de event.getAll et event.get faire event.on('') pour tous les cas et gerer une liste d events
-
   * PLUGIN MODEL
     * creation a partir d un objet array ou json
     * extends systeme evenementiel
