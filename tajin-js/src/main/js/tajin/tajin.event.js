@@ -19,17 +19,6 @@
     "use strict";
     var cb_uid = 1,
         Topic = function (opts) {
-            if ($.type(opts) === 'string') {
-                opts = {
-                    id: opts
-                };
-            }
-            if (!$.isPlainObject(opts)) {
-                opts = {};
-            }
-            if ($.type(opts.id) !== 'string') {
-                throw new Error('Missing Topic ID');
-            }
             this.listeners = [];
             this.context = opts.context;
             this.id = opts.id;
@@ -111,14 +100,14 @@
                 on: function (topic1, topic2, topicN, options) {
                     // parses arguments: can be a list of topics, an array of topics, and optional args at the end
                     if (arguments.length === 0) {
-                        throw new Error('Missing topic names');
+                        throw new Error('Missing topic name');
                     }
                     var i, j,
                         max = arguments.length - 1,
                         g_opts = arguments[max],
                         topics = [],
                         ids;
-                    if (!$.isPlainObject(g_opts)) {
+                    if (!$.isPlainObject(g_opts) || g_opts.id) {
                         g_opts = {};
                         max = arguments.length;
                     }
@@ -128,17 +117,30 @@
                             ids = [ids];
                         }
                         for (j = 0; j < ids.length; j++) {
-                            if (!em_topics[ids[j]]) {
-                                // if topic id does not exist, create it
-                                em_topics[ids[j]] = new Topic($.extend({}, g_opts, {
+                            // check if argument is an object or topic name (suppots both)
+                            if ($.type(ids[j]) === 'string') {
+                                ids[j] = {
                                     id: ids[j]
-                                }));
+                                };
                             }
-                            topics.push(em_topics[ids[j]]);
+                            if (!$.isPlainObject(ids[j])) {
+                                ids[j] = {};
+                            }
+                            if ($.type(ids[j].id) !== 'string') {
+                                throw new Error('Missing topic name');
+                            }
+                            if (!em_topics[ids[j].id]) {
+                                // if topic id does not exist, create it
+                                em_topics[ids[j].id] = new Topic($.extend({}, g_opts, ids[j]));
+                            }
+                            topics.push(em_topics[ids[j].id]);
                         }
                     }
-                    // return enhanced list of topics
-                    return Topics(topics);
+                    if (!topics.length) {
+                        throw new Error('No topic defined');
+                    }
+                    // return enhanced list of topics or only one
+                    return topics.length == 1 ? topics[0] : Topics(topics);
                 }
             };
         };

@@ -26,12 +26,6 @@ describe("tajin.event", function () {
                 expect(evt.context).toBe(this);
             });
 
-            it("fails with a duplicate name", function () {
-                expect(function () {
-                    tajin.event.on('my/event');
-                }).toThrow(new Error("Duplicate event: my/event"));
-            });
-
             it("adds multiple events with optional options at once", function () {
                 var all = tajin.event.on('my/evt1', {
                     id: 'my/evt2',
@@ -52,14 +46,6 @@ describe("tajin.event", function () {
                 expect(tajin.event.on('my/evt3').stateful).toBe(true);
             });
 
-        });
-
-    });
-
-    describe("Event accessors", function () {
-
-        describe("tajin.event.on()", function () {
-
             it("gets an event object", function () {
                 var e = tajin.event.on('my/event');
                 expect(e).toBeDefined();
@@ -71,10 +57,6 @@ describe("tajin.event", function () {
                     state: true
                 });
             });
-
-        });
-
-        describe("var eventList = tajin.event.on()", function () {
 
             it("gets many event object at once", function () {
                 var all = tajin.event.on('my/evt1', 'my/evt2', 'my/evt3');
@@ -115,8 +97,8 @@ describe("tajin.event", function () {
                     });
 
                     it("can sync stateful topics", function () {
-                        var t1 = tajin.event.add('my/sync/g1');
-                        var t2 = tajin.event.add({
+                        var t1 = tajin.event.on('my/sync/g1');
+                        var t2 = tajin.event.on({
                             id: 'my/sync/g2',
                             state: true
                         });
@@ -226,22 +208,11 @@ describe("tajin.event", function () {
 
     describe("Stateful event reset", function () {
 
-        describe("tajin.event.reset()", function () {
-
-            it("can reset a stateful event", function () {
-                var e = tajin.event.add('my/stateful');
-                spyOn(e, 'reset');
-                tajin.event.reset('my/stateful');
-                expect(e.reset).toHaveBeenCalled();
-            });
-
-        });
-
         describe("group.reset()", function () {
 
             it("can reset several events at once", function () {
-                var e1 = tajin.event.add('my/e1'),
-                    e2 = tajin.event.add('my/e2');
+                var e1 = tajin.event.on('my/e1'),
+                    e2 = tajin.event.on('my/e2');
                 spyOn(e1, 'reset');
                 spyOn(e2, 'reset');
                 tajin.event.on('my/e1', 'my/e2').reset();
@@ -256,7 +227,7 @@ describe("tajin.event", function () {
     describe("Event instance e", function () {
 
         it("exposes id, remote, stateful, context", function () {
-            var evt = tajin.event.add({
+            var evt = tajin.event.on({
                 id: 'tata',
                 state: true,
                 remote: true,
@@ -267,10 +238,11 @@ describe("tajin.event", function () {
             expect(evt.stateful).toBe(true);
             expect(evt.context).toBe(this);
         });
+
         describe("e.time", function () {
 
             it("set when fired", function () {
-                var evt = tajin.event.add();
+                var evt = tajin.event.on('/evt/time');
                 expect(evt.time).toBeUndefined();
                 evt.fire();
                 expect(evt.time).toBeDefined();
@@ -281,20 +253,22 @@ describe("tajin.event", function () {
         describe("e.data", function () {
 
             it("unset when fired if stateless", function () {
-                var evt = tajin.event.add();
+                var evt = tajin.event.on('/evt/data');
                 expect(evt.data).toBeUndefined();
                 evt.fire();
                 expect(evt.data).toBeUndefined();
             });
 
             it("set when fired if stateful", function () {
-                var evt = tajin.event.add({
+                var evt = tajin.event.on({
+                    id: 'evt/data/1',
                     state: true
                 });
                 expect(evt.data).toBeUndefined();
                 evt.fire();
                 expect(evt.data).toBeNull();
-                evt = tajin.event.add({
+                evt = tajin.event.on({
+                    id: 'evt/data/2',
                     state: true
                 });
                 evt.fire('data');
@@ -306,24 +280,24 @@ describe("tajin.event", function () {
         describe("e.fire()", function () {
 
             it("can be called multiple times if stateless", function () {
-                var evt = tajin.event.add();
+                var evt = tajin.event.on('evt/111');
                 evt.fire();
                 evt.fire();
             });
 
             it("can be called only once if stateful", function () {
-                var evt = tajin.event.add({
+                var evt = tajin.event.on({
+                    id: 'evt/222',
                     state: true
                 });
                 evt.fire();
                 expect(function () {
                     evt.fire();
-                }).toThrow(new Error("fire() cannot be called again on a stateful event. If needed, reset() must be called before or stateful flag must be removed."));
-
+                }).toThrow(new Error("fire() cannot be called again on a stateful topic. If needed, reset() must be called before or stateful flag must be removed."));
             });
 
             it("cannot be called with more than one parameters", function () {
-                var evt = tajin.event.add();
+                var evt = tajin.event.on('evet/333');
                 expect(function () {
                     evt.fire(1, 2);
                 }).toThrow(new Error("fire() only accept at most one argument"));
@@ -335,7 +309,8 @@ describe("tajin.event", function () {
         describe("e.reset()", function () {
 
             it("can be called to reset a stateful event and be able to call fire() again", function () {
-                var evt = tajin.event.add({
+                var evt = tajin.event.on({
+                    id: 'qq/1111',
                     state: true
                 });
                 evt.fire('data1');
@@ -350,7 +325,7 @@ describe("tajin.event", function () {
         describe("e.listen()", function () {
 
             it("adds a listener", function () {
-                var evt = tajin.event.add();
+                var evt = tajin.event.on('evt/444');
                 var obj = {
                     l: function () {
                     }
@@ -362,7 +337,7 @@ describe("tajin.event", function () {
             });
 
             it("checks for multiple registration errors", function () {
-                var evt = tajin.event.add(), c = 0;
+                var evt = tajin.event.on('evt/555'), c = 0;
                 var obj = {
                     l: function () {
                         c++;
@@ -380,7 +355,7 @@ describe("tajin.event", function () {
         describe("e.once()", function () {
 
             it("register a listener to be triggered only once then removed", function () {
-                var evt = tajin.event.add(), c = 0;
+                var evt = tajin.event.on('evt/666'), c = 0;
                 var obj = {
                     f1: function () {
                         c++;
@@ -398,7 +373,7 @@ describe("tajin.event", function () {
         describe("e.remove()", function () {
 
             it("removes a listener", function () {
-                var evt = tajin.event.add(), c = 0;
+                var evt = tajin.event.on('evt/777'), c = 0;
                 var obj = {
                     f1: function () {
                         c++;
