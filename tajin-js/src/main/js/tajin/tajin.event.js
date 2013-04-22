@@ -30,50 +30,52 @@
                 return 'Topic(id=' + this.id + ', stateful=' + this.stateful + ', remote=' + this.remote + ', time=' + this.time + ')';
             };
         },
+        make_forward = function(fn, array) {
+            return function () {
+                var i;
+                for (i = 0; i < array.length; i++) {
+                    array[i][fn].apply(array[i], arguments);
+                }
+            };
+        },
         forward = function (array, fn1, fn2, fnN) {
             // forward a call to a list to each element of the list
             var f;
             for (f = 1; f < arguments.length; f++) {
-                (function (fn) {
-                    array[fn] = function () {
-                        var i;
-                        for (i = 0; i < array.length; i++) {
-                            array[i][fn].apply(array[i], arguments);
-                        }
-                    }
-                }(arguments[f]));
+                array[arguments[f]] = make_forward(arguments[f], array);
             }
+        },
+        sync_register = function(topics, fn, args, triggered, i, cb) {
+            topics[i][fn](function (arg) {
+                args[i] = arg;
+                triggered[i] = true;
+                var j;
+                for (j = 0; j < topics.length; j++) {
+                    if (!triggered[j]) {
+                        return;
+                    }
+                }
+                j = topics.syncReset;
+                topics.syncReset = function () {
+                    args = [];
+                    triggered = {};
+                };
+                try {
+                    cb.apply(topics, args);
+                } finally {
+                    topics.syncReset = j;
+                }
+            });
         },
         sync = function (topics, fn) {
             return function (cb) {
                 var i, args = [], triggered = {};
                 for (i = 0; i < topics.length; i++) {
-                    (function (i) {
-                        topics[i][fn](function (arg) {
-                            args[i] = arg;
-                            triggered[i] = true;
-                            var j;
-                            for (j = 0; j < topics.length; j++) {
-                                if (!triggered[j]) {
-                                    return;
-                                }
-                            }
-                            j = topics.syncReset;
-                            topics.syncReset = function () {
-                                args = [];
-                                triggered = {};
-                            };
-                            try {
-                                cb.apply(topics, args);
-                            } finally {
-                                topics.syncReset = j;
-                            }
-                        });
-                    }(i));
+                    sync_register(topics, fn, args, triggered, i, cb);
                 }
             };
         },
-        Topics = function (topics) {
+        extend_topics = function (topics) {
             forward(topics, 'fire', 'listen', 'once', 'remove', 'reset');
             topics.sync = sync(topics, 'listen');
             topics.syncOnce = sync(topics, 'once');
@@ -143,7 +145,7 @@
                         throw new Error('No topic defined');
                     }
                     // return enhanced list of topics or only one
-                    return topics.length == 1 ? topics[0] : Topics(topics);
+                    return topics.length === 1 ? topics[0] : extend_topics(topics);
                 }
             };
         };

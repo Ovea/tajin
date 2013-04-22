@@ -79,7 +79,6 @@
                                     <includes>
                                         <include>${project.build.outputDirectory}/tajin/tajin.core.js</include>
                                         <include>${project.build.outputDirectory}/tajin/tajin.util.js</include>
-                                        <include>${project.build.outputDirectory}/tajin/tajin.config.js</include>
                                         <include>${project.build.outputDirectory}/tajin/tajin.log.js</include>
                                         <include>${project.build.outputDirectory}/tajin/tajin.event.js</include>
                                         <include>${project.build.outputDirectory}/tajin/tajin.timer.js</include>
