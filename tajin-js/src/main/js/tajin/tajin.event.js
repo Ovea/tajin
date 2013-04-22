@@ -96,6 +96,9 @@
             };
             // module exports
             this.exports = {
+                has: function (topic) {
+                    return !!em_topics[topic];
+                },
                 // tajin.event.on(...)
                 on: function (topic1, topic2, topicN, options) {
                     // parses arguments: can be a list of topics, an array of topics, and optional args at the end

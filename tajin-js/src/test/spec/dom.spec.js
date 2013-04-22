@@ -14,12 +14,8 @@ describe("tajin.dom", function () {
                 }
             };
             spyOn(obj, 'cb');
-            tajin.event.get('dom/loaded').listen(obj.cb);
+            tajin.event.on('dom/loaded').listen(obj.cb);
             expect(obj.cb).toHaveBeenCalled();
-        });
-
-        it("register event dom/loaded", function () {
-            expect(tajin.event.has('dom/loaded')).toBe(true);
         });
 
     });

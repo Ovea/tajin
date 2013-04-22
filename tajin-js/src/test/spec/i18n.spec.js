@@ -166,7 +166,7 @@ describe("tajin.i18n", function () {
 
             it("localizes specific HTML attributes (href, src, ...)", function () {
                 var element = $('#i18n').find('a:first');
-                expect(element.attr('href')).toBe('localize[link]');
+                expect(element.attr('href')).toBe('i18n[link]');
                 tajin.i18n.load('app', 'fr_CA', function (bundle) {
                     bundle.localize(element);
                     expect(element.attr('href')).toBe('http://goto/fr.ca');
@@ -185,7 +185,7 @@ describe("tajin.i18n", function () {
                     }));
 
                     expect(html.find('span').text()).toBe('');
-                    expect(html.find('a').attr('href')).toBe('localize[link]');
+                    expect(html.find('a').attr('href')).toBe('i18n[link]');
 
                     tajin.i18n.load('app', 'fr_CA', function (bundle) {
                         bundle.localize(html);
@@ -321,7 +321,7 @@ describe("tajin.i18n", function () {
                 };
 
                 spyOn(obj, 'cb');
-                tajin.event.get('i18n/html/loaded').listen(obj.cb);
+                tajin.event.on('i18n/html/loaded').listen(obj.cb);
 
                 var res_fr_CA = tajin.i18n.resources('fr-CA');
                 res_fr_CA.html('pub.html', function () {
@@ -372,7 +372,7 @@ describe("Handlebars integration", function () {
                 expect(html.find('.title').text()).toBe('My New Post');
                 expect(html.find('.body').text()).toBe('This is my first post!');
                 expect(html.find('span').text()).toBe('');
-                expect(html.find('a').attr('href')).toBe('localize[link]');
+                expect(html.find('a').attr('href')).toBe('i18n[link]');
                 expect(html.find('img').attr('src')).toMatch('pub_fr.jpg');
 
                 // 2 - it can be processed

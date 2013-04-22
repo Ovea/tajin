@@ -39,7 +39,7 @@
         name: 'dom',
         requires: 'event',
         oninstall: function (tajin) {
-            var evt = tajin.event.add({
+            var evt = tajin.event.on({
                 id: 'dom/loaded',
                 state: true
             });
@@ -59,7 +59,6 @@
                     }
                 });
             }
-            next();
         },
         exports: {
             find_duplicate_ids: fdup

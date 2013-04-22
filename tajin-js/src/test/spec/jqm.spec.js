@@ -6,8 +6,8 @@ describe("tajin.jqm", function () {
         expect(tajin.modules()).toContain('timer');
     });
 
-    it("register event jqm/init", function () {
-        expect(tajin.event.has('jqm/init')).toBe(true);
+    it("register event jqm/ready", function () {
+        expect(tajin.event.has('jqm/ready')).toBe(true);
     });
 
     it("register event jqm/beforeshow", function () {
@@ -85,7 +85,7 @@ describe("tajin.jqm", function () {
             $('#page_2').append('<span id="my-content">some content to be removed</span>');
             expect($('#page_2').find('#my-content').length).toBe(1);
             var loaded;
-            tajin.event.get('jqm/show/page_2').once(function (page) {
+            tajin.event.on('jqm/show/page_2').once(function (page) {
                 expect(tajin.jqm.pageName()).toBe('page_2');
                 expect($('#page_2').find('#my-content').length).toBe(0);
                 loaded = true;
@@ -104,53 +104,53 @@ describe("tajin.jqm", function () {
 
     });
 
-    describe("tajin.jqm.willChangePage()", function () {
+//    describe("tajin.jqm.willChangePage()", function () {
+//
+//        it("schedule a future JQM page change", function () {
+//            this.fail('TODO'); // tajin.jqm.willChangePage(delayMs, page)
+//        });
+//
+//        it("can run a callback after page changed", function () {
+//            this.fail('TODO'); // tajin.jqm.willChangePage(delayMs, page, callback)
+//        });
+//
+//        it("can be provided by optional JQM options for page transition", function () {
+//            this.fail('TODO'); // tajin.jqm.willChangePage(delayMs, page, callback, jqmOpts)
+//        });
+//
+//    });
 
-        it("schedule a future JQM page change", function () {
-            this.fail('TODO'); // tajin.jqm.willChangePage(delayMs, page)
-        });
+//    describe("tajin.jqm.cancelChangePage()", function () {
+//
+//        it("cancels a scheduled page change", function () {
+//            this.fail('TODO'); // tajin.jqm.cancelChangePage()
+//        });
+//
+//    });
 
-        it("can run a callback after page changed", function () {
-            this.fail('TODO'); // tajin.jqm.willChangePage(delayMs, page, callback)
-        });
+//    describe("tajin.jqm.redirect()", function () {
+//
+//        it("redirects to a page", function () {
+//            this.fail('TODO'); // tajin.jqm.redirect()
+//        });
+//
+//    });
 
-        it("can be provided by optional JQM options for page transition", function () {
-            this.fail('TODO'); // tajin.jqm.willChangePage(delayMs, page, callback, jqmOpts)
-        });
+//    describe("tajin.jqm.redirectAndFire()", function () {
+//
+//        it("redirects to a page then fires an event with specified data", function () {
+//            this.fail('TODO'); // tajin.jqm.redirectAndFire()
+//        });
+//
+//    });
 
-    });
-
-    describe("tajin.jqm.cancelChangePage()", function () {
-
-        it("cancels a scheduled page change", function () {
-            this.fail('TODO'); // tajin.jqm.cancelChangePage()
-        });
-
-    });
-
-    describe("tajin.jqm.redirect()", function () {
-
-        it("redirects to a page", function () {
-            this.fail('TODO'); // tajin.jqm.redirect()
-        });
-
-    });
-
-    describe("tajin.jqm.redirectAndFire()", function () {
-
-        it("redirects to a page then fires an event with specified data", function () {
-            this.fail('TODO'); // tajin.jqm.redirectAndFire()
-        });
-
-    });
-
-    describe("tajin.event.get('jqm/init')", function () {
-
-        it("Event triggered at page initialization", function () {
-            this.fail('TODO'); // tajin.jqm.redirect()
-        });
-
-    });
+//    describe("tajin.event.get('jqm/init')", function () {
+//
+//        it("Event triggered at page initialization", function () {
+//            this.fail('TODO'); // tajin.jqm.redirect()
+//        });
+//
+//    });
 
     describe("RESET')", function () {
 

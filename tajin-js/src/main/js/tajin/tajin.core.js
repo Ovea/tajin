@@ -114,8 +114,8 @@
                         console.log('[tajin.core] configure - completed with options', self.options);
                     }
                     status = 'ready';
-                    if ($.isFunction(self.options.onready)) {
-                        self.options.onready(self);
+                    if ($.isFunction(self.options.onconfigure)) {
+                        self.options.onconfigure(self);
                     }
                 }
             },

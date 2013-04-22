@@ -73,6 +73,9 @@
                         elem.html(value);
                     }
                 }
+            },
+            onconfigure: function (tajin) {
+                console.info('tajin configured', tajin.toString());
             }
         };
     </script>
@@ -84,8 +87,8 @@
     <script type="text/javascript" src="../main/js/tajin/tajin.timer.js"></script>
     <script type="text/javascript" src="../main/js/tajin/tajin.store.js"></script>
     <script type="text/javascript" src="../main/js/tajin/tajin.i18n.js"></script>
-    <!--<script type="text/javascript" src="../main/js/tajin/tajin.dom.js"></script>-->
-    <!--<script type="text/javascript" src="../main/js/tajin/tajin.jqm.js"></script>-->
+    <script type="text/javascript" src="../main/js/tajin/tajin.dom.js"></script>
+    <script type="text/javascript" src="../main/js/tajin/tajin.jqm.js"></script>
 
     <script type="text/javascript" src="test.module.js"></script>
 
@@ -97,8 +100,8 @@
     <script type="text/javascript" src="spec/timer.spec.js"></script>
     <script type="text/javascript" src="spec/store.spec.js"></script>
     <script type="text/javascript" src="spec/i18n.spec.js"></script>
-    <!--<script type="text/javascript" src="spec/dom.spec.js"></script>-->
-    <!--<script type="text/javascript" src="spec/jqm.spec.js"></script>-->
+    <script type="text/javascript" src="spec/dom.spec.js"></script>
+    <script type="text/javascript" src="spec/jqm.spec.js"></script>
 
     <script type="text/javascript">
         $(function () {
@@ -124,10 +127,10 @@
         </div>
     </div>
     <div id="i18n">
-        <span rel="localize[msg3]"></span>
-        <a href="localize[link]">lien</a>
+        <span data-i18n="msg3"></span>
+        <a href="i18n[link]">lien</a>
 
-        <div custom-attr="localize[link]">tag</div>
+        <div custom-attr="i18n[link]">tag</div>
     </div>
 </div>
 

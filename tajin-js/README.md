@@ -5,9 +5,6 @@
     * extends systeme evenementiel
     * ajout callbacks
 
-  * PLUGIN I18N
-    * utiliser data-i18n au lieu de rel loclize
-
   * PLUGIN CORS
     * ajouter
 

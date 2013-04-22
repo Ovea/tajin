@@ -99,7 +99,7 @@ describe("tajin", function () {
             try {
                 t.configure({
                     onerror: obj.err,
-                    onready: obj.succ
+                    onconfigure: obj.succ
                 });
                 // since no module is asynchrnous, the error is thrown in this part of code
                 this.fail();
@@ -112,7 +112,7 @@ describe("tajin", function () {
             t.uninstall(failing);
             t.configure({
                 onerror: obj.err,
-                onready: obj.succ
+                onconfigure: obj.succ
             });
             waitsFor(function () {
                 return call_succ;

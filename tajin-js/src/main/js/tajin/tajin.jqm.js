@@ -41,22 +41,22 @@
                     page.name = name;
                     events[evt].fire(page);
                     if (name) {
-                        tevent.get('jqm/' + evt + '/' + name).fire(page);
+                        tevent.on('jqm/' + evt + '/' + name).fire(page);
                     }
                 };
             events = {
-                ready: tajin.event.add({
+                ready: tajin.event.on({
                     id: 'jqm/ready',
                     state: true
                 }),
-                beforeshow: tajin.event.add('jqm/beforeshow'),
-                show: tajin.event.add('jqm/show'),
-                beforehide: tajin.event.add('jqm/beforehide'),
-                hide: tajin.event.add('jqm/hide'),
-                init: tajin.event.add('jqm/init'),
-                first: tajin.event.add('jqm/first'),
-                count: tajin.event.add('jqm/count'),
-                restore: tajin.event.add('jqm/restore')
+                beforeshow: tajin.event.on('jqm/beforeshow'),
+                show: tajin.event.on('jqm/show'),
+                beforehide: tajin.event.on('jqm/beforehide'),
+                hide: tajin.event.on('jqm/hide'),
+                init: tajin.event.on('jqm/init'),
+                first: tajin.event.on('jqm/first'),
+                count: tajin.event.on('jqm/count'),
+                restore: tajin.event.on('jqm/restore')
             };
             $(function () {
                 restoreState();
