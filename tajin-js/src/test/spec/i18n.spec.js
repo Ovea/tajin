@@ -118,7 +118,7 @@ describe("tajin.i18n", function () {
                 }
             };
             spyOn(obj, 'f');
-            tajin.event.get('i18n/bundle/loaded').listen(obj.f);
+            tajin.event.on('i18n/bundle/loaded').listen(obj.f);
             tajin.i18n.load('app', 'fr_FR');
             expect(obj.f).toHaveBeenCalled();
         });
@@ -268,7 +268,7 @@ describe("tajin.i18n", function () {
                 };
 
                 spyOn(obj, 'cb');
-                tajin.event.get('i18n/image/loaded').listen(obj.cb);
+                tajin.event.on('i18n/image/loaded').listen(obj.cb);
 
                 var res_fr_CA = tajin.i18n.resources('fr-CA');
                 res_fr_CA.image('pub.jpg', function () {
