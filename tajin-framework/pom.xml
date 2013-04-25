@@ -125,11 +125,6 @@
             <artifactId>joda-time</artifactId>
             <optional>true</optional>
         </dependency>
-        <dependency>
-            <groupId>org.eclipse.persistence</groupId>
-            <artifactId>eclipselink</artifactId>
-            <optional>true</optional>
-        </dependency>
 
         <!-- logging -->
         <dependency>
