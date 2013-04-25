@@ -91,6 +91,38 @@
             <groupId>com.yahoo.platform.yui</groupId>
             <artifactId>yuicompressor</artifactId>
         </dependency>
+
+        <dependency>
+            <groupId>com.ovea.tajin.servers</groupId>
+            <artifactId>tajin-server-jetty9</artifactId>
+            <version>1.0.b12</version>
+            <scope>test</scope>
+        </dependency>
+        <dependency>
+            <groupId>com.mycila</groupId>
+            <artifactId>mycila-junit</artifactId>
+            <scope>test</scope>
+        </dependency>
+        <dependency>
+            <groupId>org.codehaus.jettison</groupId>
+            <artifactId>jettison</artifactId>
+            <scope>test</scope>
+        </dependency>
+        <dependency>
+            <groupId>junit</groupId>
+            <artifactId>junit-dep</artifactId>
+            <scope>test</scope>
+        </dependency>
+        <dependency>
+            <groupId>org.hamcrest</groupId>
+            <artifactId>hamcrest-core</artifactId>
+            <scope>test</scope>
+        </dependency>
+        <dependency>
+            <groupId>org.hamcrest</groupId>
+            <artifactId>hamcrest-library</artifactId>
+            <scope>test</scope>
+        </dependency>
     </dependencies>
 
 </project>
