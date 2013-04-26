@@ -47,11 +47,12 @@ import javax.servlet.ServletContextListener
  */
 class InternalWebModule extends ServletModule implements ServletContextListener {
 
-    final List<Application> applications = ServiceLoader.load(Application) as List
+    final List<Application> applications = new LinkedList<>()
     private final PropertySettings settings
 
     InternalWebModule(PropertySettings settings) {
         this.settings = settings
+        ServiceLoader.load(Application).each {applications << it}
     }
 
     @Override
