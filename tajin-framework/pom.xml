@@ -48,20 +48,23 @@
                     <shadeSourcesContent>true</shadeSourcesContent>
                     <filters>
                         <filter>
-                            <artifact>org.codehaus.groovy:groovy-all</artifact>
-                            <excludes>
-                                <exclude>overview.html</exclude>
-                                <exclude>overviewj.html</exclude>
-                            </excludes>
-                        </filter>
-                        <filter>
-                            <artifact>org.apache.ant:ant</artifact>
+                            <artifact>*:*</artifact>
                             <excludes>
                                 <exclude>images/**</exclude>
+                                <exclude>overview.html</exclude>
+                                <exclude>overviewj.html</exclude>
+                                <exclude>about.html</exclude>
+                                <exclude>LICENSE</exclude>
+                                <exclude>NOTICE</exclude>
+                                <exclude>jetty-dir.css</exclude>
+                                <exclude>META-INF/*.RSA</exclude>
+                                <exclude>META-INF/*.SF</exclude>
+                                <exclude>about_files/**</exclude>
                             </excludes>
                         </filter>
                     </filters>
                     <transformers>
+                        <transformer implementation="org.apache.maven.plugins.shade.resource.ServicesResourceTransformer"/>
                         <transformer implementation="org.apache.maven.plugins.shade.resource.ManifestResourceTransformer">
                             <mainClass>com.ovea.tajin.framework.app.Start</mainClass>
                         </transformer>
@@ -79,11 +82,12 @@
             <artifactId>javax.inject</artifactId>
             <version>1</version>
         </dependency>
-        <dependency>
+        <!-- included in jersey-core -->
+        <!--<dependency>
             <groupId>javax.ws.rs</groupId>
             <artifactId>jsr311-api</artifactId>
             <version>1.1.1</version>
-        </dependency>
+        </dependency>-->
         <dependency>
             <groupId>org.slf4j</groupId>
             <artifactId>slf4j-api</artifactId>

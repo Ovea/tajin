@@ -36,6 +36,10 @@ public final class HttpCookie extends SimpleCookie implements Cookie {
         super(name);
     }
 
+    public HttpCookie() {
+
+    }
+
     private HttpCookie(Cookie cookie, String domain) {
         super(cookie);
         setDomain(domain);

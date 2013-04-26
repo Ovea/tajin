@@ -60,6 +60,11 @@ public final class PropertySettings {
         return new File(getRequired(key));
     }
 
+    public File getPath(String key, File def) {
+        String v = resolve(key);
+        return v == null ? def : new File(v);
+    }
+
     public String getString(String key) {
         return getRequired(key);
     }

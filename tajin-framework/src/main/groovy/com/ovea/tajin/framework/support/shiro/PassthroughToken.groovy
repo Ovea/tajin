@@ -13,21 +13,33 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package com.ovea.tajin.framework.support.guice;
+package com.ovea.tajin.framework.support.shiro
 
-import com.google.inject.TypeLiteral;
-
-import javax.annotation.PreDestroy;
-import java.lang.reflect.Method;
-import java.lang.reflect.Modifier;
+import groovy.transform.Immutable
+import groovy.transform.ToString
+import org.apache.shiro.SecurityUtils
+import org.apache.shiro.authc.HostAuthenticationToken
+import org.apache.shiro.authc.RememberMeAuthenticationToken
+import org.apache.shiro.web.subject.WebSubject
 
 /**
  * @author Mathieu Carbou (mathieu.carbou@gmail.com)
  */
-final class Jsr250PreDestroyHandler extends MethodHandlerSkeleton<PreDestroy> {
+@Immutable
+@ToString
+class PassthroughToken implements HostAuthenticationToken, RememberMeAuthenticationToken {
+
+    String email
+    boolean rememberMe = false
+    String host = ((WebSubject) SecurityUtils.subject).servletRequest.remoteHost
+
     @Override
-    public <T> void handle(TypeLiteral<? extends T> type, T instance, Method method, PreDestroy annotation) {
-        if (!Modifier.isStatic(method.getModifiers()))
-            super.handle(type, instance, method, annotation);
+    Object getCredentials() {
+        return null
+    }
+
+    @Override
+    Object getPrincipal() {
+        return email
     }
 }

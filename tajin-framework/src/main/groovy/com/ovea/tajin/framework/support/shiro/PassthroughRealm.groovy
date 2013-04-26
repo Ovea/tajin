@@ -13,9 +13,16 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package com.ovea.tajin.framework.support.guice;
+package com.ovea.tajin.framework.support.shiro
 
-import java.lang.annotation.Annotation;
+import org.apache.shiro.authc.credential.AllowAllCredentialsMatcher
 
-public interface AnnotatedMemberHandler<A extends Annotation> extends MemberHandler<A, AnnotatedMember<?>> {
+/**
+ * @author Mathieu Carbou (mathieu.carbou@gmail.com)
+ */
+class PassthroughRealm extends UsernamePasswordRealm {
+    PassthroughRealm() {
+        authenticationTokenClass = PassthroughToken
+        credentialsMatcher = new AllowAllCredentialsMatcher()
+    }
 }

@@ -35,7 +35,7 @@ public final class CookieLocaleManager implements Provider<Locale> {
     Provider<HttpServletResponse> response;
 
     @Inject
-    @Named("locale")
+    @Named("loc")
     Cookie cookie;
 
     public void set(Locale locale) {

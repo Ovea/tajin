@@ -1,11 +1,11 @@
 /**
- * Copyright (C) 2010 Mycila <mathieu.carbou@gmail.com>
+ * Copyright (C) 2011 Ovea <dev@ovea.com>
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
  *
- *         http://www.apache.org/licenses/LICENSE-2.0
+ * http://www.apache.org/licenses/LICENSE-2.0
  *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
@@ -13,7 +13,6 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-
 package com.ovea.tajin.framework.support.guice;
 
 import com.google.inject.Injector;
@@ -25,6 +24,8 @@ import com.google.inject.util.Modules;
 import javax.servlet.ServletContextEvent;
 import java.lang.reflect.Field;
 import java.lang.reflect.Modifier;
+import java.util.Collection;
+import java.util.LinkedList;
 
 /**
  * @author Mathieu Carbou (mathieu.carbou@gmail.com)
@@ -32,9 +33,20 @@ import java.lang.reflect.Modifier;
  */
 public class GuiceListener extends GuiceServletContextListener {
 
+    private final Collection<Module> modules = new LinkedList<>();
+
+    public GuiceListener() {
+    }
+
+    public GuiceListener(Collection<? extends Module> modules) {
+        this.modules.addAll(modules);
+    }
+
     @Override
     protected Injector getInjector() {
-        return Jsr250.createInjector(Stage.PRODUCTION, Modules.override(ServiceModules.loadFromClasspath(Module.class)).with(HttpContext.MODULE));
+        Collection<Module> modules = new LinkedList<>(this.modules);
+        modules.add(ServiceModules.loadFromClasspath(Module.class));
+        return Jsr250.createInjector(Stage.PRODUCTION, Modules.override(modules).with(HttpContext.MODULE));
     }
 
     @Override
@@ -58,7 +70,11 @@ public class GuiceListener extends GuiceServletContextListener {
             // set it to null
             queueField.set(null, null);
             // provoque a GC to clean the thread
-            System.gc();System.gc();System.gc();System.gc();System.gc();
+            System.gc();
+            System.gc();
+            System.gc();
+            System.gc();
+            System.gc();
         } catch (Exception ignored) {
         }
     }
