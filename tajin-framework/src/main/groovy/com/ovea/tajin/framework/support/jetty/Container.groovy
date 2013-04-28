@@ -13,9 +13,11 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package com.ovea.tajin.framework.web
+package com.ovea.tajin.framework.support.jetty
 
+import com.google.inject.Module
 import com.google.inject.servlet.GuiceFilter
+import com.ovea.tajin.framework.app.Application
 import com.ovea.tajin.framework.prop.PropertySettings
 import com.ovea.tajin.framework.support.guice.GuiceListener
 import org.eclipse.jetty.jmx.MBeanContainer
@@ -26,6 +28,8 @@ import org.eclipse.jetty.server.handler.RequestLogHandler
 import org.eclipse.jetty.servlet.ServletContextHandler
 
 import javax.servlet.DispatcherType
+import javax.servlet.ServletContextEvent
+import javax.servlet.ServletContextListener
 import javax.servlet.http.HttpSessionEvent
 import javax.servlet.http.HttpSessionListener
 import java.lang.management.ManagementFactory
@@ -38,7 +42,7 @@ class Container {
 
     private final Server server
 
-    Container(PropertySettings settings) {
+    Container(PropertySettings settings, Collection<Application> applications, Module module) {
         HandlerCollection handlerCollection = new HandlerCollection()
         ServletContextHandler context = new ServletContextHandler(handlerCollection, settings.getString('server.context', '/'))
         handlerCollection.addHandler(context)
@@ -63,10 +67,19 @@ class Container {
         server.addBean(new MBeanContainer(ManagementFactory.platformMBeanServer))
         context.setInitParameter('org.eclipse.jetty.servlet.SessionIdPathParameterName', 'none')
         context.setInitParameter('org.eclipse.jetty.servlet.SessionCookie', settings.getString('session.cookie.name', 'id'))
-        InternalWebModule module = new InternalWebModule(settings)
         context.addFilter(GuiceFilter, '/*', EnumSet.allOf(DispatcherType))
         context.addEventListener(new GuiceListener([module]))
-        context.addEventListener(module)
+        context.addEventListener(new ServletContextListener() {
+            @Override
+            void contextDestroyed(ServletContextEvent sce) {
+                applications*.onstop()
+            }
+
+            @Override
+            void contextInitialized(ServletContextEvent sce) {
+                applications*.onStart()
+            }
+        })
         context.addEventListener(new HttpSessionListener() {
             @Override
             void sessionCreated(HttpSessionEvent se) {

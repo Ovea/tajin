@@ -33,7 +33,7 @@ import static com.ovea.tajin.framework.support.guice.Reflect.findMethods;
 /**
  * @author Mathieu Carbou (mathieu.carbou@gmail.com)
  */
-public final class MethodHandlerTypeListener<A extends Annotation> implements TypeListener {
+final class MethodHandlerTypeListener<A extends Annotation> implements TypeListener {
     private final Class<A> annotationType;
     private final Class<? extends MethodHandler<A>> handlerClass;
 

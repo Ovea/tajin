@@ -24,7 +24,7 @@ import java.util.List;
 /**
  * @author Mathieu Carbou (mathieu.carbou@gmail.com)
  */
-public class DefaultLoader implements Loader {
+class DefaultLoader implements Loader {
 
     private final ClassLoader classLoader;
 

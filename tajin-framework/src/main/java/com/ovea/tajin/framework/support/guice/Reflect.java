@@ -17,6 +17,9 @@ package com.ovea.tajin.framework.support.guice;
 
 import com.google.common.base.Function;
 import com.google.common.base.Predicate;
+import com.google.common.cache.CacheBuilder;
+import com.google.common.cache.CacheLoader;
+import com.google.common.cache.LoadingCache;
 import com.google.common.collect.Iterables;
 import com.google.common.collect.Lists;
 import com.google.inject.Key;
@@ -25,11 +28,16 @@ import com.google.inject.matcher.AbstractMatcher;
 import com.google.inject.matcher.Matcher;
 
 import java.lang.annotation.Annotation;
-import java.lang.reflect.*;
+import java.lang.reflect.AnnotatedElement;
+import java.lang.reflect.Field;
+import java.lang.reflect.Member;
+import java.lang.reflect.Method;
+import java.lang.reflect.Modifier;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.LinkedList;
 import java.util.List;
+import java.util.concurrent.ExecutionException;
 
 import static com.google.common.collect.Iterables.filter;
 import static com.google.common.collect.Iterables.transform;
@@ -38,7 +46,7 @@ import static java.util.Arrays.asList;
 /**
  * @author Mathieu Carbou (mathieu.carbou@gmail.com)
  */
-public final class Reflect {
+final class Reflect {
 
 
     public static List<Key<?>> getParameterKeys(TypeLiteral<?> injectedType, Method injectedMember) {
@@ -124,7 +132,11 @@ public final class Reflect {
     }
 
     public static Iterable<Method> findMethods(final Class<?> clazz) {
-        return transform(METHOD_CACHE.get(clazz), TO_METHOD);
+        try {
+            return transform(METHOD_CACHE.get(clazz), TO_METHOD);
+        } catch (ExecutionException e) {
+            throw new RuntimeException(e.getMessage(), e);
+        }
     }
 
     public static Iterable<Field> findFields(Class<?> type, Predicate<? super Field> predicate) {
@@ -164,9 +176,9 @@ public final class Reflect {
 
     private static final List<Signature> OBJECT_METHODS = Lists.newLinkedList(transform(asList(Object.class.getDeclaredMethods()), TO_SIGNATURE));
 
-    private static final WeakCache<Class<?>, Iterable<Signature>> METHOD_CACHE = new WeakCache<Class<?>, Iterable<Signature>>(new WeakCache.Provider<Class<?>, Iterable<Signature>>() {
+    private static final LoadingCache<Class<?>, Iterable<Signature>> METHOD_CACHE = CacheBuilder.newBuilder().weakKeys().weakValues().build(new CacheLoader<Class<?>, Iterable<Signature>>() {
         @Override
-        public Iterable<Signature> get(Class<?> clazz) {
+        public Iterable<Signature> load(Class<?> clazz) throws Exception {
             if (clazz == null)
                 return Collections.emptyList();
             if (clazz == Object.class)

@@ -20,6 +20,6 @@ import java.lang.reflect.InvocationTargetException;
 /**
  * @author Mathieu Carbou (mathieu.carbou@gmail.com)
  */
-public interface MethodInvoker {
+interface MethodInvoker {
     Object invoke(Object target, Object... parameters) throws IllegalAccessException, InvocationTargetException;
 }

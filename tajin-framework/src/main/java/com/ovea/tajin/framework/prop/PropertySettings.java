@@ -87,6 +87,11 @@ public final class PropertySettings {
         return Resource.resource(getRequired(key));
     }
 
+    public Resource getResource(String key, String def) {
+        String v = resolve(key);
+        return Resource.resource(v == null ? def : v);
+    }
+
     private String getRequired(String key) throws MissingPropertySettingException {
         String v = resolve(key);
         if (v == null)

@@ -26,7 +26,7 @@ import java.util.*;
  * @author Mathieu Carbou <mathieu.carbou@gmail.com>
  * @param <S> The type of the service to be loaded by this loader
  */
-public final class ServiceClassLoader<S> implements Iterable<Class<S>> {
+final class ServiceClassLoader<S> implements Iterable<Class<S>> {
 
     private static final String PREFIX = "META-INF/services/";
     private final Class<S> service;

@@ -15,25 +15,32 @@
  */
 package com.ovea.tajin.framework.support.guice;
 
+import com.google.common.cache.CacheBuilder;
+import com.google.common.cache.CacheLoader;
+import com.google.common.cache.LoadingCache;
+import com.google.inject.internal.BytecodeGen;
+import com.google.inject.internal.cglib.reflect.$FastMethod;
+
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import java.lang.reflect.Modifier;
+import java.util.concurrent.ExecutionException;
 
 /**
  * @author Mathieu Carbou (mathieu.carbou@gmail.com)
  */
-public class Proxy {
+class Proxy {
 
     private Proxy() {
     }
 
-    private static final WeakCache<Method, MethodInvoker> INVOKER_CACHE = new WeakCache<Method, MethodInvoker>(new WeakCache.Provider<Method, MethodInvoker>() {
+    private static final LoadingCache<Method, MethodInvoker> INVOKER_CACHE = CacheBuilder.newBuilder().weakKeys().weakValues().build(new CacheLoader<Method, MethodInvoker>() {
         @Override
-        public MethodInvoker get(final Method method) {
+        public MethodInvoker load(final Method method) throws Exception {
             int modifiers = method.getModifiers();
             if (!Modifier.isPrivate(modifiers) && !Modifier.isProtected(modifiers)) {
                 try {
-                    final net.sf.cglib.reflect.FastMethod fastMethod = BytecodeGen.newFastClass(method.getDeclaringClass(), BytecodeGen.Visibility.forMember(method)).getMethod(method);
+                    final $FastMethod fastMethod = BytecodeGen.newFastClass(method.getDeclaringClass(), BytecodeGen.Visibility.forMember(method)).getMethod(method);
                     return new MethodInvoker() {
                         public Object invoke(Object target, Object... parameters) throws IllegalAccessException, InvocationTargetException {
                             return fastMethod.invoke(target, parameters);
@@ -53,7 +60,11 @@ public class Proxy {
     });
 
     public static MethodInvoker invoker(final Method method) {
-        return INVOKER_CACHE.get(method);
+        try {
+            return INVOKER_CACHE.get(method);
+        } catch (ExecutionException e) {
+            throw new RuntimeException(e.getMessage(), e);
+        }
     }
 
 }

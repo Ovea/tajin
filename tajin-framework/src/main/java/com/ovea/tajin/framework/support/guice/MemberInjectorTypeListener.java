@@ -31,7 +31,7 @@ import static com.ovea.tajin.framework.support.guice.TajinGuiceException.runtime
 /**
  * @author Mathieu Carbou (mathieu.carbou@gmail.com)
  */
-public final class MemberInjectorTypeListener<A extends Annotation> implements TypeListener {
+final class MemberInjectorTypeListener<A extends Annotation> implements TypeListener {
 
     private final Class<A> annotationType;
     private final Class<? extends KeyProvider<A>> providerClass;

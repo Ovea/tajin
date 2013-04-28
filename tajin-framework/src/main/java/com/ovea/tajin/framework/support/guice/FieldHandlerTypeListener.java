@@ -30,7 +30,7 @@ import static com.ovea.tajin.framework.support.guice.Reflect.findFields;
 /**
  * @author Mathieu Carbou (mathieu.carbou@gmail.com)
  */
-public final class FieldHandlerTypeListener<A extends Annotation> implements TypeListener {
+final class FieldHandlerTypeListener<A extends Annotation> implements TypeListener {
     private final Class<A> annotationType;
     private final Class<? extends FieldHandler<A>> handlerClass;
 

@@ -44,7 +44,7 @@ public final class HttpContext {
         }
     };
 
-    public static final Module MODULE = new Module() {
+    static final Module MODULE = new Module() {
         @Override
         public void configure(Binder binder) {
         }
@@ -80,15 +80,15 @@ public final class HttpContext {
         this.response = response;
     }
 
-    public HttpServletRequest request() {
+    public HttpServletRequest getRequest() {
         return request;
     }
 
-    public HttpServletResponse response() {
+    public HttpServletResponse getResponse() {
         return response;
     }
 
-    public static void change(HttpServletRequest request, HttpServletResponse response) {
+    public static void start(HttpServletRequest request, HttpServletResponse response) {
         if (LOGGER.isLoggable(Level.FINE)) {
             LOGGER.fine("[" + request.getRequestURI() + "] Changing HttpContext to request " + request.getClass().getName() + " and response " + response.getClass().getName());
         }

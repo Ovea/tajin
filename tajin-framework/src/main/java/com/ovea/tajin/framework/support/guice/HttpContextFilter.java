@@ -37,7 +37,7 @@ public final class HttpContextFilter implements Filter {
 
     @Override
     public void doFilter(ServletRequest request, ServletResponse response, FilterChain chain) throws IOException, ServletException {
-        HttpContext.change((HttpServletRequest) request, (HttpServletResponse) response);
+        HttpContext.start((HttpServletRequest) request, (HttpServletResponse) response);
         try {
             chain.doFilter(request, response);
         } finally {

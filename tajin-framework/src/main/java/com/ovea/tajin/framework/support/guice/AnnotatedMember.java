@@ -22,7 +22,7 @@ import java.lang.reflect.Member;
 /**
  * @author Mathieu Carbou (mathieu.carbou@gmail.com)
  */
-public final class AnnotatedMember<A extends Member & AnnotatedElement> implements Member, AnnotatedElement {
+final class AnnotatedMember<A extends Member & AnnotatedElement> implements Member, AnnotatedElement {
 
     private final A member;
 

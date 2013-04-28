@@ -25,7 +25,7 @@ import java.util.ServiceLoader;
 /**
  * @author Mathieu Carbou (mathieu.carbou@gmail.com)
  */
-public class ServiceModules {
+public final class ServiceModules {
 
     private ServiceModules() {
     }

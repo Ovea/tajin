@@ -15,17 +15,14 @@
  */
 package com.ovea.tajin.framework.app
 
-import ch.qos.logback.classic.LoggerContext
-import ch.qos.logback.classic.joran.JoranConfigurator
-import ch.qos.logback.core.joran.spi.JoranException
-import ch.qos.logback.core.util.StatusPrinter
 import com.beust.jcommander.JCommander
 import com.beust.jcommander.Parameter
 import com.beust.jcommander.ParameterException
+import com.google.common.collect.Lists
 import com.ovea.tajin.framework.io.Resource
 import com.ovea.tajin.framework.prop.PropertySettings
-import com.ovea.tajin.framework.web.Container
-import org.slf4j.LoggerFactory
+import com.ovea.tajin.framework.support.logback.LogbackConfigurator
+import com.ovea.tajin.framework.support.jetty.Container
 
 /**
  * @author Mathieu Carbou (mathieu.carbou@gmail.com)
@@ -51,22 +48,13 @@ class Start {
         // load config
         PropertySettings settings = options.config ? new PropertySettings(Resource.file(options.config)) : new PropertySettings()
         // setup logging
-        settings.getPath('logging.app.config', null)?.with { File config ->
-            LoggerContext context = (LoggerContext) LoggerFactory.getILoggerFactory();
-            try {
-                JoranConfigurator configurator = new JoranConfigurator();
-                configurator.setContext(context);
-                // Call context.reset() to clear any previous configuration, e.g. default
-                // configuration. For multi-step configuration, omit calling context.reset().
-                context.reset();
-                configurator.doConfigure(config);
-            } catch (JoranException ignored) {
-                // StatusPrinter will handle this
-            }
-            StatusPrinter.printInCaseOfErrorsOrWarnings(context);
-        }
+        Resource loggingConfig = settings.getResource('logging.app.config', 'classpath:tajin-logback.xml')
+        LogbackConfigurator.configure(loggingConfig)
+        // load applications
+        Collection<Application> apps = Lists.newLinkedList(ServiceLoader.load(Application))
+        println "Starting applications: ${apps.collect {it.class.simpleName}.join(', ')}"
         // config and start container
-        Container container = new Container(settings)
+        Container container = new Container(settings, apps, new InternalWebModule(settings, apps))
         container.start()
     }
 

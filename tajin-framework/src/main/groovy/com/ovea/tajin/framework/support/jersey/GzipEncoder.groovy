@@ -15,7 +15,6 @@
  */
 package com.ovea.tajin.framework.support.jersey
 
-import com.ovea.tajin.framework.web.NoGzip
 import com.sun.jersey.spi.container.ContainerRequest
 import com.sun.jersey.spi.container.ContainerResponse
 import com.sun.jersey.spi.container.ContainerResponseFilter

@@ -15,10 +15,11 @@
  */
 package com.ovea.tajin.framework.web
 
+import com.google.inject.servlet.RequestScoped
+import com.ovea.tajin.framework.prop.PropertySettings
 import com.ovea.tajin.framework.util.LocaleUtil
 
 import javax.inject.Inject
-import javax.inject.Named
 import javax.inject.Provider
 import javax.servlet.http.HttpServletRequest
 import javax.servlet.http.HttpServletResponse
@@ -26,7 +27,11 @@ import javax.servlet.http.HttpServletResponse
 /**
  * @author Mathieu Carbou (mathieu.carbou@gmail.com)
  */
-public final class CookieLocaleManager implements Provider<Locale> {
+@RequestScoped
+final class CookieLocaleManager implements Provider<Locale> {
+
+    private static final int DAY_SEC = 60 * 60 * 24
+    private static final String DEFAULT_NAME = 'lc'
 
     @Inject
     Provider<HttpServletRequest> request;
@@ -35,28 +40,39 @@ public final class CookieLocaleManager implements Provider<Locale> {
     Provider<HttpServletResponse> response;
 
     @Inject
-    @Named("loc")
-    Cookie cookie;
+    PropertySettings settings
 
     public void set(Locale locale) {
-        cookie.withValue(locale.toString()).saveTo(request.get(), response.get());
+        newLocaleCookie().withValue(locale.toString()).saveTo(request.get(), response.get());
     }
 
     @Override
     public Locale get() {
+        Locale found = null
         // first try to get value from cookie
-        String val = cookie.readValue(request.get());
-        if (val != null) {
-            return LocaleUtil.valueOf(val);
+        String val = newLocaleCookie().readValue(request.get());
+        if (val) {
+            found = LocaleUtil.valueOf(val)
+            if (!found) {
+                // when using cors, check the request parameters if a cookie is not present
+                val = request.get().getParameter(settings.getString('locale.cookie.name', DEFAULT_NAME));
+                if (val) {
+                    found = LocaleUtil.valueOf(val);
+                    if (!found) {
+                        // otherwise: no cookie exists client-side => first time, check request header and set cookie
+                        Locale l = request.get().getHeader("Accept-Language") == null ? Locale.US : request.get().getLocale();
+                    }
+                }
+            }
         }
-        // when using cors, check the request parameters if a cookie is not present
-        val = request.get().getParameter("locale");
-        if (val != null) {
-            return LocaleUtil.valueOf(val);
-        }
-        // otherwise: no cookie exists client-side => first time, check request header and set cookie
-        Locale l = request.get().getHeader("Accept-Language") == null ? Locale.US : request.get().getLocale();
-        set(l);
-        return l;
+        return found?:Locale.US;
+    }
+
+    Cookie newLocaleCookie() {
+        return new HttpCookie(
+            name: settings.getString('locale.cookie.name', DEFAULT_NAME),
+            maxAge: settings.getInt('locale.cookie.days', 365) * DAY_SEC,
+            httpOnly: false
+        )
     }
 }
