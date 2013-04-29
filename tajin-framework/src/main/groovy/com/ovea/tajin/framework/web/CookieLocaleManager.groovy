@@ -43,29 +43,28 @@ final class CookieLocaleManager implements Provider<Locale> {
     PropertySettings settings
 
     public void set(Locale locale) {
-        newLocaleCookie().withValue(locale.toString()).saveTo(request.get(), response.get());
+        newLocaleCookie().withValue(locale.toString().replace('_', '-')).saveTo(request.get(), response.get());
     }
 
     @Override
     public Locale get() {
-        Locale found = null
         // first try to get value from cookie
-        String val = newLocaleCookie().readValue(request.get());
-        if (val) {
-            found = LocaleUtil.valueOf(val)
-            if (!found) {
-                // when using cors, check the request parameters if a cookie is not present
-                val = request.get().getParameter(settings.getString('locale.cookie.name', DEFAULT_NAME));
-                if (val) {
-                    found = LocaleUtil.valueOf(val);
-                    if (!found) {
-                        // otherwise: no cookie exists client-side => first time, check request header and set cookie
-                        Locale l = request.get().getHeader("Accept-Language") == null ? Locale.US : request.get().getLocale();
-                    }
-                }
+        Locale found = LocaleUtil.valueOf(newLocaleCookie().readValue(request.get()))
+        if (!found) {
+            // when using cors, check the request parameters if a cookie is not present
+            found = LocaleUtil.valueOf(request.get().getParameter(settings.getString('locale.cookie.name', DEFAULT_NAME)));
+            if (!found && request.get().getHeader("Accept-Language")) {
+                // otherwise: no cookie exists client-side => first time, check request header and set cookie
+                // must check if Accept-Language header is there otherwise the default system locale is returned
+                found = request.get().getLocale();
             }
+            if (!found) {
+                found = LocaleUtil.valueOf(settings.getString('locale.default', 'en_US'), Locale.US)
+            }
+            // set locale cookie at the end
+            set(found)
         }
-        return found?:Locale.US;
+        return found
     }
 
     Cookie newLocaleCookie() {

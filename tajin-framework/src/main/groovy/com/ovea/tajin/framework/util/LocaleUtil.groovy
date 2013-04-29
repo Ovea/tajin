@@ -40,10 +40,10 @@ public final class LocaleUtil {
         if (localeString.toLowerCase().equals("default")) {
             return Locale.getDefault();
         }
-
+        localeString = localeString.replace('-', '_');
         // Extract language
         int languageIndex = localeString.indexOf('_');
-        String language = null;
+        String language;
         if (languageIndex == -1) {
             // No further "_" so is "{language}" only
             return new Locale(localeString, "");
@@ -53,7 +53,7 @@ public final class LocaleUtil {
 
         // Extract country
         int countryIndex = localeString.indexOf('_', languageIndex + 1);
-        String country = null;
+        String country;
         if (countryIndex == -1) {
             // No further "_" so is "{language}_{country}"
             country = localeString.substring(languageIndex + 1);
