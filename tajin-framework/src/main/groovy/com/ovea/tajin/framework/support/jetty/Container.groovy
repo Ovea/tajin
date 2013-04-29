@@ -129,7 +129,7 @@ class Container {
             )
             HttpConfiguration httpsConfiguration = new HttpConfiguration(httpConfiguration)
             httpsConfiguration.addCustomizer(new SecureRequestCustomizer())
-            ServerConnector https = new ServerConnector(server, [new SslConnectionFactory(sslContextFactory, 'http/1.1'), new HttpConnectionFactory(httpsConfiguration)] as SslConnectionFactory[])
+            ServerConnector https = new ServerConnector(server, [new SslConnectionFactory(sslContextFactory, 'http/1.1'), new HttpConnectionFactory(httpsConfiguration)] as ConnectionFactory[])
             https.port = settings.getInt('server.https.port')
             https.idleTimeout = 30000
             server.addConnector(https)
