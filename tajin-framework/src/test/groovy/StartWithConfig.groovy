@@ -6,6 +6,10 @@ import com.ovea.tajin.framework.app.TajinApplication
  */
 class StartWithConfig {
     public static void main(String[] args) {
-        TajinApplication.main('-c', 'test/data/sample.properties')
+        //TajinApplication.main('-c', 'classpath:com/ovea/tajin/framework/config.properties')
+        //TajinApplication.main('-c', 'src/test/data/sample1.properties')
+        //TajinApplication.main('-c', 'src/test/data/sample2.properties')
+        //TajinApplication.main('-c', 'src/test/data/sample3.properties')
+        TajinApplication.main('-c', 'src/test/data/sample4.properties')
     }
 }

@@ -33,7 +33,6 @@ class LogbackConfigurator {
     static void configure(Resource resource) {
         LogManager.getLogManager().reset()
         SLF4JBridgeHandler.install()
-        println "Logging configuration: ${resource}"
         LoggerContext context = (LoggerContext) LoggerFactory.getILoggerFactory();
         try {
             JoranConfigurator configurator = new JoranConfigurator();

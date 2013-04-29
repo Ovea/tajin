@@ -74,7 +74,7 @@ class InternalWebModule extends ServletModule {
             bind(it.class).toInstance(it)
         }
 
-        // configure filters
+        // configure CORS filter if desired
         settings.getString('cors.allowedOrigins', null)?.with { String origin ->
             filter('/*').through(CrossOriginFilter, [
                 allowedMethods: 'GET,POST,HEAD,PUT,DELETE',
@@ -130,7 +130,14 @@ class InternalWebModule extends ServletModule {
     }
 
     private static WebBinder proxy(Binder binder) {
-        return new groovy.util.Proxy(adaptee: binder) as WebBinder
+        def proxy = new groovy.util.Proxy() {
+            void configure(Closure<?> c) {
+                c.delegate = binder
+                c()
+            }
+        }
+        proxy.adaptee = binder
+        return proxy as WebBinder
     }
 
 }

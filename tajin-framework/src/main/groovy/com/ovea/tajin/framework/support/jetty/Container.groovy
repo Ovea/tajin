@@ -21,11 +21,11 @@ import com.ovea.tajin.framework.app.Application
 import com.ovea.tajin.framework.prop.PropertySettings
 import com.ovea.tajin.framework.support.guice.GuiceListener
 import org.eclipse.jetty.jmx.MBeanContainer
-import org.eclipse.jetty.server.AsyncNCSARequestLog
-import org.eclipse.jetty.server.Server
+import org.eclipse.jetty.server.*
 import org.eclipse.jetty.server.handler.HandlerCollection
 import org.eclipse.jetty.server.handler.RequestLogHandler
 import org.eclipse.jetty.servlet.ServletContextHandler
+import org.eclipse.jetty.util.ssl.SslContextFactory
 
 import javax.servlet.DispatcherType
 import javax.servlet.ServletContextEvent
@@ -44,27 +44,9 @@ class Container {
 
     Container(PropertySettings settings, Collection<Application> applications, Module module) {
         HandlerCollection handlerCollection = new HandlerCollection()
+        // create jetty context
         ServletContextHandler context = new ServletContextHandler(handlerCollection, settings.getString('server.context', '/'))
         handlerCollection.addHandler(context)
-        settings.getPath('logging.request.folder', null)?.with { File dir ->
-            RequestLogHandler requestLogHandler = new RequestLogHandler(
-                _requestLog: new AsyncNCSARequestLog(
-                    filename: "${dir.absolutePath}/request.yyyy_mm_dd.log",
-                    filenameDateFormat: 'yyyy_MM_dd',
-                    retainDays: settings.getInt('logging.request.retainDays', 30),
-                    extended: settings.getBoolean('logging.request.extended', false),
-                    logCookies: settings.getBoolean('logging.request.cookies', false),
-                    append: true,
-                    logTimeZone: 'GMT',
-                    ignorePaths: settings.getStrings('logging.request.ignores', '').collect { it.trim() },
-                )
-            )
-            handlerCollection.addHandler(requestLogHandler)
-        }
-        server = new Server(settings.getInt('server.port', 8080))
-        server.stopAtShutdown = true
-        server.setHandler(handlerCollection)
-        server.addBean(new MBeanContainer(ManagementFactory.platformMBeanServer))
         context.setInitParameter('org.eclipse.jetty.servlet.SessionIdPathParameterName', 'none')
         context.setInitParameter('org.eclipse.jetty.servlet.SessionCookie', settings.getString('session.cookie.name', 'id'))
         context.addFilter(GuiceFilter, '/*', EnumSet.allOf(DispatcherType))
@@ -91,6 +73,67 @@ class Container {
 
             }
         })
+        // attach a NCSA logger if desired
+        settings.getPath('logging.request.folder', null)?.with { File dir ->
+            dir.mkdirs()
+            handlerCollection.addHandler(new RequestLogHandler(
+                requestLog: new AsyncNCSARequestLog(
+                    filename: "${dir.absolutePath}/request.yyyy_mm_dd.log",
+                    filenameDateFormat: 'yyyy-MM-dd',
+                    retainDays: settings.getInt('logging.request.retainDays', 30),
+                    extended: settings.getBoolean('logging.request.extended', false),
+                    logCookies: settings.getBoolean('logging.request.cookies', false),
+                    append: true,
+                    logTimeZone: 'GMT',
+                    ignorePaths: settings.getStrings('logging.request.ignores', '').collect { it.trim() },
+                )
+            ))
+        }
+        // create jetty server
+        server = new Server()
+        server.stopAtShutdown = true
+        server.setHandler(handlerCollection)
+        server.addBean(new MBeanContainer(ManagementFactory.platformMBeanServer))
+        // configure HTTP connector
+        HttpConfiguration httpConfiguration = new HttpConfiguration(
+            secureScheme: 'https',
+            securePort: settings.getInt('server.https.port', 0),
+            outputBufferSize: 32 * 1024,
+            requestHeaderSize: 8 * 1024,
+            responseHeaderSize: 8 * 1024,
+            headerCacheSize: 512,
+            sendServerVersion: false,
+            sendDateHeader: false
+        )
+        ServerConnector http = new ServerConnector(server, [new HttpConnectionFactory(httpConfiguration)] as ConnectionFactory[])
+        http.port = settings.getInt('server.http.port', 8080)
+        http.idleTimeout = 30000
+        server.addConnector(http)
+        // configure HTTPS connector
+        if (settings.has('server.https.port')) {
+            SslContextFactory sslContextFactory = new SslContextFactory(
+                keyStorePath: settings.getString('server.https.keystore.path'),
+                keyStorePassword: settings.getString('server.https.keystore.password'),
+                trustStorePath: settings.getString('server.https.keystore.path'),
+                trustStorePassword: settings.getString('server.https.keystore.password'),
+                endpointIdentificationAlgorithm: '',
+                excludeCipherSuites: [
+                    'SSL_RSA_WITH_DES_CBC_SHA',
+                    'SSL_DHE_RSA_WITH_DES_CBC_SHA',
+                    'SSL_DHE_DSS_WITH_DES_CBC_SHA',
+                    'SSL_RSA_EXPORT_WITH_RC4_40_MD5',
+                    'SSL_RSA_EXPORT_WITH_DES40_CBC_SHA',
+                    'SSL_DHE_RSA_EXPORT_WITH_DES40_CBC_SHA',
+                    'SSL_DHE_DSS_EXPORT_WITH_DES40_CBC_SHA'
+                ]
+            )
+            HttpConfiguration httpsConfiguration = new HttpConfiguration(httpConfiguration)
+            httpsConfiguration.addCustomizer(new SecureRequestCustomizer())
+            ServerConnector https = new ServerConnector(server, [new SslConnectionFactory(sslContextFactory, 'http/1.1'), new HttpConnectionFactory(httpsConfiguration)] as SslConnectionFactory[])
+            https.port = settings.getInt('server.https.port')
+            https.idleTimeout = 30000
+            server.addConnector(https)
+        }
     }
 
     void start() {

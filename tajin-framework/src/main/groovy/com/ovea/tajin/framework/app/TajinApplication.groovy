@@ -45,14 +45,21 @@ class TajinApplication {
             commander.usage()
             System.exit(1)
         }
+        println "Tajin version ${Tajin.VERSION}"
+        PropertySettings settings = new PropertySettings()
         // load config
-        PropertySettings settings = options.config ? new PropertySettings(Resource.file(options.config)) : new PropertySettings()
+        if (options.config) {
+            Resource config = Resource.resource(options.config)
+            println "  - Using Tajin configuration: ${config}"
+            settings = new PropertySettings(config)
+        }
         // setup logging
-        Resource loggingConfig = settings.getResource('logging.app.config', 'classpath:tajin-logback.xml')
+        Resource loggingConfig = settings.getResource('logging.app.config', 'classpath:com/ovea/tajin/framework/tajin-logback.xml')
+        println "  - Using logging configuration: ${loggingConfig}"
         LogbackConfigurator.configure(loggingConfig)
         // load applications
         Collection<Application> apps = Lists.newLinkedList(ServiceLoader.load(Application))
-        println "Starting applications: ${apps ? apps.collect { it.class.simpleName }.join(', ') : '<none>'}"
+        println "  - Starting applications: ${apps ? apps.collect { it.class.simpleName }.join(', ') : '<none>'}"
         // config and start container
         Container container = new Container(settings, apps, new InternalWebModule(settings, apps))
         container.start()
@@ -61,7 +68,7 @@ class TajinApplication {
     static class Options {
 
         @Parameter(names = ['-c', '--config'], required = false, arity = 1, description = 'Configuration property file')
-        File config
+        String config
 
         @Parameter(names = ['-h', '--help'], required = false, arity = 0, description = 'Show this help', help = true)
         Boolean help
