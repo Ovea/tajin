@@ -15,14 +15,14 @@
  */
 package com.ovea.tajin.framework.app
 
-import com.google.inject.Binder
 import com.ovea.tajin.framework.prop.PropertySettings
+import com.ovea.tajin.framework.support.guice.WebBinder
 
 public interface Application {
     /**
      * Called at initialization time
      */
-    void onInit(Binder binder, PropertySettings settings)
+    void onInit(WebBinder binder, PropertySettings settings)
 
     /**
      * Called when web application is started and injections are completed

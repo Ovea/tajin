@@ -15,15 +15,13 @@
  */
 package com.ovea.tajin.framework.app
 
+import com.google.inject.Binder
 import com.google.inject.Injector
 import com.google.inject.Provider
 import com.google.inject.servlet.RequestScoped
 import com.google.inject.servlet.ServletModule
 import com.ovea.tajin.framework.prop.PropertySettings
-import com.ovea.tajin.framework.support.guice.Expand
-import com.ovea.tajin.framework.support.guice.ExpandHandler
-import com.ovea.tajin.framework.support.guice.HttpContextFilter
-import com.ovea.tajin.framework.support.guice.TajinGuice
+import com.ovea.tajin.framework.support.guice.*
 import com.ovea.tajin.framework.support.jersey.GzipEncoder
 import com.ovea.tajin.framework.support.jersey.SecurityResourceFilterFactory
 import com.ovea.tajin.framework.support.shiro.*
@@ -70,8 +68,9 @@ class InternalWebModule extends ServletModule {
         TajinGuice.in(binder()).handleMethodAfterInjection(Expand, ExpandHandler)
 
         // configure discovered applications
+        WebBinder webBinder = proxy(binder())
         applications.each {
-            it.onInit(binder(), settings)
+            it.onInit(webBinder, settings)
             bind(it.class).toInstance(it)
         }
 
@@ -128,6 +127,10 @@ class InternalWebModule extends ServletModule {
             "com.sun.jersey.spi.container.ContainerResponseFilters": GzipEncoder.name,
             "com.sun.jersey.spi.container.ResourceFilters": SecurityResourceFilterFactory.name
         ])
+    }
+
+    private static WebBinder proxy(Binder binder) {
+        return new groovy.util.Proxy(adaptee: binder) as WebBinder
     }
 
 }

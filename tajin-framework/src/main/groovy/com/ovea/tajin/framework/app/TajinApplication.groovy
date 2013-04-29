@@ -21,19 +21,19 @@ import com.beust.jcommander.ParameterException
 import com.google.common.collect.Lists
 import com.ovea.tajin.framework.io.Resource
 import com.ovea.tajin.framework.prop.PropertySettings
-import com.ovea.tajin.framework.support.logback.LogbackConfigurator
 import com.ovea.tajin.framework.support.jetty.Container
+import com.ovea.tajin.framework.support.logback.LogbackConfigurator
 
 /**
  * @author Mathieu Carbou (mathieu.carbou@gmail.com)
  * @date 2013-04-26
  */
-class Start {
+class TajinApplication {
     static void main(String... args) {
         // parse options
         Options options = new Options()
         JCommander commander = new JCommander()
-        commander.programName = Start.name
+        commander.programName = TajinApplication.name
         commander.addObject(options)
         try {
             commander.parse(args)
@@ -52,7 +52,7 @@ class Start {
         LogbackConfigurator.configure(loggingConfig)
         // load applications
         Collection<Application> apps = Lists.newLinkedList(ServiceLoader.load(Application))
-        println "Starting applications: ${apps.collect {it.class.simpleName}.join(', ')}"
+        println "Starting applications: ${apps ? apps.collect { it.class.simpleName }.join(', ') : '<none>'}"
         // config and start container
         Container container = new Container(settings, apps, new InternalWebModule(settings, apps))
         container.start()
