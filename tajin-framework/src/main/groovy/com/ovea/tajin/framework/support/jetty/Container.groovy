@@ -24,6 +24,7 @@ import org.eclipse.jetty.jmx.MBeanContainer
 import org.eclipse.jetty.server.*
 import org.eclipse.jetty.server.handler.HandlerCollection
 import org.eclipse.jetty.server.handler.RequestLogHandler
+import org.eclipse.jetty.servlet.DefaultServlet
 import org.eclipse.jetty.servlet.ServletContextHandler
 import org.eclipse.jetty.util.ssl.SslContextFactory
 
@@ -43,13 +44,17 @@ class Container {
     private final Server server
 
     Container(PropertySettings settings, Collection<Application> applications, Module module) {
-        HandlerCollection handlerCollection = new HandlerCollection()
-        // create jetty context
-        ServletContextHandler context = new ServletContextHandler(handlerCollection, settings.getString('server.context', '/'))
-        handlerCollection.addHandler(context)
+        HandlerCollection handlers = new HandlerCollection()
+
+        // create a programmatic context for defined context path
+        ServletContextHandler context = new ServletContextHandler(ServletContextHandler.SESSIONS)
+        handlers.addHandler(context)
+        context.contextPath = settings.getString('server.context', '/')
+        context.classLoader = Thread.currentThread().contextClassLoader
+        context.addFilter(GuiceFilter, '/*', EnumSet.allOf(DispatcherType))
+        context.addServlet(DefaultServlet, '/*')
         context.setInitParameter('org.eclipse.jetty.servlet.SessionIdPathParameterName', 'none')
         context.setInitParameter('org.eclipse.jetty.servlet.SessionCookie', settings.getString('session.cookie.name', 'id'))
-        context.addFilter(GuiceFilter, '/*', EnumSet.allOf(DispatcherType))
         context.addEventListener(new GuiceListener([module]))
         context.addEventListener(new ServletContextListener() {
             @Override
@@ -76,7 +81,7 @@ class Container {
         // attach a NCSA logger if desired
         settings.getPath('logging.request.folder', null)?.with { File dir ->
             dir.mkdirs()
-            handlerCollection.addHandler(new RequestLogHandler(
+            handlers.addHandler(new RequestLogHandler(
                 requestLog: new AsyncNCSARequestLog(
                     filename: "${dir.absolutePath}/request.yyyy_mm_dd.log",
                     filenameDateFormat: 'yyyy-MM-dd',
@@ -89,13 +94,15 @@ class Container {
                 )
             ))
         }
+
         // create jetty server
         server = new Server()
         server.stopAtShutdown = true
-        server.setHandler(handlerCollection)
+        server.handler = handlers
         server.addBean(new MBeanContainer(ManagementFactory.platformMBeanServer))
+
         // configure HTTP connector
-        HttpConfiguration httpConfiguration = new HttpConfiguration(
+        HttpConfiguration httpConf = new HttpConfiguration(
             secureScheme: 'https',
             securePort: settings.getInt('server.https.port', 0),
             outputBufferSize: 32 * 1024,
@@ -105,12 +112,15 @@ class Container {
             sendServerVersion: false,
             sendDateHeader: false
         )
-        ServerConnector http = new ServerConnector(server, [new HttpConnectionFactory(httpConfiguration)] as ConnectionFactory[])
-        http.port = settings.getInt('server.http.port', 8080)
-        http.idleTimeout = 30000
-        server.addConnector(http)
-        // configure HTTPS connector
+        HttpConnectionFactory http = new HttpConnectionFactory(httpConf)
+        ServerConnector httpConnect = new ServerConnector(server, http)
+        httpConnect.port = settings.getInt('server.http.port', 8080)
+        httpConnect.idleTimeout = 30000
+        server.addConnector(httpConnect)
+
+        // configure HTTPS connectors
         if (settings.has('server.https.port')) {
+            // ssl config
             SslContextFactory sslContextFactory = new SslContextFactory(
                 keyStorePath: settings.getString('server.https.keystore.path'),
                 keyStorePassword: settings.getString('server.https.keystore.password'),
@@ -127,17 +137,22 @@ class Container {
                     'SSL_DHE_DSS_EXPORT_WITH_DES40_CBC_SHA'
                 ]
             )
-            HttpConfiguration httpsConfiguration = new HttpConfiguration(httpConfiguration)
-            httpsConfiguration.addCustomizer(new SecureRequestCustomizer())
-            ServerConnector https = new ServerConnector(server, [new SslConnectionFactory(sslContextFactory, 'http/1.1'), new HttpConnectionFactory(httpsConfiguration)] as ConnectionFactory[])
-            https.port = settings.getInt('server.https.port')
-            https.idleTimeout = 30000
-            server.addConnector(https)
+            // connector config
+            HttpConfiguration httpsConf = new HttpConfiguration(httpConf)
+            httpsConf.addCustomizer(new SecureRequestCustomizer())
+            // SSL Factory
+            SslConnectionFactory ssl = new SslConnectionFactory(sslContextFactory, http.protocol)
+            // HTTPS Connector
+            ServerConnector httpsConnect = new ServerConnector(server, ssl, new HttpConnectionFactory(httpsConf))
+            httpsConnect.port = settings.getInt('server.https.port')
+            httpsConnect.idleTimeout = 30000
+            server.addConnector(httpsConnect)
         }
     }
 
     void start() {
         server.start()
+        server.join()
     }
 
     void stop() {

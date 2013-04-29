@@ -27,75 +27,52 @@ import javax.ws.rs.core.MultivaluedMap
 import java.lang.annotation.Annotation
 import java.lang.reflect.Type
 
-/**
- * @author japod
- */
-public abstract class GroovyJSONProvider extends AbstractMessageReaderWriterProvider<Object> {
+@Produces("*/*")
+@Consumes("*/*")
+class GroovyJSONProvider extends AbstractMessageReaderWriterProvider<Object> {
 
-    @Produces(MediaType.APPLICATION_JSON)
-    @Consumes(MediaType.APPLICATION_JSON)
-    public static final class App extends GroovyJSONProvider {
-        @Override
-        protected boolean isSupported(MediaType m) {
-            return true;
-        }
-    }
+    private static boolean isSupported(MediaType m) { m == MediaType.APPLICATION_JSON_TYPE || m.subtype.endsWith("+json") }
 
-    @Produces("*/*")
-    @Consumes("*/*")
-    public static final class General extends GroovyJSONProvider {
-        @Override
-        protected boolean isSupported(MediaType m) {
-            return m.getSubtype().endsWith("+json");
-        }
-    }
+    private static List<Class<?>> SUPPORTED_PARAM_TYPES = [Object, Map, List]
+    private static List<Class<?>> SUPPORTED_RETURN_TYPES = [Map, List, JsonBuilder]
 
     @Override
     boolean isReadable(Class<?> type, Type genericType, Annotation[] annotations, MediaType mediaType) {
-        return isSupported(mediaType) && (Object.class == type || Map.class == type || List.class == type);
+        isSupported(mediaType) && type in SUPPORTED_PARAM_TYPES
     }
 
     @Override
-    public final boolean isWriteable(Class<?> type, Type genericType, Annotation[] annotations, MediaType mediaType) {
-        return isSupported(mediaType);
+    final boolean isWriteable(Class<?> type, Type genericType, Annotation[] annotations, MediaType mediaType) {
+        isSupported(mediaType) && SUPPORTED_RETURN_TYPES.find { it.isAssignableFrom(type) }
     }
 
-    protected abstract boolean isSupported(MediaType m);
-
     @Override
-    public Object readFrom(
-        Class<Object> type,
-        Type genericType,
-        Annotation[] annotations,
-        MediaType mediaType,
-        MultivaluedMap<String, String> httpHeaders,
-        InputStream entityStream) throws IOException {
+    Object readFrom(Class<Object> type, Type genericType, Annotation[] annotations, MediaType mediaType, MultivaluedMap<String, String> httpHeaders, InputStream entityStream) {
+        def o
         try {
-            return new JsonSlurper().parseText(readFromAsString(entityStream, mediaType));
-        } catch (Exception e) {
-            throw new WebApplicationException(new Exception("Error creating JSON Type: " + type.getName(), e), 400);
+            o = new JsonSlurper().parseText(readFromAsString(entityStream, mediaType))
+        } catch (e) {
+            throw new WebApplicationException(new Exception("Error creating JSON " + type.simpleName, e), 400)
+        }
+        if (type.isInstance(o)) {
+            return o
+        } else {
+            throw new WebApplicationException(new Exception("Error creating JSON " + type.simpleName + ' from JSON ' + o.class.simpleName,), 400)
         }
     }
 
     @Override
-    public void writeTo(
-        Object t,
-        Class<?> type,
-        Type genericType,
-        Annotation[] annotations,
-        MediaType mediaType,
-        MultivaluedMap<String, Object> httpHeaders,
-        OutputStream entityStream) throws IOException {
+    public void writeTo(Object t, Class<?> type, Type genericType, Annotation[] annotations, MediaType mediaType, MultivaluedMap<String, Object> httpHeaders, OutputStream entityStream) {
         try {
-            OutputStreamWriter writer = new OutputStreamWriter(entityStream, getCharset(mediaType));
+            OutputStreamWriter writer = new OutputStreamWriter(entityStream, getCharset(mediaType))
             if (t instanceof JsonBuilder) {
                 ((JsonBuilder) t).writeTo(writer);
             } else {
                 new JsonBuilder(t).writeTo(writer);
             }
             writer.flush();
-        } catch (Exception je) {
-            throw new WebApplicationException(new Exception("Error writing JSON Type: " + type.getName(), je), 500);
+        } catch (Exception e) {
+            throw new WebApplicationException(new Exception("Error writing JSON Type " + type.simpleName, e), 500)
         }
     }
 }

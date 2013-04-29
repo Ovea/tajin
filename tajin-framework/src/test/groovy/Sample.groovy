@@ -15,6 +15,7 @@ class Sample implements Application {
     @Override
     void onInit(WebBinder binder, PropertySettings settings) {
         binder.configure {
+            bind(MyRest)
             bind(AccountRepository).toInstance(new AccountRepository() {
                 @Override
                 SimpleAccount getAccount(String email) {
