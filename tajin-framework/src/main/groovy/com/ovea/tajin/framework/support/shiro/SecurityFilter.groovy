@@ -45,7 +45,7 @@ class SecurityFilter extends AuthenticationFilter {
 
     @PostConstruct
     void init() {
-        settings.getStrings('security.filter', '/secured/*').each { String path ->
+        settings.getStrings('security.filter', '').collect { it.trim() }.each { String path ->
             LOGGER.info('Protecting path {}', path)
             appliedPaths.put(path, [])
         }
