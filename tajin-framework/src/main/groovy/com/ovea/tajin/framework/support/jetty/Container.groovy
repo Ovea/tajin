@@ -56,7 +56,7 @@ class Container {
                     logCookies: settings.getBoolean('logging.request.cookies', false),
                     append: true,
                     logTimeZone: 'GMT',
-                    ignorePaths: settings.getStrings('logging.request.ignores', ''),
+                    ignorePaths: settings.getStrings('logging.request.ignores', '').collect { it.trim() },
                 )
             )
             handlerCollection.addHandler(requestLogHandler)
