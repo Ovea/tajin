@@ -33,8 +33,8 @@ import static com.ovea.tajin.framework.support.guice.TajinGuice.in;
  */
 final class Jsr250Module implements Module {
 
-    private final Set<Scope> scopes = new HashSet<Scope>();
-    private final Set<Class<? extends Annotation>> scopeAnnotations = new HashSet<Class<? extends Annotation>>();
+    private final Set<Scope> scopes = new HashSet<>();
+    private final Set<Class<? extends Annotation>> scopeAnnotations = new HashSet<>();
 
     @Override
     public void configure(Binder binder) {
@@ -54,7 +54,7 @@ final class Jsr250Module implements Module {
                     Multimap<Binding<?>, Binding<?>> dependants = Multimaps.newSetMultimap(new IdentityHashMap<Binding<?>, Collection<Binding<?>>>(), new Supplier<Set<Binding<?>>>() {
                         @Override
                         public Set<Binding<?>> get() {
-                            return new HashSet<Binding<?>>();
+                            return new HashSet<>();
                         }
                     });
                     for (Binding<?> binding : bindings.values()) {
@@ -66,7 +66,7 @@ final class Jsr250Module implements Module {
                             }
                         }
                     }
-                    Map<Object, Object> done = new IdentityHashMap<Object, Object>(bindings.size());
+                    Map<Object, Object> done = new IdentityHashMap<>(bindings.size());
                     for (final Binding<?> binding : bindings.values())
                         if (new SingletonChecker(binding).isSingleton()) {
                             close(binding, done, dependants);
