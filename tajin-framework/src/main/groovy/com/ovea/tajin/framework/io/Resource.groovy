@@ -27,7 +27,7 @@ abstract class Resource {
 
     abstract File getAsFile()
 
-    abstract List<Resource> alikes();
+    abstract List<Resource> getAlikes();
 
     abstract InputStream getInput()
 
@@ -171,7 +171,7 @@ abstract class Resource {
         }
 
         @Override
-        public List<Resource> alikes() {
+        public List<Resource> getAlikes() {
             return [this]
         }
 
@@ -288,7 +288,7 @@ abstract class Resource {
     private static abstract class UrlBasedResource extends Resource {
 
         @Override
-        public List<Resource> alikes() {
+        public List<Resource> getAlikes() {
             return [this]
         }
 
@@ -354,7 +354,7 @@ abstract class Resource {
         }
 
         @Override
-        public List<Resource> alikes() {
+        public List<Resource> getAlikes() {
             try {
                 List<Resource> urls = new LinkedList<Resource>();
                 Enumeration<URL> e = classloader.getResources(path);
@@ -477,7 +477,7 @@ abstract class Resource {
         }
 
         @Override
-        public List<Resource> alikes() {
+        public List<Resource> getAlikes() {
             return [this]
         }
 

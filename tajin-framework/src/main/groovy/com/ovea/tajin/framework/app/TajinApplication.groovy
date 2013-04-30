@@ -20,9 +20,9 @@ import com.beust.jcommander.Parameter
 import com.beust.jcommander.ParameterException
 import com.google.common.collect.Lists
 import com.ovea.tajin.framework.io.Resource
-import com.ovea.tajin.framework.util.PropertySettings
 import com.ovea.tajin.framework.support.jetty.Container
 import com.ovea.tajin.framework.support.logback.LogbackConfigurator
+import com.ovea.tajin.framework.util.PropertySettings
 
 /**
  * @author Mathieu Carbou (mathieu.carbou@gmail.com)
@@ -44,6 +44,10 @@ class TajinApplication {
         if (options.help) {
             commander.usage()
             System.exit(1)
+        }
+        if (options.keyLength) {
+            println new BigInteger(options.keyLength, new Random()).toString(16)
+            System.exit(0)
         }
         println "Tajin version ${Tajin.VERSION}"
         PropertySettings settings = new PropertySettings()
@@ -72,6 +76,9 @@ class TajinApplication {
 
         @Parameter(names = ['-h', '--help'], required = false, arity = 0, description = 'Show this help', help = true)
         Boolean help
+
+        @Parameter(names = ['-g', '--genkey'], required = false, arity = 1, description = 'Generate a new random key with specified bit length')
+        int keyLength
     }
 
 }
