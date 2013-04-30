@@ -150,12 +150,9 @@ class Container {
         }
     }
 
-    void start() {
-        server.start()
-        server.join()
-    }
+    void isStarted() { server.isStarted() }
 
-    void stop() {
-        server.stop()
-    }
+    void start() { server.start() }
+
+    void stop() { server.stop() }
 }

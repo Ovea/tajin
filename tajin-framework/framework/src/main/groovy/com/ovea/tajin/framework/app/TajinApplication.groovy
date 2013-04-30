@@ -30,6 +30,36 @@ import org.codehaus.groovy.runtime.InvokerHelper
  * @date 2013-04-26
  */
 class TajinApplication {
+
+    final PropertySettings settings
+
+    @Delegate
+    final Container container
+
+    TajinApplication(PropertySettings settings) {
+        this.settings = settings
+        // check if we need to enhance classpath
+        def cp = settings.getStrings('server.classpath', [])
+        if (cp) {
+            if (Thread.currentThread().contextClassLoader instanceof URLClassLoader) {
+                cp.each { String path ->
+                    InvokerHelper.invokeMethod(Thread.currentThread().contextClassLoader, 'addURL', [new File(path).canonicalFile.toURI().toURL()])
+                }
+            } else {
+                throw new AssertionError('Cannot enhance classpath using classloader of type ' + Thread.currentThread().contextClassLoader.class.name)
+            }
+        }
+        // setup logging
+        Resource loggingConfig = settings.getResource('logging.app.config', 'classpath:com/ovea/tajin/framework/tajin-logback.xml')
+        println "  - Using logging configuration: ${loggingConfig}"
+        LogbackConfigurator.configure(loggingConfig)
+        // load applications
+        Collection<Application> apps = Lists.newLinkedList(ServiceLoader.load(Application))
+        println "  - Starting applications: ${apps ? apps.collect { it.class.simpleName }.join(', ') : '<none>'}"
+        // config and start container
+        container = new Container(settings, apps, new InternalWebModule(settings, apps))
+    }
+
     static void main(String... args) {
         // parse options
         Options options = new Options()
@@ -58,27 +88,7 @@ class TajinApplication {
             println "  - Using Tajin configuration: ${config}"
             settings = new PropertySettings(config)
         }
-        // check if we need to enhnce classpath
-        def cp = settings.getStrings('server.classpath', [])
-        if (cp) {
-            if (Thread.currentThread().contextClassLoader instanceof URLClassLoader) {
-                cp.each { String path ->
-                    InvokerHelper.invokeMethod(Thread.currentThread().contextClassLoader, 'addURL', [new File(path).canonicalFile.toURI().toURL()])
-                }
-            } else {
-                throw new AssertionError('Cannot enhance classpath using classloader of type ' + Thread.currentThread().contextClassLoader.class.name)
-            }
-        }
-        // setup logging
-        Resource loggingConfig = settings.getResource('logging.app.config', 'classpath:com/ovea/tajin/framework/tajin-logback.xml')
-        println "  - Using logging configuration: ${loggingConfig}"
-        LogbackConfigurator.configure(loggingConfig)
-        // load applications
-        Collection<Application> apps = Lists.newLinkedList(ServiceLoader.load(Application))
-        println "  - Starting applications: ${apps ? apps.collect { it.class.simpleName }.join(', ') : '<none>'}"
-        // config and start container
-        Container container = new Container(settings, apps, new InternalWebModule(settings, apps))
-        container.start()
+        new TajinApplication(settings).start()
     }
 
     static class Options {
