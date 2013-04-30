@@ -21,6 +21,10 @@ import com.google.inject.Provider
 import com.google.inject.matcher.Matchers
 import com.google.inject.servlet.RequestScoped
 import com.google.inject.servlet.ServletModule
+import com.ovea.tajin.framework.i18n.I18NHandler
+import com.ovea.tajin.framework.i18n.I18NService
+import com.ovea.tajin.framework.i18n.I18NServiceFactory
+import com.ovea.tajin.framework.i18n.JsonI18NServiceFactory
 import com.ovea.tajin.framework.security.TokenBuilder
 import com.ovea.tajin.framework.support.guice.*
 import com.ovea.tajin.framework.support.jersey.GzipEncoder
@@ -80,6 +84,14 @@ class InternalWebModule extends ServletModule {
         }
         bind(TemplateResolver).toInstance(resolver)
         binder().bindListener(Matchers.any(), new TmplHandler());
+
+        // setup i18n
+        boolean i18nCache = settings.getBoolean('i18n.cache', true)
+        JsonI18NServiceFactory factory = new JsonI18NServiceFactory()
+        factory.debug = !i18nCache
+        factory.missingKeyBehaviour = settings.getEnum(I18NService.MissingKeyBehaviour, 'i18n.miss', I18NService.MissingKeyBehaviour.RETURN_KEY)
+        bind(I18NServiceFactory).toInstance(factory)
+        binder().bindListener(Matchers.any(), new I18NHandler());
 
         // bind filters
         bind(GuiceContainer).in(javax.inject.Singleton)
