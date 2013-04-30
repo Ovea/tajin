@@ -38,8 +38,4 @@ class PassthroughToken implements HostAuthenticationToken, RememberMeAuthenticat
         return null
     }
 
-    @Override
-    Object getPrincipal() {
-        return principal
-    }
 }

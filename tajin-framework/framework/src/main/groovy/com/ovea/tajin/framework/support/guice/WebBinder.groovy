@@ -16,33 +16,19 @@
 package com.ovea.tajin.framework.support.guice
 
 import com.google.inject.Binder
-import com.google.inject.servlet.ServletModule
 
-public interface WebBinder extends Binder {
+public class WebBinder {
 
-    void configure(Closure<?> c)
+    @Delegate
+    private final Binder binder
 
-    /**
-     * @param urlPattern Any Servlet-style pattern. examples: /*, /html/*, *.html, etc.
-     * @since 2.0
-     */
-    ServletModule.FilterKeyBindingBuilder filter(String urlPattern, String... morePatterns)
+    WebBinder(Binder binder) {
+        this.binder = binder
+    }
 
-    /**
-     * @param regex Any Java-style regular expression.
-     * @since 2.0
-     */
-    ServletModule.FilterKeyBindingBuilder filterRegex(String regex, String... regexes)
+    void configure(Closure<?> c) {
+        c.delegate = binder
+        c()
+    }
 
-    /**
-     * @param urlPattern Any Servlet-style pattern. examples: /*, /html/*, *.html, etc.
-     * @since 2.0
-     */
-    ServletModule.ServletKeyBindingBuilder serve(String urlPattern, String... morePatterns)
-
-    /**
-     * @param regex Any Java-style regular expression.
-     * @since 2.0
-     */
-    ServletModule.ServletKeyBindingBuilder serveRegex(String regex, String... regexes)
 }

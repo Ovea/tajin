@@ -101,7 +101,7 @@ class InternalWebModule extends ServletModule {
         TajinGuice.in(binder()).handleMethodAfterInjection(Expand, ExpandHandler)
 
         // configure discovered applications
-        WebBinder webBinder = proxy(binder())
+        WebBinder webBinder = new WebBinder(binder())
         applications.each {
             it.onInit(webBinder, settings)
             bind(it.class).toInstance(it)
@@ -160,17 +160,6 @@ class InternalWebModule extends ServletModule {
             "com.sun.jersey.spi.container.ContainerResponseFilters": GzipEncoder.name,
             "com.sun.jersey.spi.container.ResourceFilters": SecurityResourceFilterFactory.name
         ])
-    }
-
-    private static WebBinder proxy(Binder binder) {
-        def proxy = new groovy.util.Proxy() {
-            void configure(Closure<?> c) {
-                c.delegate = binder
-                c()
-            }
-        }
-        proxy.adaptee = binder
-        return proxy as WebBinder
     }
 
 }
