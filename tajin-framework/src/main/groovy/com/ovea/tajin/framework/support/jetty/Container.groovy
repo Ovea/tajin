@@ -18,7 +18,7 @@ package com.ovea.tajin.framework.support.jetty
 import com.google.inject.Module
 import com.google.inject.servlet.GuiceFilter
 import com.ovea.tajin.framework.app.Application
-import com.ovea.tajin.framework.prop.PropertySettings
+import com.ovea.tajin.framework.util.PropertySettings
 import com.ovea.tajin.framework.support.guice.GuiceListener
 import org.eclipse.jetty.jmx.MBeanContainer
 import org.eclipse.jetty.server.*

@@ -1,5 +1,5 @@
 import com.ovea.tajin.framework.app.Application
-import com.ovea.tajin.framework.prop.PropertySettings
+import com.ovea.tajin.framework.util.PropertySettings
 import com.ovea.tajin.framework.support.guice.WebBinder
 import com.ovea.tajin.framework.support.shiro.AccountRepository
 import com.ovea.tajin.framework.support.shiro.UsernamePasswordRealm

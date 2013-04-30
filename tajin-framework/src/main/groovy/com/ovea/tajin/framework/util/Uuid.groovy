@@ -15,7 +15,7 @@
  */
 package com.ovea.tajin.framework.util
 
-import org.apache.commons.codec.binary.Base64
+import org.apache.shiro.codec.Base64
 
 public final class Uuid implements Serializable, Comparable<Uuid> {
 
@@ -30,7 +30,7 @@ public final class Uuid implements Serializable, Comparable<Uuid> {
     public static Uuid valueOf(String uuidString) {
         if (uuidString == null)
             throw new IllegalArgumentException("Illegal UUID string");
-        byte[] b = Base64.decodeBase64(uuidString);
+        byte[] b = Base64.decode(uuidString);
         // the string is the B64 representation of 128bits: two long
         if (b.length != 16)
             throw new IllegalArgumentException("Invalid UUID string");
@@ -61,7 +61,7 @@ public final class Uuid implements Serializable, Comparable<Uuid> {
 
     @Override
     public String toString() {
-        return Base64.encodeBase64URLSafeString(toBytes());
+        return Base64.encodeToString(toBytes());
     }
 
     /**

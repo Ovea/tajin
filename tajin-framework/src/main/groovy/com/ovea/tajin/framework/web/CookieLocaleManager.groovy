@@ -16,7 +16,7 @@
 package com.ovea.tajin.framework.web
 
 import com.google.inject.servlet.RequestScoped
-import com.ovea.tajin.framework.prop.PropertySettings
+import com.ovea.tajin.framework.util.PropertySettings
 import com.ovea.tajin.framework.util.LocaleUtil
 
 import javax.inject.Inject

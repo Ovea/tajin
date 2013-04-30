@@ -15,7 +15,7 @@
  */
 package com.ovea.tajin.framework.support.shiro
 
-import com.ovea.tajin.framework.prop.PropertySettings
+import com.ovea.tajin.framework.util.PropertySettings
 import org.apache.shiro.SecurityUtils
 import org.apache.shiro.authc.SimpleAccount
 import org.apache.shiro.subject.Subject

@@ -20,7 +20,7 @@ import com.beust.jcommander.Parameter
 import com.beust.jcommander.ParameterException
 import com.google.common.collect.Lists
 import com.ovea.tajin.framework.io.Resource
-import com.ovea.tajin.framework.prop.PropertySettings
+import com.ovea.tajin.framework.util.PropertySettings
 import com.ovea.tajin.framework.support.jetty.Container
 import com.ovea.tajin.framework.support.logback.LogbackConfigurator
 

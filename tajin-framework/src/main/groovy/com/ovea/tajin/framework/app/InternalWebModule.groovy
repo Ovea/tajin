@@ -20,7 +20,7 @@ import com.google.inject.Injector
 import com.google.inject.Provider
 import com.google.inject.servlet.RequestScoped
 import com.google.inject.servlet.ServletModule
-import com.ovea.tajin.framework.prop.PropertySettings
+import com.ovea.tajin.framework.util.PropertySettings
 import com.ovea.tajin.framework.security.TokenBuilder
 import com.ovea.tajin.framework.support.guice.*
 import com.ovea.tajin.framework.support.jersey.GzipEncoder

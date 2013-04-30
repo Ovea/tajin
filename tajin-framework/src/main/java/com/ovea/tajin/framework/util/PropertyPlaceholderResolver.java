@@ -13,7 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package com.ovea.tajin.framework.prop;
+package com.ovea.tajin.framework.util;
 
 import java.util.HashSet;
 import java.util.Properties;
