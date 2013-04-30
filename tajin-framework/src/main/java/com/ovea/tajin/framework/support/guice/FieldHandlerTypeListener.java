@@ -24,8 +24,8 @@ import com.google.inject.spi.TypeListener;
 import java.lang.annotation.Annotation;
 import java.lang.reflect.Field;
 
-import static com.ovea.tajin.framework.support.guice.Reflect.annotatedBy;
-import static com.ovea.tajin.framework.support.guice.Reflect.findFields;
+import static com.ovea.tajin.framework.util.Reflect.annotatedBy;
+import static com.ovea.tajin.framework.util.Reflect.findFields;
 
 /**
  * @author Mathieu Carbou (mathieu.carbou@gmail.com)

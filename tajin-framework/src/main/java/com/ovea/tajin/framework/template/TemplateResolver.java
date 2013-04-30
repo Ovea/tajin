@@ -15,13 +15,11 @@
  */
 package com.ovea.tajin.framework.template;
 
-import com.ovea.tajin.framework.io.Resource;
-
 import java.util.Locale;
 
 /**
  * @author Mathieu Carbou (mathieu.carbou@gmail.com)
  */
 public interface TemplateResolver {
-    Resource resolve(String path, Locale locale) throws TemplateResolverException;
+    Template resolve(String path, Locale locale) throws TemplateResolverException;
 }

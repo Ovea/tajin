@@ -29,14 +29,12 @@ import java.io.UnsupportedEncodingException;
  */
 final class DynamicMarkupDataBuilder implements MarkupDataBuilder {
 
-    private final TemplateCompiler compiler;
     private final TemplateResolver resolver;
     private final LocaleProvider localeProvider;
     private final ContextProvider contextProvider;
     private final MarkupOptions markupOptions;
 
-    DynamicMarkupDataBuilder(TemplateCompiler compiler, ContextProvider contextProvider, LocaleProvider localeProvider, MarkupOptions markupOptions, TemplateResolver resolver) {
-        this.compiler = compiler;
+    DynamicMarkupDataBuilder(ContextProvider contextProvider, LocaleProvider localeProvider, MarkupOptions markupOptions, TemplateResolver resolver) {
         this.contextProvider = contextProvider;
         this.localeProvider = localeProvider;
         this.markupOptions = markupOptions;
@@ -46,8 +44,7 @@ final class DynamicMarkupDataBuilder implements MarkupDataBuilder {
     @Override
     public MarkupData build(HttpServletRequest request, HttpServletResponse response, String path) {
         try {
-            Resource resource = resolver.resolve(path, localeProvider.get(request));
-            Template template = compiler.compile(resource);
+            Template template = resolver.resolve(path, localeProvider.get(request));
             String markup = template.merge(contextProvider.build(request, response));
             return new MarkupData(markup.getBytes(markupOptions.defaultCharset));
         } catch (RuntimeException e) {

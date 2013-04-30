@@ -17,22 +17,24 @@ package com.ovea.tajin.framework.template;
 
 import com.ovea.tajin.framework.io.Resource;
 
-import java.net.URL;
-
 /**
  * @author Mathieu Carbou (mathieu.carbou@gmail.com)
  */
-public final class ClassPathTemplateResolver extends TemplateResolverSkeleton {
-    private final ClassLoader classLoader;
+public final class ResourceTemplateResolver extends TemplateResolverSkeleton {
 
-    public ClassPathTemplateResolver(TemplateCompiler compiler, ClassLoader classLoader) {
+    public ResourceTemplateResolver(TemplateCompiler compiler) {
         super(compiler);
-        this.classLoader = classLoader;
     }
 
     @Override
     protected Resource tryPath(String path) {
-        URL tmpl = classLoader.getResource(path);
-        return tmpl != null ? Resource.url(tmpl) : null;
+        try {
+            Resource r = Resource.resource(path);
+            if (r.isExist()) {
+                return r;
+            }
+        } catch (Exception ignored) {
+        }
+        return null;
     }
 }

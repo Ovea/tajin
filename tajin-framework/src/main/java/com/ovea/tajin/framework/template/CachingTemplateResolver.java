@@ -15,8 +15,6 @@
  */
 package com.ovea.tajin.framework.template;
 
-import com.ovea.tajin.framework.io.Resource;
-
 import java.util.Locale;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ConcurrentMap;
@@ -28,7 +26,7 @@ public final class CachingTemplateResolver implements TemplateResolver {
 
     private static final Object NULL = new Object();
 
-    private final ConcurrentMap<String, Object> cache = new ConcurrentHashMap<String, Object>();
+    private final ConcurrentMap<String, Object> cache = new ConcurrentHashMap<>();
     private final TemplateResolver resolver;
 
     public CachingTemplateResolver(TemplateResolver resolver) {
@@ -36,7 +34,7 @@ public final class CachingTemplateResolver implements TemplateResolver {
     }
 
     @Override
-    public Resource resolve(String path, Locale locale) throws TemplateResolverException {
+    public Template resolve(String path, Locale locale) throws TemplateResolverException {
         final String key = path + locale;
         Object obj = cache.get(key);
         if (obj == null) {
@@ -53,6 +51,6 @@ public final class CachingTemplateResolver implements TemplateResolver {
         if (obj == NULL) {
             throw new TemplateResolverException("Cannot resolve template for path " + path);
         }
-        return (Resource) obj;
+        return (Template) obj;
     }
 }

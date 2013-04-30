@@ -27,8 +27,8 @@ import java.lang.reflect.Method;
 import static com.google.common.collect.Iterables.filter;
 import static com.google.common.collect.Lists.newLinkedList;
 import static com.google.common.collect.Lists.reverse;
-import static com.ovea.tajin.framework.support.guice.Reflect.annotatedBy;
-import static com.ovea.tajin.framework.support.guice.Reflect.findMethods;
+import static com.ovea.tajin.framework.util.Reflect.annotatedBy;
+import static com.ovea.tajin.framework.util.Reflect.findMethods;
 
 /**
  * @author Mathieu Carbou (mathieu.carbou@gmail.com)

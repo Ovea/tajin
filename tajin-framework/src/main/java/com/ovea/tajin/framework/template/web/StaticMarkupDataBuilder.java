@@ -25,7 +25,7 @@ import java.util.concurrent.ConcurrentMap;
  */
 final class StaticMarkupDataBuilder implements MarkupDataBuilder {
 
-    private final ConcurrentMap<String, MarkupData> cache = new ConcurrentHashMap<String, MarkupData>();
+    private final ConcurrentMap<String, MarkupData> cache = new ConcurrentHashMap<>();
     private final MarkupDataBuilder markupDataBuilder;
     private final LocaleProvider localeProvider;
 

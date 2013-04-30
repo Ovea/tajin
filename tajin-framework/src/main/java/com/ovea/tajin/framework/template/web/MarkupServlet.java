@@ -63,7 +63,7 @@ public final class MarkupServlet extends HttpServlet {
         super.init(config);
         markupOptions = MarkupOptions.from(config);
         TemplateCompiler compiler = !markupOptions.debug && markupOptions.compilerCache ? new CachingTemplateCompiler(newCompiler(markupOptions)) : newCompiler(markupOptions);
-        TemplateResolver resolver = !markupOptions.debug && markupOptions.resolverCache ? new CachingTemplateResolver(new FileSystemTemplateResolver(markupOptions.webappDir)) : new FileSystemTemplateResolver(markupOptions.webappDir);
+        TemplateResolver resolver = !markupOptions.debug && markupOptions.resolverCache ? new CachingTemplateResolver(new FileSystemTemplateResolver(compiler, markupOptions.webappDir)) : new FileSystemTemplateResolver(compiler, markupOptions.webappDir);
         localeProvider = nullSafe(localeProvider != null ? localeProvider : new LocaleProvider() {
             @Override
             public Locale get(HttpServletRequest request) {
@@ -77,7 +77,7 @@ public final class MarkupServlet extends HttpServlet {
             }
         });
         cachingFixture = new CachingFixture(markupOptions);
-        markupDataBuilder = new DynamicMarkupDataBuilder(compiler, contextProvider, localeProvider, markupOptions, resolver);
+        markupDataBuilder = new DynamicMarkupDataBuilder(contextProvider, localeProvider, markupOptions, resolver);
         if (!markupOptions.debug && !markupOptions.dynamic) {
             markupDataBuilder = new StaticMarkupDataBuilder(this.markupDataBuilder, localeProvider);
         }
@@ -158,9 +158,9 @@ public final class MarkupServlet extends HttpServlet {
             public Map<String, Object> build(HttpServletRequest request, HttpServletResponse response) {
                 Map<String, Object> ctx = contextProvider.build(request, response);
                 if (ctx == null) {
-                    ctx = new HashMap<String, Object>();
+                    ctx = new HashMap<>();
                 } else {
-                    ctx = new HashMap<String, Object>(ctx);
+                    ctx = new HashMap<>(ctx);
                 }
                 if (!ctx.containsKey("req")) {
                     ctx.put("req", request);
@@ -169,7 +169,7 @@ public final class MarkupServlet extends HttpServlet {
                     ctx.put("res", response);
                 }
                 if (!ctx.containsKey("sess")) {
-                    Map<String, Object> attributes = new LinkedHashMap<String, Object>();
+                    Map<String, Object> attributes = new LinkedHashMap<>();
                     HttpSession session = request.getSession(false);
                     if (session != null) {
                         Enumeration<String> e = session.getAttributeNames();
@@ -181,7 +181,7 @@ public final class MarkupServlet extends HttpServlet {
                     ctx.put("sess", attributes);
                 }
                 if (!ctx.containsKey("attr")) {
-                    Map<String, Object> attributes = new LinkedHashMap<String, Object>();
+                    Map<String, Object> attributes = new LinkedHashMap<>();
                     Enumeration<String> e = request.getAttributeNames();
                     while (e.hasMoreElements()) {
                         String key = e.nextElement();
@@ -190,7 +190,7 @@ public final class MarkupServlet extends HttpServlet {
                     ctx.put("attr", attributes);
                 }
                 if (!ctx.containsKey("param")) {
-                    Map<String, Object> attributes = new LinkedHashMap<String, Object>();
+                    Map<String, Object> attributes = new LinkedHashMap<>();
                     Enumeration<String> e = request.getParameterNames();
                     while (e.hasMoreElements()) {
                         String key = e.nextElement();

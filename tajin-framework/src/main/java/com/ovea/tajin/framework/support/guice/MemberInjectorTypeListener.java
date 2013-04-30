@@ -25,7 +25,7 @@ import java.lang.reflect.Method;
 import java.util.List;
 
 import static com.google.common.collect.Iterables.filter;
-import static com.ovea.tajin.framework.support.guice.Reflect.*;
+import static com.ovea.tajin.framework.util.Reflect.*;
 import static com.ovea.tajin.framework.support.guice.TajinGuiceException.runtime;
 
 /**

@@ -13,7 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package com.ovea.tajin.framework.support.guice;
+package com.ovea.tajin.framework.util;
 
 import com.google.common.base.Function;
 import com.google.common.base.Predicate;
@@ -26,6 +26,7 @@ import com.google.inject.Key;
 import com.google.inject.TypeLiteral;
 import com.google.inject.matcher.AbstractMatcher;
 import com.google.inject.matcher.Matcher;
+import com.ovea.tajin.framework.support.guice.TajinGuice;
 
 import java.lang.annotation.Annotation;
 import java.lang.reflect.AnnotatedElement;
@@ -46,7 +47,7 @@ import static java.util.Arrays.asList;
 /**
  * @author Mathieu Carbou (mathieu.carbou@gmail.com)
  */
-final class Reflect {
+public final class Reflect {
 
 
     public static List<Key<?>> getParameterKeys(TypeLiteral<?> injectedType, Method injectedMember) {

@@ -23,8 +23,15 @@ import java.util.Locale;
  * @author Mathieu Carbou (mathieu.carbou@gmail.com)
  */
 abstract class TemplateResolverSkeleton implements TemplateResolver {
+
+    protected final TemplateCompiler compiler;
+
+    protected TemplateResolverSkeleton(TemplateCompiler compiler) {
+        this.compiler = compiler;
+    }
+
     @Override
-    public final Resource resolve(String path, Locale locale) throws TemplateResolverException {
+    public final Template resolve(String path, Locale locale) throws TemplateResolverException {
         if (path == null) {
             throw new TemplateResolverException("Empty path");
         }
@@ -40,7 +47,7 @@ abstract class TemplateResolverSkeleton implements TemplateResolver {
             templateName.replace(pos, pos + locales[prev].length(), locales[i]);
             Resource tmpl = tryPath(templateName.toString());
             if (tmpl != null) {
-                return tmpl;
+                return compiler.compile(tmpl);
             }
         }
         throw new TemplateResolverException("Cannot resolve template for path " + path);

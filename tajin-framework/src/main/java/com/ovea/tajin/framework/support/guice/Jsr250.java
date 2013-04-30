@@ -20,14 +20,15 @@ import com.google.inject.*;
 import com.google.inject.spi.DefaultElementVisitor;
 import com.google.inject.spi.Element;
 import com.google.inject.spi.Elements;
+import com.ovea.tajin.framework.util.Reflect;
 
 import javax.annotation.PreDestroy;
 import java.lang.reflect.Method;
 import java.util.Arrays;
 
 import static com.google.common.collect.Iterables.filter;
-import static com.ovea.tajin.framework.support.guice.Reflect.annotatedBy;
-import static com.ovea.tajin.framework.support.guice.Reflect.findMethods;
+import static com.ovea.tajin.framework.util.Reflect.annotatedBy;
+import static com.ovea.tajin.framework.util.Reflect.findMethods;
 
 /**
  * @author Mathieu Carbou (mathieu.carbou@gmail.com)

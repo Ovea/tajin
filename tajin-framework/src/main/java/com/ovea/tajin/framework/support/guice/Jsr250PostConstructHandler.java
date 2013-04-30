@@ -18,6 +18,7 @@ package com.ovea.tajin.framework.support.guice;
 import com.google.inject.Injector;
 import com.google.inject.Key;
 import com.google.inject.TypeLiteral;
+import com.ovea.tajin.framework.util.Reflect;
 
 import javax.annotation.PostConstruct;
 import javax.inject.Inject;

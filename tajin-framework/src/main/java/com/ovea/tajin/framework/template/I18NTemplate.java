@@ -15,24 +15,23 @@
  */
 package com.ovea.tajin.framework.template;
 
-import com.ovea.tajin.framework.io.Resource;
-
-import java.net.URL;
+import java.util.Locale;
 
 /**
  * @author Mathieu Carbou (mathieu.carbou@gmail.com)
+ * @date 2013-04-30
  */
-public final class ClassPathTemplateResolver extends TemplateResolverSkeleton {
-    private final ClassLoader classLoader;
+public class I18NTemplate {
 
-    public ClassPathTemplateResolver(TemplateCompiler compiler, ClassLoader classLoader) {
-        super(compiler);
-        this.classLoader = classLoader;
+    private final TemplateResolver resolver;
+    private final String path;
+
+    public I18NTemplate(TemplateResolver resolver, String path) {
+        this.resolver = resolver;
+        this.path = path;
     }
 
-    @Override
-    protected Resource tryPath(String path) {
-        URL tmpl = classLoader.getResource(path);
-        return tmpl != null ? Resource.url(tmpl) : null;
+    public String merge(Locale locale, Object context) {
+        return resolver.resolve(path, locale).merge(context);
     }
 }

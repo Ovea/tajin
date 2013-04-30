@@ -26,7 +26,7 @@ import java.lang.reflect.Field;
 import java.lang.reflect.Method;
 
 import static com.google.common.collect.Iterables.filter;
-import static com.ovea.tajin.framework.support.guice.Reflect.*;
+import static com.ovea.tajin.framework.util.Reflect.*;
 
 /**
  * @author Mathieu Carbou (mathieu.carbou@gmail.com)

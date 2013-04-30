@@ -15,24 +15,21 @@
  */
 package com.ovea.tajin.framework.template;
 
-import com.ovea.tajin.framework.io.Resource;
+import java.lang.annotation.Retention;
+import java.lang.annotation.Target;
 
-import java.net.URL;
+import static java.lang.annotation.ElementType.FIELD;
+import static java.lang.annotation.RetentionPolicy.RUNTIME;
 
 /**
- * @author Mathieu Carbou (mathieu.carbou@gmail.com)
+ * Inject a resource bundle which name is based on the same name of the injected class
  */
-public final class ClassPathTemplateResolver extends TemplateResolverSkeleton {
-    private final ClassLoader classLoader;
+@Target(FIELD)
+@Retention(RUNTIME)
+public @interface Tmpl {
 
-    public ClassPathTemplateResolver(TemplateCompiler compiler, ClassLoader classLoader) {
-        super(compiler);
-        this.classLoader = classLoader;
-    }
-
-    @Override
-    protected Resource tryPath(String path) {
-        URL tmpl = classLoader.getResource(path);
-        return tmpl != null ? Resource.url(tmpl) : null;
-    }
+    /**
+     * Template location
+     */
+    String value();
 }

@@ -27,7 +27,8 @@ import java.net.MalformedURLException;
 public final class FileSystemTemplateResolver extends TemplateResolverSkeleton {
     private final File webDir;
 
-    public FileSystemTemplateResolver(File baseDir) {
+    public FileSystemTemplateResolver(TemplateCompiler compiler, File baseDir) {
+        super(compiler);
         try {
             this.webDir = baseDir.getCanonicalFile();
         } catch (IOException e) {

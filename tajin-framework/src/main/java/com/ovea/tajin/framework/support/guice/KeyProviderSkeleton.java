@@ -17,6 +17,7 @@ package com.ovea.tajin.framework.support.guice;
 
 import com.google.inject.Key;
 import com.google.inject.TypeLiteral;
+import com.ovea.tajin.framework.util.Reflect;
 
 import java.lang.annotation.Annotation;
 import java.lang.reflect.Field;

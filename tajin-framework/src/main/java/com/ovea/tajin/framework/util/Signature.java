@@ -13,14 +13,14 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package com.ovea.tajin.framework.support.guice;
+package com.ovea.tajin.framework.util;
 
 import java.lang.reflect.Method;
 
 /**
  * @author Mathieu Carbou (mathieu.carbou@gmail.com)
  */
-final class Signature {
+public final class Signature {
     public final Class[] parameterTypes;
     private final int hash;
     public final Method method;

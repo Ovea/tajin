@@ -18,14 +18,16 @@ package com.ovea.tajin.framework.app
 import com.google.inject.Binder
 import com.google.inject.Injector
 import com.google.inject.Provider
+import com.google.inject.matcher.Matchers
 import com.google.inject.servlet.RequestScoped
 import com.google.inject.servlet.ServletModule
-import com.ovea.tajin.framework.util.PropertySettings
 import com.ovea.tajin.framework.security.TokenBuilder
 import com.ovea.tajin.framework.support.guice.*
 import com.ovea.tajin.framework.support.jersey.GzipEncoder
 import com.ovea.tajin.framework.support.jersey.SecurityResourceFilterFactory
 import com.ovea.tajin.framework.support.shiro.*
+import com.ovea.tajin.framework.template.*
+import com.ovea.tajin.framework.util.PropertySettings
 import com.ovea.tajin.framework.web.CookieLocaleManager
 import com.sun.jersey.guice.spi.container.servlet.GuiceContainer
 import org.apache.shiro.SecurityUtils
@@ -65,6 +67,19 @@ class InternalWebModule extends ServletModule {
         settings.getString('token.key', null)?.with { String key ->
             bind(TokenBuilder).toInstance(new TokenBuilder(Hex.decode(key)))
         }
+
+        // setup groovy templating system
+        boolean cachetmpl = settings.getBoolean('template.cache', true)
+        TemplateCompiler compiler = new GroovyTemplateCompiler()
+        if (cachetmpl) {
+            compiler = new CachingTemplateCompiler(compiler)
+        }
+        TemplateResolver resolver = new ResourceTemplateResolver(compiler)
+        if (cachetmpl) {
+            resolver = new CachingTemplateResolver(resolver)
+        }
+        bind(TemplateResolver).toInstance(resolver)
+        binder().bindListener(Matchers.any(), new TmplHandler());
 
         // bind filters
         bind(GuiceContainer).in(javax.inject.Singleton)
