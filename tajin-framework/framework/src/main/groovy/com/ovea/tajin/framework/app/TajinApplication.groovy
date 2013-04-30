@@ -23,6 +23,7 @@ import com.ovea.tajin.framework.io.Resource
 import com.ovea.tajin.framework.support.jetty.Container
 import com.ovea.tajin.framework.support.logback.LogbackConfigurator
 import com.ovea.tajin.framework.util.PropertySettings
+import org.codehaus.groovy.runtime.InvokerHelper
 
 /**
  * @author Mathieu Carbou (mathieu.carbou@gmail.com)
@@ -56,6 +57,17 @@ class TajinApplication {
             Resource config = Resource.resource(options.config)
             println "  - Using Tajin configuration: ${config}"
             settings = new PropertySettings(config)
+        }
+        // check if we need to enhnce classpath
+        def cp = settings.getStrings('server.classpath', [])
+        if (cp) {
+            if (Thread.currentThread().contextClassLoader instanceof URLClassLoader) {
+                cp.each { String path ->
+                    InvokerHelper.invokeMethod(Thread.currentThread().contextClassLoader, 'addURL', [new File(path).canonicalFile.toURI().toURL()])
+                }
+            } else {
+                throw new AssertionError('Cannot enhance classpath using classloader of type ' + Thread.currentThread().contextClassLoader.class.name)
+            }
         }
         // setup logging
         Resource loggingConfig = settings.getResource('logging.app.config', 'classpath:com/ovea/tajin/framework/tajin-logback.xml')

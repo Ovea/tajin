@@ -11,6 +11,7 @@ class StartWithConfig {
         //TajinApplication.main('-c', 'src/test/data/sample-ncsa.properties')
         //TajinApplication.main('-c', 'src/test/data/sample-security.properties')
         //TajinApplication.main('-c', 'src/test/data/sample-ssl.properties')
-        TajinApplication.main('-c', 'src/test/data/sample-tmpl.properties')
+        //TajinApplication.main('-c', 'src/test/data/sample-tmpl.properties')
+        TajinApplication.main('-c', 'src/test/data/sample-classpath.properties')
     }
 }

@@ -18,8 +18,8 @@ package com.ovea.tajin.framework.support.jetty
 import com.google.inject.Module
 import com.google.inject.servlet.GuiceFilter
 import com.ovea.tajin.framework.app.Application
-import com.ovea.tajin.framework.util.PropertySettings
 import com.ovea.tajin.framework.support.guice.GuiceListener
+import com.ovea.tajin.framework.util.PropertySettings
 import org.eclipse.jetty.jmx.MBeanContainer
 import org.eclipse.jetty.server.*
 import org.eclipse.jetty.server.handler.HandlerCollection
@@ -90,7 +90,7 @@ class Container {
                     logCookies: settings.getBoolean('logging.request.cookies', false),
                     append: true,
                     logTimeZone: 'GMT',
-                    ignorePaths: settings.getStrings('logging.request.ignores', '').collect { it.trim() },
+                    ignorePaths: settings.getStrings('logging.request.ignores', []).collect { it.trim() },
                 )
             ))
         }

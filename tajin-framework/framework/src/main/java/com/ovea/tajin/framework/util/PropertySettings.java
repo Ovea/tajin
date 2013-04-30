@@ -83,6 +83,11 @@ public final class PropertySettings {
         return Arrays.asList((v == null ? def : v.split(",|;")));
     }
 
+    public List<String> getStrings(String key, List<String> def) {
+        String v = resolve(key);
+        return v == null ? def : Arrays.asList(v.split(",|;"));
+    }
+
     public Resource getResource(String key) {
         return Resource.resource(getRequired(key));
     }
