@@ -21,6 +21,7 @@ import com.google.inject.Provider
 import com.google.inject.servlet.RequestScoped
 import com.google.inject.servlet.ServletModule
 import com.ovea.tajin.framework.prop.PropertySettings
+import com.ovea.tajin.framework.security.TokenBuilder
 import com.ovea.tajin.framework.support.guice.*
 import com.ovea.tajin.framework.support.jersey.GzipEncoder
 import com.ovea.tajin.framework.support.jersey.SecurityResourceFilterFactory
@@ -59,6 +60,11 @@ class InternalWebModule extends ServletModule {
     protected void configureServlets() {
         bind(PropertySettings).toInstance(settings)
         bind(Locale).toProvider(CookieLocaleManager).in(RequestScoped)
+
+        // bind TokenBuilder if needed
+        settings.getString('token.key', null)?.with { String key ->
+            bind(TokenBuilder).toInstance(new TokenBuilder(Hex.decode(key)))
+        }
 
         // bind filters
         bind(GuiceContainer).in(javax.inject.Singleton)
