@@ -4,6 +4,8 @@ import com.ovea.tajin.framework.template.I18NTemplate
 import com.ovea.tajin.framework.template.Template
 
 import javax.annotation.security.PermitAll
+import javax.inject.Inject
+import javax.inject.Provider
 import javax.inject.Singleton
 import javax.ws.rs.GET
 import javax.ws.rs.Path
@@ -16,6 +18,9 @@ import javax.ws.rs.core.MediaType
 @Path("/user")
 @Singleton
 class MyRest {
+
+    @Inject
+    Provider<Locale> locale
 
     @Template('classpath:tmpl.txt')
     I18NTemplate template

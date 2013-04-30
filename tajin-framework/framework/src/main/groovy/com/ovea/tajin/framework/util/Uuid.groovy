@@ -29,11 +29,11 @@ public final class Uuid implements Serializable, Comparable<Uuid> {
 
     public static Uuid valueOf(String uuidString) {
         if (uuidString == null)
-            throw new IllegalArgumentException("Illegal UUID string");
+            throw new IllegalArgumentException("Illegal UUID string: " + uuidString);
         byte[] b = Base64.decode(uuidString);
         // the string is the B64 representation of 128bits: two long
         if (b.length != 16)
-            throw new IllegalArgumentException("Invalid UUID string");
+            throw new IllegalArgumentException("Invalid UUID string: " + uuidString);
         return new Uuid(fromBytes(b));
     }
 

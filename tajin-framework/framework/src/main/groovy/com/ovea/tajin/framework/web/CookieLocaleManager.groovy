@@ -15,9 +15,8 @@
  */
 package com.ovea.tajin.framework.web
 
-import com.google.inject.servlet.RequestScoped
-import com.ovea.tajin.framework.util.PropertySettings
 import com.ovea.tajin.framework.util.LocaleUtil
+import com.ovea.tajin.framework.util.PropertySettings
 
 import javax.inject.Inject
 import javax.inject.Provider
@@ -27,23 +26,22 @@ import javax.servlet.http.HttpServletResponse
 /**
  * @author Mathieu Carbou (mathieu.carbou@gmail.com)
  */
-@RequestScoped
 final class CookieLocaleManager implements Provider<Locale> {
 
     private static final int DAY_SEC = 60 * 60 * 24
     private static final String DEFAULT_NAME = 'lc'
 
     @Inject
-    Provider<HttpServletRequest> request;
+    Provider<HttpServletRequest> request
 
     @Inject
-    Provider<HttpServletResponse> response;
+    Provider<HttpServletResponse> response
 
     @Inject
     PropertySettings settings
 
     public void set(Locale locale) {
-        newLocaleCookie().withValue(locale.toString().replace('_', '-')).saveTo(request.get(), response.get());
+        newLocaleCookie().withValue(locale.toString().replace('_', '-')).saveTo(request.get(), response.get())
     }
 
     @Override
@@ -52,11 +50,11 @@ final class CookieLocaleManager implements Provider<Locale> {
         Locale found = LocaleUtil.valueOf(newLocaleCookie().readValue(request.get()))
         if (!found) {
             // when using cors, check the request parameters if a cookie is not present
-            found = LocaleUtil.valueOf(request.get().getParameter(settings.getString('locale.cookie.name', DEFAULT_NAME)));
+            found = LocaleUtil.valueOf(request.get().getParameter(settings.getString('locale.cookie.name', DEFAULT_NAME)))
             if (!found && request.get().getHeader("Accept-Language")) {
                 // otherwise: no cookie exists client-side => first time, check request header and set cookie
                 // must check if Accept-Language header is there otherwise the default system locale is returned
-                found = request.get().getLocale();
+                found = request.get().getLocale()
             }
             if (!found) {
                 found = LocaleUtil.valueOf(settings.getString('locale.default', 'en_US'), Locale.US)

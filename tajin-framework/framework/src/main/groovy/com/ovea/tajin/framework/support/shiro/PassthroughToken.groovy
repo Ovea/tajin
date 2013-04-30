@@ -29,7 +29,7 @@ import org.apache.shiro.web.subject.WebSubject
 @ToString
 class PassthroughToken implements HostAuthenticationToken, RememberMeAuthenticationToken {
 
-    String email
+    String principal
     boolean rememberMe = false
     String host = ((WebSubject) SecurityUtils.subject).servletRequest.remoteHost
 
@@ -40,6 +40,6 @@ class PassthroughToken implements HostAuthenticationToken, RememberMeAuthenticat
 
     @Override
     Object getPrincipal() {
-        return email
+        return principal
     }
 }

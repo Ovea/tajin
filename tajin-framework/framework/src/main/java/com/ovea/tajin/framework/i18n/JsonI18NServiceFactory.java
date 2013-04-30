@@ -15,14 +15,12 @@
  */
 package com.ovea.tajin.framework.i18n;
 
-import javax.inject.Singleton;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ConcurrentMap;
 
 /**
  * @author Mathieu Carbou (mathieu.carbou@gmail.com)
  */
-@Singleton
 public final class JsonI18NServiceFactory implements I18NServiceFactory {
 
     private final ConcurrentMap<String, JsonI18NService> cache = new ConcurrentHashMap<String, JsonI18NService>();

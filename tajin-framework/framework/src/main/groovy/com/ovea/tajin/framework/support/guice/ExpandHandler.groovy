@@ -17,13 +17,11 @@ package com.ovea.tajin.framework.support.guice
 
 import com.google.inject.TypeLiteral
 
-import javax.inject.Singleton
 import java.lang.reflect.Method
 
 /**
  * @author Mathieu Carbou (mathieu.carbou@gmail.com)
  */
-@Singleton
 class ExpandHandler extends MethodHandlerSkeleton<Expand> {
     @Override
     <T> void handle(TypeLiteral<? extends T> type, T instance, Method method, Expand annotation) {
@@ -32,7 +30,7 @@ class ExpandHandler extends MethodHandlerSkeleton<Expand> {
         Class<?>[] paramTypes = method.parameterTypes
         MetaMethod mm = instance.metaClass.pickMethod(method.name, paramTypes)
         if (paramTypes && paramTypes[0] == modelType) {
-            modelType.metaClass[name] << {Object[] args ->
+            modelType.metaClass[name] << { Object[] args ->
                 Object[] params = new Object[args.length + 1]
                 params[0] = delegate
                 if (args.length) {
@@ -50,8 +48,8 @@ class ExpandHandler extends MethodHandlerSkeleton<Expand> {
                 return mm.doMethodInvoke(instance, params)
             }
         } else {
-            modelType.metaClass.static[name] << {Object[] args ->
-                Object[] params = args ? (Object[]) args[0] : args
+            modelType.metaClass.static[name] << { Object[] args ->
+                Object[] params = args
                 def pTypes = mm.parameterTypes
                 if (params.length != pTypes.length) {
                     throw new IllegalArgumentException('Bad argument size')
