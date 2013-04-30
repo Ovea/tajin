@@ -18,5 +18,5 @@ package com.ovea.tajin.framework.template;
 import com.ovea.tajin.framework.io.Resource;
 
 public interface TemplateCompiler {
-    Template compile(Resource resource) throws TemplateCompilerException;
+    ResolvedTemplate compile(Resource resource) throws TemplateCompilerException;
 }

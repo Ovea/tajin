@@ -31,7 +31,7 @@ abstract class TemplateResolverSkeleton implements TemplateResolver {
     }
 
     @Override
-    public final Template resolve(String path, Locale locale) throws TemplateResolverException {
+    public final ResolvedTemplate resolve(String path, Locale locale) throws TemplateResolverException {
         if (path == null) {
             throw new TemplateResolverException("Empty path");
         }

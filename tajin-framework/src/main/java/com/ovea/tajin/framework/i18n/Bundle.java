@@ -13,7 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package com.ovea.tajin.framework.template;
+package com.ovea.tajin.framework.i18n;
 
 import java.lang.annotation.Retention;
 import java.lang.annotation.Target;
@@ -26,10 +26,10 @@ import static java.lang.annotation.RetentionPolicy.RUNTIME;
  */
 @Target(FIELD)
 @Retention(RUNTIME)
-public @interface Tmpl {
+public @interface Bundle {
 
     /**
-     * Template location
+     * Change the location of the resource bundle to use
      */
     String value();
 }

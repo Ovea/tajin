@@ -51,7 +51,7 @@ public abstract class I18NServiceSkeleton implements I18NService {
     }
 
     @Override
-    public final I18NBundle forLocale(Locale locale) {
+    public final I18NBundle getBundle(Locale locale) {
         I18NBundle bundle = cache.get(locale);
         if (bundle == null) {
             cache.putIfAbsent(locale, newBundle(bundleName, locale));

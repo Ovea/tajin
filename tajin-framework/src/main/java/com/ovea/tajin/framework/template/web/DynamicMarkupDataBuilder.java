@@ -15,9 +15,7 @@
  */
 package com.ovea.tajin.framework.template.web;
 
-import com.ovea.tajin.framework.io.Resource;
-import com.ovea.tajin.framework.template.Template;
-import com.ovea.tajin.framework.template.TemplateCompiler;
+import com.ovea.tajin.framework.template.ResolvedTemplate;
 import com.ovea.tajin.framework.template.TemplateResolver;
 
 import javax.servlet.http.HttpServletRequest;
@@ -44,7 +42,7 @@ final class DynamicMarkupDataBuilder implements MarkupDataBuilder {
     @Override
     public MarkupData build(HttpServletRequest request, HttpServletResponse response, String path) {
         try {
-            Template template = resolver.resolve(path, localeProvider.get(request));
+            ResolvedTemplate template = resolver.resolve(path, localeProvider.get(request));
             String markup = template.merge(contextProvider.build(request, response));
             return new MarkupData(markup.getBytes(markupOptions.defaultCharset));
         } catch (RuntimeException e) {

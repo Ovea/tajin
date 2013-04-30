@@ -29,14 +29,14 @@ public final class I18NHandler implements TypeListener {
 
     @Override
     public <I> void hear(final TypeLiteral<I> type, TypeEncounter<I> encounter) {
-        final Iterable<Field> fields = Reflect.findFields(type.getRawType(), Reflect.annotatedBy(I18N.class));
+        final Iterable<Field> fields = Reflect.findFields(type.getRawType(), Reflect.annotatedBy(Bundle.class));
         if (!Iterables.isEmpty(fields)) {
             final Provider<I18NServiceFactory> factory = encounter.getProvider(I18NServiceFactory.class);
             encounter.register(new MembersInjector<I>() {
                 @Override
                 public void injectMembers(I instance) {
                     for (Field field : fields) {
-                        I18N annotation = field.getAnnotation(I18N.class);
+                        Bundle annotation = field.getAnnotation(Bundle.class);
                         I18NService service = factory.get().forBundle(annotation.value());
                         if (!field.getType().isAssignableFrom(I18NService.class))
                             throw new IllegalStateException("Field " + field + " must be of type " + I18NService.class.getName());

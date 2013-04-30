@@ -25,7 +25,7 @@ import java.util.concurrent.ConcurrentMap;
  */
 public final class CachingTemplateCompiler implements TemplateCompiler {
 
-    private final ConcurrentMap<Resource, Template> cache = new ConcurrentHashMap<>();
+    private final ConcurrentMap<Resource, ResolvedTemplate> cache = new ConcurrentHashMap<>();
     private final TemplateCompiler templateCompiler;
 
     public CachingTemplateCompiler(TemplateCompiler templateCompiler) {
@@ -33,11 +33,11 @@ public final class CachingTemplateCompiler implements TemplateCompiler {
     }
 
     @Override
-    public Template compile(Resource location) throws TemplateCompilerException {
-        Template template = cache.get(location);
+    public ResolvedTemplate compile(Resource location) throws TemplateCompilerException {
+        ResolvedTemplate template = cache.get(location);
         if (template == null) {
             template = templateCompiler.compile(location);
-            Template old = cache.putIfAbsent(location, template);
+            ResolvedTemplate old = cache.putIfAbsent(location, template);
             if (old != null) {
                 template = old;
             }

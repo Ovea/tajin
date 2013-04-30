@@ -29,14 +29,14 @@ public final class TmplHandler implements TypeListener {
 
     @Override
     public <I> void hear(final TypeLiteral<I> type, TypeEncounter<I> encounter) {
-        final Iterable<Field> fields = Reflect.findFields(type.getRawType(), Reflect.annotatedBy(Tmpl.class));
+        final Iterable<Field> fields = Reflect.findFields(type.getRawType(), Reflect.annotatedBy(Template.class));
         if (!Iterables.isEmpty(fields)) {
             final Provider<TemplateResolver> resolver = encounter.getProvider(TemplateResolver.class);
             encounter.register(new MembersInjector<I>() {
                 @Override
                 public void injectMembers(I instance) {
                     for (Field field : fields) {
-                        Tmpl annotation = field.getAnnotation(Tmpl.class);
+                        Template annotation = field.getAnnotation(Template.class);
                         I18NTemplate tmpl = new I18NTemplate(resolver.get(), annotation.value());
                         if (!field.getType().isAssignableFrom(I18NTemplate.class))
                             throw new IllegalStateException("Field " + field + " must be of type " + I18NTemplate.class.getName());

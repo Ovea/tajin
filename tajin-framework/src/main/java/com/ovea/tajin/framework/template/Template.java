@@ -15,42 +15,21 @@
  */
 package com.ovea.tajin.framework.template;
 
-import com.ovea.tajin.framework.io.Resource;
+import java.lang.annotation.Retention;
+import java.lang.annotation.Target;
 
-public abstract  class Template {
+import static java.lang.annotation.ElementType.FIELD;
+import static java.lang.annotation.RetentionPolicy.RUNTIME;
 
-    private final Resource resource;
-    private final String defaultCharset;
+/**
+ * Inject a resource bundle which name is based on the same name of the injected class
+ */
+@Target(FIELD)
+@Retention(RUNTIME)
+public @interface Template {
 
-    public Template(Resource resource) {
-        this(resource, "UTF-8");
-    }
-
-    public Template(Resource resource, String defaultCharset) {
-        this.resource = resource;
-        this.defaultCharset = defaultCharset;
-    }
-
-    public abstract String merge(Object context);
-
-    public String getDefaultCharset() {
-        return defaultCharset;
-    }
-
-    public final Resource getResource() {
-        return resource;
-    }
-
-    public final String getTemplate() {
-        return getTemplate(getDefaultCharset());
-    }
-
-    public final String getTemplate(String charset) {
-        return resource.getText(charset);
-    }
-
-    @Override
-    public final String toString() {
-        return getTemplate();
-    }
+    /**
+     * Template location
+     */
+    String value();
 }

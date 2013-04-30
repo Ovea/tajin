@@ -12,6 +12,7 @@ import org.apache.shiro.util.SimpleByteSource
  * @date 2013-04-28
  */
 class Sample implements Application {
+
     @Override
     void onInit(WebBinder binder, PropertySettings settings) {
         binder.configure {

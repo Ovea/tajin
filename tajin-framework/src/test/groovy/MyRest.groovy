@@ -1,7 +1,7 @@
-import com.ovea.tajin.framework.i18n.I18N
+import com.ovea.tajin.framework.i18n.Bundle
 import com.ovea.tajin.framework.i18n.I18NService
 import com.ovea.tajin.framework.template.I18NTemplate
-import com.ovea.tajin.framework.template.Tmpl
+import com.ovea.tajin.framework.template.Template
 
 import javax.annotation.security.PermitAll
 import javax.inject.Singleton
@@ -17,10 +17,10 @@ import javax.ws.rs.core.MediaType
 @Singleton
 class MyRest {
 
-    @Tmpl('classpath:tmpl.txt')
+    @Template('classpath:tmpl.txt')
     I18NTemplate template
 
-    @I18N('classpath:a.json')
+    @Bundle('classpath:a.json')
     I18NService i18n
 
     @GET
@@ -32,7 +32,7 @@ class MyRest {
             id: 1,
             email: 'toto@tajin.com',
             msg: template.merge(Locale.FRANCE, [obj: [value: 'me']]),
-            msg2: i18n.forLocale(Locale.CANADA_FRENCH).message('mykey.mysubkey')
+            msg2: i18n.getBundle(Locale.CANADA_FRENCH).message('mykey.mysubkey')
         ]
     }
 

@@ -21,5 +21,5 @@ import java.util.Locale;
  * @author Mathieu Carbou (mathieu.carbou@gmail.com)
  */
 public interface TemplateResolver {
-    Template resolve(String path, Locale locale) throws TemplateResolverException;
+    ResolvedTemplate resolve(String path, Locale locale) throws TemplateResolverException;
 }

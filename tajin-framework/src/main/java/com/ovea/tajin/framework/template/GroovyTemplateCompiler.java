@@ -38,14 +38,14 @@ public class GroovyTemplateCompiler implements TemplateCompiler {
     }
 
     @Override
-    public Template compile(Resource resource) throws TemplateCompilerException {
+    public ResolvedTemplate compile(Resource resource) throws TemplateCompilerException {
         final groovy.text.Template tmpl;
         try {
             tmpl = new SimpleTemplateEngine(Thread.currentThread().getContextClassLoader()).createTemplate(resource.getText(defaultCharset));
         } catch (ClassNotFoundException | IOException e) {
             throw new RuntimeException(e.getMessage(), e);
         }
-        return new Template(resource) {
+        return new ResolvedTemplate(resource) {
             @Override
             public String merge(Object context) {
                 try {

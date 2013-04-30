@@ -25,5 +25,5 @@ public interface I18NService {
         RETURN_KEY
     }
 
-    I18NBundle forLocale(Locale locale);
+    I18NBundle getBundle(Locale locale);
 }

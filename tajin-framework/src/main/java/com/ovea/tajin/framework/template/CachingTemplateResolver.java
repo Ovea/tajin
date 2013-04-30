@@ -34,7 +34,7 @@ public final class CachingTemplateResolver implements TemplateResolver {
     }
 
     @Override
-    public Template resolve(String path, Locale locale) throws TemplateResolverException {
+    public ResolvedTemplate resolve(String path, Locale locale) throws TemplateResolverException {
         final String key = path + locale;
         Object obj = cache.get(key);
         if (obj == null) {
@@ -51,6 +51,6 @@ public final class CachingTemplateResolver implements TemplateResolver {
         if (obj == NULL) {
             throw new TemplateResolverException("Cannot resolve template for path " + path);
         }
-        return (Template) obj;
+        return (ResolvedTemplate) obj;
     }
 }
