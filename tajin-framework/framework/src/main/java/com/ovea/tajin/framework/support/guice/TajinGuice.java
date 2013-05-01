@@ -15,7 +15,11 @@
  */
 package com.ovea.tajin.framework.support.guice;
 
-import com.google.inject.*;
+import com.google.inject.Binder;
+import com.google.inject.BindingAnnotation;
+import com.google.inject.Key;
+import com.google.inject.Module;
+import com.google.inject.Provider;
 import com.google.inject.matcher.AbstractMatcher;
 import com.google.inject.matcher.Matcher;
 import com.google.inject.matcher.Matchers;

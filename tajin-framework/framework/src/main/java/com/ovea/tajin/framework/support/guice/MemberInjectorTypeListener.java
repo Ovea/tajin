@@ -15,7 +15,11 @@
  */
 package com.ovea.tajin.framework.support.guice;
 
-import com.google.inject.*;
+import com.google.inject.Injector;
+import com.google.inject.Key;
+import com.google.inject.MembersInjector;
+import com.google.inject.Provider;
+import com.google.inject.TypeLiteral;
 import com.google.inject.spi.TypeEncounter;
 import com.google.inject.spi.TypeListener;
 
@@ -25,8 +29,10 @@ import java.lang.reflect.Method;
 import java.util.List;
 
 import static com.google.common.collect.Iterables.filter;
-import static com.ovea.tajin.framework.util.Reflect.*;
 import static com.ovea.tajin.framework.support.guice.TajinGuiceException.runtime;
+import static com.ovea.tajin.framework.util.Reflect.annotatedBy;
+import static com.ovea.tajin.framework.util.Reflect.findFields;
+import static com.ovea.tajin.framework.util.Reflect.findMethods;
 
 /**
  * @author Mathieu Carbou (mathieu.carbou@gmail.com)

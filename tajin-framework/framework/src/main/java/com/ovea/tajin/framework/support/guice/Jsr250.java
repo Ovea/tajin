@@ -16,7 +16,15 @@
 package com.ovea.tajin.framework.support.guice;
 
 import com.google.common.collect.Iterables;
-import com.google.inject.*;
+import com.google.inject.Binder;
+import com.google.inject.Binding;
+import com.google.inject.Guice;
+import com.google.inject.Inject;
+import com.google.inject.Injector;
+import com.google.inject.Key;
+import com.google.inject.Module;
+import com.google.inject.Stage;
+import com.google.inject.TypeLiteral;
 import com.google.inject.spi.DefaultElementVisitor;
 import com.google.inject.spi.Element;
 import com.google.inject.spi.Elements;

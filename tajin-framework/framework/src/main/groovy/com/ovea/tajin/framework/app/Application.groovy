@@ -15,8 +15,8 @@
  */
 package com.ovea.tajin.framework.app
 
-import com.ovea.tajin.framework.util.PropertySettings
 import com.ovea.tajin.framework.support.guice.WebBinder
+import com.ovea.tajin.framework.util.PropertySettings
 
 public interface Application {
     /**

@@ -18,13 +18,30 @@ package com.ovea.tajin.framework.support.guice;
 import com.google.common.base.Supplier;
 import com.google.common.collect.Multimap;
 import com.google.common.collect.Multimaps;
-import com.google.inject.*;
-import com.google.inject.spi.*;
+import com.google.inject.Binder;
+import com.google.inject.Binding;
+import com.google.inject.Inject;
+import com.google.inject.Injector;
+import com.google.inject.Key;
+import com.google.inject.Module;
+import com.google.inject.Scope;
+import com.google.inject.Scopes;
+import com.google.inject.Singleton;
+import com.google.inject.spi.BindingScopingVisitor;
+import com.google.inject.spi.Dependency;
+import com.google.inject.spi.HasDependencies;
+import com.google.inject.spi.InstanceBinding;
+import com.google.inject.spi.ProviderInstanceBinding;
 
 import javax.annotation.PostConstruct;
 import javax.annotation.Resource;
 import java.lang.annotation.Annotation;
-import java.util.*;
+import java.util.Arrays;
+import java.util.Collection;
+import java.util.HashSet;
+import java.util.IdentityHashMap;
+import java.util.Map;
+import java.util.Set;
 
 import static com.ovea.tajin.framework.support.guice.TajinGuice.in;
 
