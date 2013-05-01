@@ -25,7 +25,7 @@ class Tajin {
 
     static final String VERSION = {
         try {
-            return new PropertySettings(Resource.classpath(Tajin.classLoader, '/META-INF/maven/com.ovea.tajin/tajin-framework/pom.properties')).getString("version")
+            return new PropertySettings(Resource.classpath(Tajin.classLoader, '/META-INF/maven/com.ovea.tajin.framework/tajin-framework/pom.properties')).getString("version")
         } catch (ignored) {
             return "unknown"
         }
