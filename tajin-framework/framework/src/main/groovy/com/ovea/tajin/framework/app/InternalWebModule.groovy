@@ -35,6 +35,7 @@ import com.ovea.tajin.framework.web.CookieLocaleManager
 import com.sun.jersey.guice.spi.container.servlet.GuiceContainer
 import org.apache.shiro.SecurityUtils
 import org.apache.shiro.authc.pam.AllSuccessfulStrategy
+import org.apache.shiro.authc.pam.FirstSuccessfulStrategy
 import org.apache.shiro.authc.pam.ModularRealmAuthenticator
 import org.apache.shiro.codec.Hex
 import org.apache.shiro.io.DefaultSerializer
@@ -141,7 +142,7 @@ class InternalWebModule extends ServletModule {
                         realms: realms,
                         sessionManager: new ServletContainerSessionManager(),
                         authenticator: new ModularRealmAuthenticator(
-                            authenticationStrategy: new AllSuccessfulStrategy(),
+                            authenticationStrategy: new FirstSuccessfulStrategy(),
                             realms: realms
                         )
                     )
