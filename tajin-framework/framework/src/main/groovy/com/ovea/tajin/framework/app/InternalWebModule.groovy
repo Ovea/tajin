@@ -34,7 +34,6 @@ import com.ovea.tajin.framework.util.PropertySettings
 import com.ovea.tajin.framework.web.CookieLocaleManager
 import com.sun.jersey.guice.spi.container.servlet.GuiceContainer
 import org.apache.shiro.SecurityUtils
-import org.apache.shiro.authc.pam.AllSuccessfulStrategy
 import org.apache.shiro.authc.pam.FirstSuccessfulStrategy
 import org.apache.shiro.authc.pam.ModularRealmAuthenticator
 import org.apache.shiro.codec.Hex
@@ -69,28 +68,46 @@ class InternalWebModule extends ServletModule {
 
         // bind TokenBuilder if needed
         settings.getString('token.key', null)?.with { String key ->
-            bind(TokenBuilder).toInstance(new TokenBuilder(Hex.decode(key)))
+            bind(TokenBuilder).toProvider(new Provider<TokenBuilder>() {
+                TokenBuilder get() { new TokenBuilder(Hex.decode(key)) }
+            }).in(javax.inject.Singleton)
         }
 
         // setup groovy templating system
-        boolean cachetmpl = settings.getBoolean('template.cache', true)
-        TemplateCompiler compiler = new GroovyTemplateCompiler()
-        if (cachetmpl) {
-            compiler = new CachingTemplateCompiler(compiler)
-        }
-        TemplateResolver resolver = new ResourceTemplateResolver(compiler)
-        if (cachetmpl) {
-            resolver = new CachingTemplateResolver(resolver)
-        }
-        bind(TemplateResolver).toInstance(resolver)
+        bind(TemplateCompiler).toProvider(new Provider<TemplateCompiler>() {
+            @Override
+            TemplateCompiler get() {
+                TemplateCompiler compiler = new GroovyTemplateCompiler()
+                if (settings.getBoolean('template.cache', true)) {
+                    compiler = new CachingTemplateCompiler(compiler)
+                }
+                return compiler
+            }
+        }).in(javax.inject.Singleton)
+        bind(TemplateResolver).toProvider(new Provider<TemplateResolver>() {
+            @Inject TemplateCompiler compiler
+
+            @Override
+            TemplateResolver get() {
+                TemplateResolver resolver = new ResourceTemplateResolver(compiler)
+                if (settings.getBoolean('template.cache', true)) {
+                    resolver = new CachingTemplateResolver(resolver)
+                }
+                return resolver
+            }
+        }).in(javax.inject.Singleton)
         binder().bindListener(Matchers.any(), new TmplHandler());
 
         // setup i18n
-        boolean i18nCache = settings.getBoolean('i18n.cache', true)
-        JsonI18NServiceFactory factory = new JsonI18NServiceFactory()
-        factory.debug = !i18nCache
-        factory.missingKeyBehaviour = settings.getEnum(I18NService.MissingKeyBehaviour, 'i18n.miss', I18NService.MissingKeyBehaviour.RETURN_KEY)
-        bind(I18NServiceFactory).toInstance(factory)
+        bind(I18NServiceFactory).toProvider(new Provider<I18NServiceFactory>() {
+            @Override
+            I18NServiceFactory get() {
+                JsonI18NServiceFactory factory = new JsonI18NServiceFactory()
+                factory.debug = !settings.getBoolean('i18n.cache', true)
+                factory.missingKeyBehaviour = settings.getEnum(I18NService.MissingKeyBehaviour, 'i18n.miss', I18NService.MissingKeyBehaviour.RETURN_KEY)
+                return factory
+            }
+        }).in(javax.inject.Singleton)
         binder().bindListener(Matchers.any(), new I18NHandler());
 
         // bind filters
@@ -122,8 +139,7 @@ class InternalWebModule extends ServletModule {
         if (settings.has('security.filter')) {
             bind(org.apache.shiro.mgt.SecurityManager).to(WebSecurityManager)
             bind(WebSecurityManager).toProvider(new Provider<WebSecurityManager>() {
-                @Inject
-                Injector injector
+                @Inject Injector injector
 
                 @Override
                 WebSecurityManager get() {

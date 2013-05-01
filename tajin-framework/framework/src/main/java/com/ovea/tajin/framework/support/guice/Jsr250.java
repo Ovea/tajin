@@ -16,15 +16,7 @@
 package com.ovea.tajin.framework.support.guice;
 
 import com.google.common.collect.Iterables;
-import com.google.inject.Binder;
-import com.google.inject.Binding;
-import com.google.inject.Guice;
-import com.google.inject.Inject;
-import com.google.inject.Injector;
-import com.google.inject.Key;
-import com.google.inject.Module;
-import com.google.inject.Stage;
-import com.google.inject.TypeLiteral;
+import com.google.inject.*;
 import com.google.inject.spi.DefaultElementVisitor;
 import com.google.inject.spi.Element;
 import com.google.inject.spi.Elements;
@@ -78,7 +70,7 @@ public final class Jsr250 {
         try {
             return Guice.createInjector(
                 stage,
-                hasJSR250Module(stage, modules) ? modules : Iterables.concat(modules, Arrays.asList(new Jsr250Module())))
+                Iterables.concat(modules, Arrays.asList(new Jsr250Module())))
                 .getInstance(Jsr250Injector.class);
         } catch (RuntimeException e) {
             destroyModule.destroy();
@@ -86,7 +78,7 @@ public final class Jsr250 {
         }
     }
 
-    private static boolean hasJSR250Module(Stage stage, Iterable<? extends Module> modules) {
+    /*private static boolean hasJSR250Module(Stage stage, Iterable<? extends Module> modules) {
         final Key key = Key.get(Jsr250Destroyer.class);
         for (Element element : Elements.getElements(stage, modules)) {
             Boolean res = element.acceptVisitor(new DefaultElementVisitor<Boolean>() {
@@ -99,7 +91,7 @@ public final class Jsr250 {
                 return true;
         }
         return false;
-    }
+    }*/
 
     public static Module newJsr250Module() {
         return new Jsr250Module();
