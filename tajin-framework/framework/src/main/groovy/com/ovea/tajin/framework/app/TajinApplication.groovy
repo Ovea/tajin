@@ -43,6 +43,7 @@ class TajinApplication {
         if (cp) {
             if (Thread.currentThread().contextClassLoader instanceof URLClassLoader) {
                 cp.each { String path ->
+                    println "  - Adding to classpath: ${path}"
                     InvokerHelper.invokeMethod(Thread.currentThread().contextClassLoader, 'addURL', [new File(path).canonicalFile.toURI().toURL()])
                 }
             } else {

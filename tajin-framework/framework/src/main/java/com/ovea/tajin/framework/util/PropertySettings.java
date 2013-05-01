@@ -22,6 +22,7 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.util.Arrays;
 import java.util.List;
+import java.util.Map;
 import java.util.Properties;
 
 public final class PropertySettings {
@@ -54,6 +55,11 @@ public final class PropertySettings {
             }
         }
         this.resolver.setSystemPropertiesMode(SystemPropertiesMode.OVERRIDE);
+    }
+
+    public PropertySettings plus(Map<String, String> m) {
+        properties.putAll(m);
+        return this;
     }
 
     public File getPath(String key) {
