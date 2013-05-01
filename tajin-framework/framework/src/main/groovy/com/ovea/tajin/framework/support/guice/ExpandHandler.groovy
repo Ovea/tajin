@@ -49,7 +49,7 @@ class ExpandHandler extends MethodHandlerSkeleton<Expand> {
             }
         } else {
             modelType.metaClass.static[name] << { Object[] args ->
-                Object[] params = args
+                Object[] params = args && args[0] != null ? (Object[]) args[0] : args
                 def pTypes = mm.parameterTypes
                 if (params.length != pTypes.length) {
                     throw new IllegalArgumentException('Bad argument size')
