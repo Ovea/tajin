@@ -15,6 +15,7 @@
  */
 package com.ovea.tajin.framework.support.shiro
 
+import org.apache.shiro.authc.AuthenticationToken
 import org.apache.shiro.authc.SimpleAccount
 
 /**
@@ -24,5 +25,8 @@ public interface AccountRepository {
 
     String ANONYMOUS_PRINCIPAL = 'anonymous@anonymous.me'
 
-    SimpleAccount getAccount(String email)
+    SimpleAccount getAccount(String principalId)
+
+    SimpleAccount getAccount(AuthenticationToken token)
+
 }

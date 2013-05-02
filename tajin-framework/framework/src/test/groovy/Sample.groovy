@@ -3,6 +3,7 @@ import com.ovea.tajin.framework.support.guice.WebBinder
 import com.ovea.tajin.framework.support.shiro.AccountRepository
 import com.ovea.tajin.framework.support.shiro.UsernamePasswordRealm
 import com.ovea.tajin.framework.util.PropertySettings
+import org.apache.shiro.authc.AuthenticationToken
 import org.apache.shiro.authc.SimpleAccount
 import org.apache.shiro.crypto.hash.Sha512Hash
 import org.apache.shiro.util.SimpleByteSource
@@ -19,7 +20,12 @@ class Sample implements Application {
             bind(MyRest)
             bind(AccountRepository).toInstance(new AccountRepository() {
                 @Override
-                SimpleAccount getAccount(String email) {
+                SimpleAccount getAccount(AuthenticationToken token) {
+                    return getAccount(token.principal as String)
+                }
+
+                @Override
+                SimpleAccount getAccount(String id) {
                     return new SimpleAccount(
                         email,
                         new Sha512Hash('password', email, 1).toHex(),

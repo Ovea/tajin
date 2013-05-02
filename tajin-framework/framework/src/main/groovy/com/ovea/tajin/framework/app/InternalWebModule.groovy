@@ -28,7 +28,9 @@ import com.ovea.tajin.framework.security.TokenBuilder
 import com.ovea.tajin.framework.support.guice.*
 import com.ovea.tajin.framework.support.jersey.GzipEncoder
 import com.ovea.tajin.framework.support.jersey.SecurityResourceFilterFactory
-import com.ovea.tajin.framework.support.shiro.*
+import com.ovea.tajin.framework.support.shiro.GuiceShiroFilter
+import com.ovea.tajin.framework.support.shiro.SecurityFilter
+import com.ovea.tajin.framework.support.shiro.VersionedRememberMeManager
 import com.ovea.tajin.framework.template.*
 import com.ovea.tajin.framework.util.PropertySettings
 import com.ovea.tajin.framework.web.CookieLocaleManager
@@ -143,7 +145,7 @@ class InternalWebModule extends ServletModule {
 
                 @Override
                 WebSecurityManager get() {
-                    def realms = [UsernamePasswordRealm, PassthroughRealm].collect { injector.getInstance(it) }
+                    def realms = settings.getStrings('security.realms').collect { injector.getInstance(Thread.currentThread().contextClassLoader.loadClass(it)) }
                     DefaultWebSecurityManager manager = new DefaultWebSecurityManager(
                         rememberMeManager: !settings.has("rememberme.cookie.name") ? null : new VersionedRememberMeManager(
                             version: settings.getInt('rememberme.cookie.version', 1),

@@ -49,7 +49,7 @@ class UsernamePasswordRealm extends AuthorizingRealm {
     @Override
     protected AuthenticationInfo doGetAuthenticationInfo(AuthenticationToken token) {
         LOGGER.trace("doGetAuthenticationInfo {}", token);
-        def account = accountRepository.getAccount(token.principal as String)
+        def account = accountRepository.getAccount(token)
         if (account) {
             if (account.locked) {
                 throw new LockedAccountException("Account [" + token.principal + "] is locked.");
