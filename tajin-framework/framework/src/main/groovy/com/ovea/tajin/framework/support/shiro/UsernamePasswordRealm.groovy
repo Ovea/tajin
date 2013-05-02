@@ -28,6 +28,7 @@ import org.slf4j.Logger
 import org.slf4j.LoggerFactory
 
 import javax.inject.Inject
+
 /**
  * @author Mathieu Carbou (mathieu.carbou@gmail.com)
  */
@@ -53,6 +54,9 @@ class UsernamePasswordRealm extends AuthorizingRealm {
         if (account) {
             if (account.locked) {
                 throw new LockedAccountException("Account [" + token.principal + "] is locked.");
+            }
+            if (account.credentialsExpired) {
+                throw new LockedAccountException("Account [" + token.principal + "] credential expired.");
             }
             return account
         }

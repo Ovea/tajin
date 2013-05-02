@@ -25,8 +25,14 @@ public interface AccountRepository {
 
     String ANONYMOUS_PRINCIPAL = 'anonymous@anonymous.me'
 
-    SimpleAccount getAccount(String principalId)
-
+    /**
+     * Build account information with principal id, password hash and locking status from a user entered data
+     */
     SimpleAccount getAccount(AuthenticationToken token)
+
+    /**
+     * Retreive an account from database thanks to a principal ID. The user has been authenticated and the account with full roles can be created
+     */
+    SimpleAccount getAccount(String principalId)
 
 }
