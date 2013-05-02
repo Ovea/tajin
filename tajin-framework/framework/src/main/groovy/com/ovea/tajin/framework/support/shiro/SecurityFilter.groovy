@@ -16,8 +16,6 @@
 package com.ovea.tajin.framework.support.shiro
 
 import com.ovea.tajin.framework.util.PropertySettings
-import org.apache.shiro.SecurityUtils
-import org.apache.shiro.authc.SimpleAccount
 import org.apache.shiro.subject.Subject
 import org.apache.shiro.web.filter.authc.AuthenticationFilter
 import org.slf4j.Logger
@@ -54,20 +52,7 @@ class SecurityFilter extends AuthenticationFilter {
     @Override
     protected boolean isAccessAllowed(ServletRequest request, ServletResponse response, Object mappedValue) {
         Subject subject = getSubject(request, response)
-        if (subject.authenticated) {
-            return true
-        }
-        if (subject.remembered && AccountRepository.ANONYMOUS_PRINCIPAL != subject.principal) {
-            SimpleAccount account = accountRepository.getAccount(subject.principal as String)
-            if (account == null || account.locked) {
-                // if the remembered user does not exist
-                SecurityUtils.subject.logout()
-                LOGGER.warn('Remembered user {} cannot be found !', subject.principal)
-                return false
-            }
-            return true
-        }
-        return false
+        return subject.authenticated || subject.remembered
     }
 
     @Override

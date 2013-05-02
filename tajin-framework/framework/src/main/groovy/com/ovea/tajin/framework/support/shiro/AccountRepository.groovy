@@ -15,24 +15,23 @@
  */
 package com.ovea.tajin.framework.support.shiro
 
+import org.apache.shiro.authc.AuthenticationInfo
 import org.apache.shiro.authc.AuthenticationToken
-import org.apache.shiro.authc.SimpleAccount
+import org.apache.shiro.authz.AuthorizationInfo
 
 /**
  * Load account or returns null
  */
 public interface AccountRepository {
 
-    String ANONYMOUS_PRINCIPAL = 'anonymous@anonymous.me'
-
     /**
      * Build account information with principal id, password hash and locking status from a user entered data
      */
-    SimpleAccount getAccount(AuthenticationToken token)
+    AuthenticationInfo getAuthenticationInfo(AuthenticationToken token)
 
     /**
      * Retreive an account from database thanks to a principal ID. The user has been authenticated and the account with full roles can be created
      */
-    SimpleAccount getAccount(String principalId)
+    AuthorizationInfo getAuthorizationInfo(String principalId)
 
 }

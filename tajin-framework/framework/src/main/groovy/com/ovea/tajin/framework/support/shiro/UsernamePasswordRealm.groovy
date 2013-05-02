@@ -17,7 +17,6 @@ package com.ovea.tajin.framework.support.shiro
 
 import org.apache.shiro.authc.AuthenticationInfo
 import org.apache.shiro.authc.AuthenticationToken
-import org.apache.shiro.authc.LockedAccountException
 import org.apache.shiro.authc.UsernamePasswordToken
 import org.apache.shiro.authc.credential.HashedCredentialsMatcher
 import org.apache.shiro.authz.AuthorizationInfo
@@ -49,24 +48,14 @@ class UsernamePasswordRealm extends AuthorizingRealm {
 
     @Override
     protected AuthenticationInfo doGetAuthenticationInfo(AuthenticationToken token) {
-        LOGGER.trace("doGetAuthenticationInfo {}", token);
-        def account = accountRepository.getAccount(token)
-        if (account) {
-            if (account.locked) {
-                throw new LockedAccountException("Account [" + token.principal + "] is locked.");
-            }
-            if (account.credentialsExpired) {
-                throw new LockedAccountException("Account [" + token.principal + "] credential expired.");
-            }
-            return account
-        }
-        return null
+        LOGGER.trace("doGetAuthenticationInfo {}", token)
+        return accountRepository.getAuthenticationInfo(token)
     }
 
     @Override
     protected AuthorizationInfo doGetAuthorizationInfo(PrincipalCollection principals) {
-        LOGGER.trace("doGetAuthorizationInfo {}", principals);
-        return accountRepository.getAccount(getAvailablePrincipal(principals) as String)
+        LOGGER.trace("doGetAuthorizationInfo {}", principals)
+        return accountRepository.getAuthorizationInfo(getAvailablePrincipal(principals) as String)
     }
 
 }

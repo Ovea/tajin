@@ -20,19 +20,19 @@ class Sample implements Application {
             bind(MyRest)
             bind(AccountRepository).toInstance(new AccountRepository() {
                 @Override
-                SimpleAccount getAccount(AuthenticationToken token) {
-                    return getAccount(token.principal as String)
+                SimpleAccount getAuthorizationInfo(String principalId) {
+                    return new SimpleAccount(
+                        principalId,
+                        new Sha512Hash('password', principalId, 1).toHex(),
+                        new SimpleByteSource(principalId as String),
+                        UsernamePasswordRealm.simpleName)
                 }
 
                 @Override
-                SimpleAccount getAccount(String id) {
-                    return new SimpleAccount(
-                        email,
-                        new Sha512Hash('password', email, 1).toHex(),
-                        new SimpleByteSource(email as String),
-                        UsernamePasswordRealm.simpleName)
-
+                SimpleAccount getAuthenticationInfo(AuthenticationToken token) {
+                    return getAuthorizationInfo(token.principal as String)
                 }
+
             })
         }
     }
