@@ -15,6 +15,9 @@
  */
 package com.ovea.tajin.framework.util;
 
+import com.google.common.base.Function;
+import com.google.common.collect.Iterables;
+import com.google.common.collect.Lists;
 import com.ovea.tajin.framework.io.Resource;
 
 import java.io.File;
@@ -81,17 +84,26 @@ public final class PropertySettings {
     }
 
     public List<String> getStrings(String key) {
-        return Arrays.asList(getRequired(key).split(",|;"));
+        return split(getRequired(key));
     }
 
     public List<String> getStrings(String key, String... def) {
         String v = resolve(key);
-        return Arrays.asList((v == null ? def : v.split(",|;")));
+        return v == null ? Arrays.asList(def) : split(v);
     }
 
     public List<String> getStrings(String key, List<String> def) {
         String v = resolve(key);
-        return v == null ? def : Arrays.asList(v.split(",|;"));
+        return v == null ? def : split(v);
+    }
+
+    private List<String> split(String s) {
+        return Lists.newArrayList(Iterables.transform(Lists.newArrayList(s.split(",|;")), new Function<String, String>() {
+            @Override
+            public String apply(java.lang.String input) {
+                return input.trim();
+            }
+        }));
     }
 
     public Resource getResource(String key) {
