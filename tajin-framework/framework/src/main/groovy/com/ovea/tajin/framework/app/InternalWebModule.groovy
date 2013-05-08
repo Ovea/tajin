@@ -26,6 +26,7 @@ import com.ovea.tajin.framework.i18n.I18NServiceFactory
 import com.ovea.tajin.framework.i18n.JsonI18NServiceFactory
 import com.ovea.tajin.framework.security.TokenBuilder
 import com.ovea.tajin.framework.support.guice.*
+import com.ovea.tajin.framework.support.jersey.AuditResourceFilterFactory
 import com.ovea.tajin.framework.support.jersey.GzipEncoder
 import com.ovea.tajin.framework.support.jersey.SecurityResourceFilterFactory
 import com.ovea.tajin.framework.support.shiro.GuiceShiroFilter
@@ -34,7 +35,6 @@ import com.ovea.tajin.framework.support.shiro.VersionedRememberMeManager
 import com.ovea.tajin.framework.template.*
 import com.ovea.tajin.framework.util.PropertySettings
 import com.ovea.tajin.framework.web.CookieLocaleManager
-import com.sun.jersey.api.container.filter.ResourceDebuggingFilterFactory
 import com.sun.jersey.guice.spi.container.servlet.GuiceContainer
 import org.apache.shiro.SecurityUtils
 import org.apache.shiro.authc.pam.FirstSuccessfulStrategy
@@ -177,7 +177,7 @@ class InternalWebModule extends ServletModule {
         bind(RootPath)
         serve("/*").with(GuiceContainer, [
             "com.sun.jersey.spi.container.ContainerResponseFilters": GzipEncoder.name,
-            "com.sun.jersey.spi.container.ResourceFilters": "${SecurityResourceFilterFactory.name};${ResourceDebuggingFilterFactory.name}" as String
+            "com.sun.jersey.spi.container.ResourceFilters": "${SecurityResourceFilterFactory.name};${AuditResourceFilterFactory.name}" as String
         ])
     }
 
