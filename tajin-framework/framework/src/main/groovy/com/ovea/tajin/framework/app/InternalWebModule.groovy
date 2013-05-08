@@ -30,6 +30,7 @@ import com.ovea.tajin.framework.support.jersey.AuditResourceFilterFactory
 import com.ovea.tajin.framework.support.jersey.GzipEncoder
 import com.ovea.tajin.framework.support.jersey.SecurityResourceFilterFactory
 import com.ovea.tajin.framework.support.shiro.GuiceShiroFilter
+import com.ovea.tajin.framework.support.shiro.MemoryCacheManager
 import com.ovea.tajin.framework.support.shiro.SecurityFilter
 import com.ovea.tajin.framework.support.shiro.VersionedRememberMeManager
 import com.ovea.tajin.framework.template.*
@@ -39,8 +40,10 @@ import com.sun.jersey.guice.spi.container.servlet.GuiceContainer
 import org.apache.shiro.SecurityUtils
 import org.apache.shiro.authc.pam.FirstSuccessfulStrategy
 import org.apache.shiro.authc.pam.ModularRealmAuthenticator
+import org.apache.shiro.cache.CacheManager
 import org.apache.shiro.codec.Hex
 import org.apache.shiro.io.DefaultSerializer
+import org.apache.shiro.realm.Realm
 import org.apache.shiro.web.mgt.DefaultWebSecurityManager
 import org.apache.shiro.web.mgt.WebSecurityManager
 import org.apache.shiro.web.session.mgt.ServletContainerSessionManager
@@ -146,7 +149,7 @@ class InternalWebModule extends ServletModule {
 
                 @Override
                 WebSecurityManager get() {
-                    def realms = settings.getStrings('security.realms').collect { injector.getInstance(Thread.currentThread().contextClassLoader.loadClass(it)) }
+                    List<Realm> realms = settings.getStrings('security.realms').collect { it.empty ? null : injector.getInstance(Thread.currentThread().contextClassLoader.loadClass(it)) as Realm }
                     DefaultWebSecurityManager manager = new DefaultWebSecurityManager(
                         rememberMeManager: !settings.has("rememberme.cookie.name") ? null : new VersionedRememberMeManager(
                             version: settings.getInt('rememberme.cookie.version', 1),
@@ -158,6 +161,7 @@ class InternalWebModule extends ServletModule {
                                 maxAge: settings.getInt("rememberme.cookie.days", 365) * DAY_SEC
                             )
                         ),
+                        cacheManager: settings.getString('security.cache', MemoryCacheManager.name).with { it.trim().length() == 0 ? null : injector.getInstance(Thread.currentThread().contextClassLoader.loadClass(it)) as CacheManager },
                         realms: realms,
                         sessionManager: new ServletContainerSessionManager(),
                         authenticator: new ModularRealmAuthenticator(
