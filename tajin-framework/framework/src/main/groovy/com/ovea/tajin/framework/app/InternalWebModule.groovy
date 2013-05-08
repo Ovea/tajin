@@ -34,6 +34,7 @@ import com.ovea.tajin.framework.support.shiro.VersionedRememberMeManager
 import com.ovea.tajin.framework.template.*
 import com.ovea.tajin.framework.util.PropertySettings
 import com.ovea.tajin.framework.web.CookieLocaleManager
+import com.sun.jersey.api.container.filter.ResourceDebuggingFilterFactory
 import com.sun.jersey.guice.spi.container.servlet.GuiceContainer
 import org.apache.shiro.SecurityUtils
 import org.apache.shiro.authc.pam.FirstSuccessfulStrategy
@@ -138,7 +139,7 @@ class InternalWebModule extends ServletModule {
         filter('/*').through(HttpContextFilter)
 
         // setup security layer if required
-        if (settings.has('security.filter')) {
+        if (settings.getBoolean('security.enabled', false)) {
             bind(org.apache.shiro.mgt.SecurityManager).to(WebSecurityManager)
             bind(WebSecurityManager).toProvider(new Provider<WebSecurityManager>() {
                 @Inject Injector injector
@@ -176,7 +177,7 @@ class InternalWebModule extends ServletModule {
         bind(RootPath)
         serve("/*").with(GuiceContainer, [
             "com.sun.jersey.spi.container.ContainerResponseFilters": GzipEncoder.name,
-            "com.sun.jersey.spi.container.ResourceFilters": SecurityResourceFilterFactory.name
+            "com.sun.jersey.spi.container.ResourceFilters": "${SecurityResourceFilterFactory.name};${ResourceDebuggingFilterFactory.name}" as String
         ])
     }
 

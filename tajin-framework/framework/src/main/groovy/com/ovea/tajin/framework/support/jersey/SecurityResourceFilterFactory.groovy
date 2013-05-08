@@ -1,7 +1,7 @@
 /**
  * Copyright (C) 2011 Ovea <dev@ovea.com>
  *
- * Licensed under the Apache License, Version 2.0 (the "License");
+ * Licensed under the Apache License, Version 2.0 (the "License")
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
  *
@@ -35,34 +35,32 @@ import javax.ws.rs.core.SecurityContext
  */
 public final class SecurityResourceFilterFactory extends RolesAllowedResourceFilterFactory {
 
-    @Context
-
-    SecurityContext sc;
+    @Context SecurityContext sc
 
     private class Filter implements ResourceFilter, ContainerRequestFilter {
 
-        private final boolean denyAll;
-        private final String[] rolesAllowed;
+        private final boolean denyAll
+        private final String[] rolesAllowed
 
         protected Filter() {
-            this.denyAll = true;
-            this.rolesAllowed = null;
+            this.denyAll = true
+            this.rolesAllowed = new String[0]
         }
 
         protected Filter(String[] rolesAllowed) {
-            this.denyAll = false;
-            this.rolesAllowed = (rolesAllowed != null) ? rolesAllowed : [];
+            this.denyAll = false
+            this.rolesAllowed = (rolesAllowed != null) ? rolesAllowed : []
         }
 
         // ResourceFilter
         @Override
         public ContainerRequestFilter getRequestFilter() {
-            return this;
+            return this
         }
 
         @Override
         public ContainerResponseFilter getResponseFilter() {
-            return null;
+            return null
         }
 
         // ContainerRequestFilter
@@ -71,34 +69,40 @@ public final class SecurityResourceFilterFactory extends RolesAllowedResourceFil
             if (!denyAll) {
                 for (String role : rolesAllowed) {
                     if (sc.isUserInRole(role))
-                        return request;
+                        return request
                 }
             }
-            throw new WebApplicationException(Response.Status.FORBIDDEN);
+            throw new WebApplicationException(Response.Status.FORBIDDEN)
         }
     }
 
     @Override
     public List<ResourceFilter> create(AbstractMethod am) {
         // DenyAll on the method take precedence over RolesAllowed and PermitAll
-        if (am.isAnnotationPresent(DenyAll.class))
-            return Collections.<ResourceFilter>singletonList(new Filter());
+        if (am.isAnnotationPresent(DenyAll))
+            return Collections.<ResourceFilter> singletonList(new Filter())
 
         // RolesAllowed on the method takes precedence over PermitAll
-        RolesAllowed ra = am.getAnnotation(RolesAllowed.class);
-        if (ra != null)
-            return Collections.<ResourceFilter>singletonList(new Filter(ra.value()));
+        if (am.isAnnotationPresent(RolesAllowed))
+            return Collections.<ResourceFilter> singletonList(new Filter(am.getAnnotation(RolesAllowed).value()))
 
         // PermitAll takes precedence over RolesAllowed on the class
-        if (am.isAnnotationPresent(PermitAll.class))
-            return null;
+        if (am.isAnnotationPresent(PermitAll))
+            return null
+
+        // DenyAll on the class takes precedence over other below
+        if (am.getResource().isAnnotationPresent(DenyAll))
+            return Collections.<ResourceFilter> singletonList(new Filter())
 
         // RolesAllowed on the class takes precedence over PermitAll
-        ra = am.getResource().getAnnotation(RolesAllowed.class);
-        if (ra != null)
-            return Collections.<ResourceFilter>singletonList(new Filter(ra.value()));
+        if (am.getResource().isAnnotationPresent(RolesAllowed))
+            return Collections.<ResourceFilter> singletonList(new Filter(am.getResource().getAnnotation(RolesAllowed).value()))
 
-        // deny by default
-        return Collections.<ResourceFilter>singletonList(new Filter());
+        // Then check if we must permit
+        if (am.getResource().isAnnotationPresent(PermitAll))
+            return null
+
+        // deny by default if not annotation is present
+        return Collections.<ResourceFilter> singletonList(new Filter())
     }
 }

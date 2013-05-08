@@ -43,16 +43,32 @@ class SecurityFilter extends AuthenticationFilter {
 
     @PostConstruct
     void init() {
-        settings.getStrings('security.filter', []).collect { it.trim() }.each { String path ->
-            LOGGER.info('Protecting path {}', path)
-            appliedPaths.put(path, [])
+        settings.getStrings('security.paths', []).collect { it.trim() }.each { String spec ->
+            int bs = spec.indexOf('[')
+            int be = spec.indexOf(']')
+            String path = bs == -1 ? spec : spec.substring(0, bs)
+            def required = []
+            if (bs != -1 && be != -1) {
+                required = spec.substring(bs + 1, be).split('\\+') as List
+            }
+            LOGGER.info("Requirements for path {} : {}", path, required)
+            appliedPaths.put(path, required)
         }
     }
 
     @Override
     protected boolean isAccessAllowed(ServletRequest request, ServletResponse response, Object mappedValue) {
         Subject subject = getSubject(request, response)
-        return subject.authenticated || subject.remembered
+        def allowed = mappedValue as List
+        boolean allowAuth = 'auth' in allowed
+        boolean allowRmb = 'rmb' in allowed
+        if (allowAuth && allowRmb) {
+            return subject.authenticated || subject.remembered
+        }
+        if (allowAuth && !allowRmb) {
+            return subject.authenticated
+        }
+        return false
     }
 
     @Override
