@@ -87,10 +87,11 @@ public final class PermissionResourceFilterFactory implements ResourceFilterFact
                     s = p.indexOf('{', e + 1)
                 }
             }
-            if (!new TreeSet<>(((AbstractResourceMethod) am).getParameters().collect { it.sourceName }).containsAll(vars)) {
-                throw new IllegalArgumentException('Bad permissions: ' + permissions + ' for method ' + am)
+            if (((AbstractResourceMethod) am).parameters.collect { it.sourceName }.containsAll(vars)) {
+                return Collections.<ResourceFilter> singletonList(new Filter(am.getAnnotation(Permissions).value(), vars))
             }
-            return Collections.<ResourceFilter> singletonList(new Filter(am.getAnnotation(Permissions).value(), vars))
+            throw new IllegalArgumentException('Bad permissions: ' + permissions + ' for method ' + am)
+
         }
         return null
     }
