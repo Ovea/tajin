@@ -43,7 +43,7 @@ class GroovyJSONProvider extends AbstractMessageReaderWriterProvider<Object> {
 
     @Override
     final boolean isWriteable(Class<?> type, Type genericType, Annotation[] annotations, MediaType mediaType) {
-        isSupported(mediaType) && SUPPORTED_RETURN_TYPES.find { it.isAssignableFrom(type) }
+        isSupported(mediaType) && (SUPPORTED_RETURN_TYPES.find { it.isAssignableFrom(type) } || type.array)
     }
 
     @Override
@@ -67,7 +67,7 @@ class GroovyJSONProvider extends AbstractMessageReaderWriterProvider<Object> {
             OutputStreamWriter writer = new OutputStreamWriter(entityStream, getCharset(mediaType))
             if (t instanceof JsonBuilder) {
                 ((JsonBuilder) t).writeTo(writer);
-            } else if (t instanceof Map || t instanceof List) {
+            } else if (t instanceof Map || t instanceof List || type.array) {
                 new JsonBuilder(t).writeTo(writer);
             } else if (t instanceof JsonSupport) {
                 new JsonBuilder(((JsonSupport) t).toJSON()).writeTo(writer);
