@@ -18,7 +18,7 @@
   * SECURITY
     * add anti-replay
     * add owasp checkers
-    * CSRF (https://github.com/esheri3/OWASP-CSRFGuard)
+    * CSRF (https://github.com/esheri3/OWASP-CSRFGuard) / CRF Token
     * Checking The Origin Header (https://www.owasp.org/index.php/Cross-Site_Request_Forgery_(CSRF)_Prevention_Cheat_Sheet)
     * https://nealpoole.com/blog/2010/11/preventing-csrf-attacks-with-ajax-and-http-headers/
     * https://www.owasp.org/images/0/08/OWASP_SCP_Quick_Reference_Guide_v2.pdf
