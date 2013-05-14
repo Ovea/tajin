@@ -70,7 +70,7 @@ class GroovyJSONProvider extends AbstractMessageReaderWriterProvider<Object> {
             } else if (t instanceof Map || t instanceof List || type.array) {
                 new JsonBuilder(t).writeTo(writer);
             } else if (t instanceof JsonSupport) {
-                new JsonBuilder(((JsonSupport) t).toJSON()).writeTo(writer);
+                new JsonBuilder(((JsonSupport) t).json).writeTo(writer);
             } else {
                 // we hope the object is not complex
                 new JsonBuilder(t).writeTo(writer);

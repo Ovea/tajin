@@ -17,5 +17,5 @@ package com.ovea.tajin.framework.support.jersey
 
 public interface JsonArraySupport extends JsonSupport<Collection<?>> {
     @Override
-    Collection<?> toJSON()
+    Collection<?> getJson()
 }

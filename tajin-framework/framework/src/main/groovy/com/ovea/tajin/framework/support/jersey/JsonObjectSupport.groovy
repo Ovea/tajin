@@ -17,5 +17,5 @@ package com.ovea.tajin.framework.support.jersey
 
 public interface JsonObjectSupport extends JsonSupport<Map<String, ?>> {
     @Override
-    Map<String, ?> toJSON()
+    Map<String, ?> getJson()
 }

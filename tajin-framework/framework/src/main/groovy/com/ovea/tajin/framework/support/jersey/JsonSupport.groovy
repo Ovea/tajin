@@ -16,5 +16,5 @@
 package com.ovea.tajin.framework.support.jersey
 
 public interface JsonSupport<T> {
-    T toJSON()
+    T getJson()
 }
