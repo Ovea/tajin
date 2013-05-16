@@ -15,7 +15,7 @@
  */
 package com.ovea.tajin.framework.security
 
-import org.apache.shiro.codec.Base64
+import org.apache.commons.codec.binary.Base64
 import org.apache.shiro.crypto.AesCipherService
 import org.apache.shiro.crypto.OperationMode
 
@@ -42,7 +42,7 @@ class TokenBuilder {
 
     Token decode(String token) {
         try {
-            byte[] serialized = aesCipherService.decrypt(Base64.decode(token), key).bytes;
+            byte[] serialized = aesCipherService.decrypt(Base64.decodeBase64(token), key).bytes;
             DataInputStream dis = new DataInputStream(new ByteArrayInputStream(serialized));
             int size = dis.readInt();
             String[] parts = new String[size];
@@ -62,7 +62,7 @@ class TokenBuilder {
             for (String part : data)
                 daos.writeUTF(part);
             byte[] serialized = baos.toByteArray();
-            String token = Base64.encodeToString(aesCipherService.encrypt(serialized, key).bytes);
+            String token = Base64.encodeBase64URLSafeString(aesCipherService.encrypt(serialized, key).bytes);
             return new Token(token, data);
         } catch (IOException e) {
             throw new RuntimeException(e.getMessage(), e);

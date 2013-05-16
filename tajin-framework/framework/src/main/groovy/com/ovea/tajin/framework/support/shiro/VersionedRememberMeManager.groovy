@@ -15,7 +15,7 @@
  */
 package com.ovea.tajin.framework.support.shiro
 
-import org.apache.shiro.codec.Base64
+import org.apache.commons.codec.binary.Base64
 import org.apache.shiro.subject.PrincipalCollection
 import org.apache.shiro.subject.SimplePrincipalCollection
 import org.apache.shiro.subject.SubjectContext
@@ -97,7 +97,7 @@ public class VersionedRememberMeManager extends CookieRememberMeManager {
         if (LOGGER.isLoggable(Level.FINE)) {
             LOGGER.fine("Acquired Base64 encoded identity [" + base64 + "]");
         }
-        byte[] decoded = Base64.decode(base64);
+        byte[] decoded = Base64.decodeBase64(base64);
         if (LOGGER.isLoggable(Level.FINE)) {
             LOGGER.fine("Base64 decoded byte array length: " + (decoded != null ? decoded.length : 0) + " bytes.");
         }
