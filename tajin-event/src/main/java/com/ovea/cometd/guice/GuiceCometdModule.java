@@ -15,13 +15,16 @@
  */
 package com.ovea.cometd.guice;
 
-import com.google.inject.*;
+import com.google.inject.AbstractModule;
+import com.google.inject.Provider;
+import com.google.inject.Provides;
+import com.google.inject.Singleton;
+import com.google.inject.TypeLiteral;
 import com.google.inject.matcher.AbstractMatcher;
 import com.google.inject.spi.InjectionListener;
 import com.google.inject.spi.TypeEncounter;
 import com.google.inject.spi.TypeListener;
 import com.ovea.cometd.Dispatcher;
-import com.ovea.json.JSONObject;
 import org.cometd.bayeux.Session;
 import org.cometd.bayeux.server.BayeuxServer;
 import org.cometd.java.annotation.ServerAnnotationProcessor;
@@ -91,51 +94,51 @@ public class GuiceCometdModule extends AbstractModule implements Provider<Bayeux
         if (discoverBindings()) {
             // automatically add services
             bindListener(new AbstractMatcher<TypeLiteral<?>>() {
-                    public boolean matches(TypeLiteral<?> o) {
-                        return o.getRawType().isAnnotationPresent(Service.class);
-                    }
-                }, new TypeListener() {
-                public <I> void hear(TypeLiteral<I> type, TypeEncounter<I> encounter) {
-                    final Provider<ServerAnnotationProcessor> processor = encounter.getProvider(ServerAnnotationProcessor.class);
-                    encounter.register(new InjectionListener<I>() {
-                        public void afterInjection(I injectee) {
-                            processor.get().process(injectee);
-                        }
-                    });
-                }
-            }
+                             public boolean matches(TypeLiteral<?> o) {
+                                 return o.getRawType().isAnnotationPresent(Service.class);
+                             }
+                         }, new TypeListener() {
+                             public <I> void hear(TypeLiteral<I> type, TypeEncounter<I> encounter) {
+                                 final Provider<ServerAnnotationProcessor> processor = encounter.getProvider(ServerAnnotationProcessor.class);
+                                 encounter.register(new InjectionListener<I>() {
+                                     public void afterInjection(I injectee) {
+                                         processor.get().process(injectee);
+                                     }
+                                 });
+                             }
+                         }
             );
             // automatically add extensions
             bindListener(new AbstractMatcher<TypeLiteral<?>>() {
-                    public boolean matches(TypeLiteral<?> o) {
-                        return BayeuxServer.Extension.class.isAssignableFrom(o.getRawType());
-                    }
-                }, new TypeListener() {
-                public <I> void hear(TypeLiteral<I> type, TypeEncounter<I> encounter) {
-                    final Provider<BayeuxServer> server = encounter.getProvider(BayeuxServer.class);
-                    encounter.register(new InjectionListener<I>() {
-                        public void afterInjection(I injectee) {
-                            server.get().addExtension(BayeuxServer.Extension.class.cast(injectee));
-                        }
-                    });
-                }
-            }
+                             public boolean matches(TypeLiteral<?> o) {
+                                 return BayeuxServer.Extension.class.isAssignableFrom(o.getRawType());
+                             }
+                         }, new TypeListener() {
+                             public <I> void hear(TypeLiteral<I> type, TypeEncounter<I> encounter) {
+                                 final Provider<BayeuxServer> server = encounter.getProvider(BayeuxServer.class);
+                                 encounter.register(new InjectionListener<I>() {
+                                     public void afterInjection(I injectee) {
+                                         server.get().addExtension(BayeuxServer.Extension.class.cast(injectee));
+                                     }
+                                 });
+                             }
+                         }
             );
             // automatically add session listeners
             bindListener(new AbstractMatcher<TypeLiteral<?>>() {
-                    public boolean matches(TypeLiteral<?> o) {
-                        return BayeuxServer.BayeuxServerListener.class.isAssignableFrom(o.getRawType());
-                    }
-                }, new TypeListener() {
-                public <I> void hear(TypeLiteral<I> type, TypeEncounter<I> encounter) {
-                    final Provider<BayeuxServer> server = encounter.getProvider(BayeuxServer.class);
-                    encounter.register(new InjectionListener<I>() {
-                        public void afterInjection(I injectee) {
-                            server.get().addListener(BayeuxServer.BayeuxServerListener.class.cast(injectee));
-                        }
-                    });
-                }
-            }
+                             public boolean matches(TypeLiteral<?> o) {
+                                 return BayeuxServer.BayeuxServerListener.class.isAssignableFrom(o.getRawType());
+                             }
+                         }, new TypeListener() {
+                             public <I> void hear(TypeLiteral<I> type, TypeEncounter<I> encounter) {
+                                 final Provider<BayeuxServer> server = encounter.getProvider(BayeuxServer.class);
+                                 encounter.register(new InjectionListener<I>() {
+                                     public void afterInjection(I injectee) {
+                                         server.get().addListener(BayeuxServer.BayeuxServerListener.class.cast(injectee));
+                                     }
+                                 });
+                             }
+                         }
             );
         }
         applicationBindings();
@@ -175,12 +178,12 @@ public class GuiceCometdModule extends AbstractModule implements Provider<Bayeux
     Dispatcher dispatcher(final BayeuxServer bayeuxServer) {
         return new Dispatcher() {
             @Override
-            public void publish(String topic, JSONObject data) {
+            public void publish(String topic, Object data) {
                 publish(null, topic, data);
             }
 
             @Override
-            public void publish(String from, String topic, JSONObject data) {
+            public void publish(String from, String topic, Object data) {
                 Session session = bayeuxServer.getSession(from);
                 bayeuxServer.createIfAbsent(topic);
                 bayeuxServer.getChannel(topic).publish(session, data, null);

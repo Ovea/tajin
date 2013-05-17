@@ -15,12 +15,10 @@
  */
 package com.ovea.cometd;
 
-import com.ovea.json.JSONObject;
-
 /**
  * @author Mathieu Carbou (mathieu.carbou@gmail.com)
  */
 public interface Dispatcher {
-    void publish(String topic, JSONObject data);
-    void publish(String from, String topic, JSONObject data);
+    void publish(String topic, Object data);
+    void publish(String from, String topic, Object data);
 }
