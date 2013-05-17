@@ -38,7 +38,9 @@
         </plugins>
     </build>
 
-    <dependency>
+    <dependencies>
+
+        <dependency>
             <groupId>org.cometd.java</groupId>
             <artifactId>cometd-java-server</artifactId>
             <version>2.4.0.RC3</version>
@@ -110,6 +112,7 @@
             <version>10.0.1</version>
             <optional>true</optional>
         </dependency>
+
     </dependencies>
-    
+
 </project>
