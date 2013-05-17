@@ -2,6 +2,8 @@
 
 Tajin is a set of building blocks to help developing applications faster and cleanly. This is not a framework which impose guidelines but much more and clever linked set of tools to solve every-days need in application development
 
+[![Build Status](https://travis-ci.org/Ovea/tajin.png)](https://travis-ci.org/Ovea/tajin)
+
 ## Tajin Modules ##
 
 Tajin is built on modules which can be used independently when you need it. Amongst those modules you will find:
