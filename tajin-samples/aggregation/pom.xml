@@ -40,8 +40,8 @@
     <dependencies>
         <dependency>
             <groupId>com.ovea.tajin</groupId>
-            <artifactId>tajin-client</artifactId>
-            <version>1.0.b12-SNAPSHOT</version>
+            <artifactId>tajin-js</artifactId>
+            <version>1.0.b12</version>
             <type>war</type>
             <scope>runtime</scope>
         </dependency>
