@@ -16,21 +16,6 @@
     <build>
         <plugins>
             <plugin>
-                <artifactId>maven-war-plugin</artifactId>
-                <configuration>
-                    <overlays>
-                        <overlay>
-                            <groupId>com.ovea.tajin</groupId>
-                            <artifactId>tajin-client</artifactId>
-                            <excludes>
-                                <exclude>META-INF/**</exclude>
-                                <exclude>WEB-INF/web.xml</exclude>
-                            </excludes>
-                        </overlay>
-                    </overlays>
-                </configuration>
-            </plugin>
-            <plugin>
                 <groupId>org.eclipse.jetty</groupId>
                 <artifactId>jetty-maven-plugin</artifactId>
             </plugin>

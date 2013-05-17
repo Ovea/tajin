@@ -44,12 +44,6 @@
                 <configuration>
                     <filters>
                         <filter>
-                            <artifact>com.ovea.tajin:tajin-client</artifact>
-                            <excludes>
-                                <exclude>WEB-INF/**</exclude>
-                            </excludes>
-                        </filter>
-                        <filter>
                             <artifact>org.codehaus.groovy:groovy-all</artifact>
                             <excludes>
                                 <exclude>overview.html</exclude>
