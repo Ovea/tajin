@@ -33,7 +33,7 @@ class GroovyJSONProvider extends AbstractMessageReaderWriterProvider<Object> {
 
     private static boolean isSupported(MediaType m) { m.type == 'application' && m.subtype.endsWith("json") }
 
-    private static List<Class<?>> SUPPORTED_PARAM_TYPES = [Object, Map, List]
+    private static List<Class<?>> SUPPORTED_PARAM_TYPES = [Object, Map, List, Collection]
     private static List<Class<?>> SUPPORTED_RETURN_TYPES = [Map, List, JsonBuilder, JsonSupport]
 
     @Override
