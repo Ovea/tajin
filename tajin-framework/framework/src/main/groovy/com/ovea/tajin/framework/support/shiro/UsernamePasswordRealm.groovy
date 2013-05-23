@@ -55,7 +55,7 @@ class UsernamePasswordRealm extends AuthorizingRealm {
     @Override
     protected AuthorizationInfo doGetAuthorizationInfo(PrincipalCollection principals) {
         LOGGER.trace("doGetAuthorizationInfo {}", principals)
-        return accountRepository.getAuthorizationInfo(getAvailablePrincipal(principals) as String)
+        return accountRepository.getAuthorizationInfo(getAvailablePrincipal(principals))
     }
 
 }

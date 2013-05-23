@@ -30,8 +30,8 @@ public interface AccountRepository {
     AuthenticationInfo getAuthenticationInfo(AuthenticationToken token)
 
     /**
-     * Retreive an account from database thanks to a principal ID. The user has been authenticated and the account with full roles can be created
+     * Retreive an account from database thanks to a principal. The user has been authenticated and the account with full roles can be created
      */
-    AuthorizationInfo getAuthorizationInfo(String principalId)
+    AuthorizationInfo getAuthorizationInfo(Object principal)
 
 }
