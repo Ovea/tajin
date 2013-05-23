@@ -37,10 +37,12 @@ import com.ovea.tajin.framework.support.shiro.VersionedRememberMeManager
 import com.ovea.tajin.framework.template.*
 import com.ovea.tajin.framework.util.PropertySettings
 import com.ovea.tajin.framework.web.CookieLocaleManager
+import com.ovea.tajin.framework.web.RequestLog
 import com.sun.jersey.guice.spi.container.servlet.GuiceContainer
 import org.apache.shiro.SecurityUtils
 import org.apache.shiro.authc.pam.FirstSuccessfulStrategy
 import org.apache.shiro.authc.pam.ModularRealmAuthenticator
+import org.apache.shiro.authz.ModularRealmAuthorizer
 import org.apache.shiro.cache.CacheManager
 import org.apache.shiro.codec.Hex
 import org.apache.shiro.io.DefaultSerializer
@@ -143,7 +145,8 @@ class InternalWebModule extends ServletModule {
         filter('/*').through(HttpContextFilter)
 
         // setup security layer if required
-        if (settings.getBoolean('security.enabled', false)) {
+        boolean secured = settings.getBoolean('security.enabled', false)
+        if (secured) {
             bind(org.apache.shiro.mgt.SecurityManager).to(WebSecurityManager)
             bind(WebSecurityManager).toProvider(new Provider<WebSecurityManager>() {
                 @Inject Injector injector
@@ -152,6 +155,7 @@ class InternalWebModule extends ServletModule {
                 WebSecurityManager get() {
                     List<Realm> realms = settings.getStrings('security.realms').collect { it.empty ? null : injector.getInstance(Thread.currentThread().contextClassLoader.loadClass(it)) as Realm }
                     DefaultWebSecurityManager manager = new DefaultWebSecurityManager(
+                        sessionManager: new ServletContainerSessionManager(),
                         rememberMeManager: !settings.has("rememberme.cookie.name") ? null : new VersionedRememberMeManager(
                             version: settings.getInt('rememberme.cookie.version', 1),
                             serializer: new DefaultSerializer<>(),
@@ -163,12 +167,11 @@ class InternalWebModule extends ServletModule {
                             )
                         ),
                         cacheManager: settings.getString('security.cache', MemoryCacheManager.name).with { it.trim().length() == 0 ? null : injector.getInstance(Thread.currentThread().contextClassLoader.loadClass(it)) as CacheManager },
-                        realms: realms,
-                        sessionManager: new ServletContainerSessionManager(),
                         authenticator: new ModularRealmAuthenticator(
                             authenticationStrategy: new FirstSuccessfulStrategy(),
-                            realms: realms
-                        )
+                        ),
+                        authorizer: new ModularRealmAuthorizer(),
+                        realms: realms,
                     )
                     SecurityUtils.securityManager = manager
                     return manager
@@ -178,9 +181,16 @@ class InternalWebModule extends ServletModule {
             filter('/*').through(SecurityFilter)
         }
 
+        // setup performance logger
+        if (settings.getBoolean('logging.perf', false)) {
+            filter('/*').through(RequestLog, [
+                secured: secured as String
+            ])
+        }
+
         // setup REST API
         bind(RootPath)
-        if (settings.getBoolean('security.enabled', false)) {
+        if (secured) {
             serve("/*").with(GuiceContainer, [
                 "com.sun.jersey.spi.container.ContainerResponseFilters": GzipEncoder.name,
                 "com.sun.jersey.spi.container.ResourceFilters": "${AuditResourceFilterFactory.name};${SecurityResourceFilterFactory.name};${PermissionResourceFilterFactory.name}" as String
