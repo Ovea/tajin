@@ -51,9 +51,9 @@ class RequestLog implements Filter {
         } finally {
             time = System.currentTimeMillis() - time
             if (secured) {
-                LOGGER.info("[${(time as String).padLeft(5)}ms] ${req.method.padLeft(6)} ${req.requestURI} [${req.userPrincipal}] [auth=${SecurityUtils.subject.authenticated},rmbr=${SecurityUtils.subject.remembered}]")
+                LOGGER.info("|${(time as String).padLeft(5)}|${req.method.padLeft(6)}|${req.requestURI}|auth=${SecurityUtils.subject.authenticated ? 1 : 0}|rmb=${SecurityUtils.subject.remembered ? 1 : 0}|${req.userPrincipal}")
             } else {
-                LOGGER.info("[${(time as String).padLeft(5)}ms] ${req.method.padLeft(6)} ${req.requestURI}")
+                LOGGER.info("|${(time as String).padLeft(5)}|${req.method.padLeft(6)}|${req.requestURI}")
             }
         }
     }
