@@ -20,7 +20,7 @@ class Sample implements Application {
             bind(MyRest)
             bind(AccountRepository).toInstance(new AccountRepository() {
                 @Override
-                SimpleAccount getAuthorizationInfo(String principalId) {
+                SimpleAccount getAuthorizationInfo(Object principalId) {
                     return new SimpleAccount(
                         principalId,
                         new Sha512Hash('password', principalId, 1).toHex(),
