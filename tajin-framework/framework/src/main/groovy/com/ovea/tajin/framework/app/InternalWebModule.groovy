@@ -155,6 +155,7 @@ class InternalWebModule extends ServletModule {
                 WebSecurityManager get() {
                     List<Realm> realms = settings.getStrings('security.realms').collect { it.empty ? null : injector.getInstance(Thread.currentThread().contextClassLoader.loadClass(it)) as Realm }
                     DefaultWebSecurityManager manager = new DefaultWebSecurityManager(
+                        // WARNNG: order of setters is important
                         sessionManager: new ServletContainerSessionManager(),
                         rememberMeManager: !settings.has("rememberme.cookie.name") ? null : new VersionedRememberMeManager(
                             version: settings.getInt('rememberme.cookie.version', 1),
@@ -166,12 +167,12 @@ class InternalWebModule extends ServletModule {
                                 maxAge: settings.getInt("rememberme.cookie.days", 365) * DAY_SEC
                             )
                         ),
-                        cacheManager: settings.getString('security.cache', MemoryCacheManager.name).with { it.trim().length() == 0 ? null : injector.getInstance(Thread.currentThread().contextClassLoader.loadClass(it)) as CacheManager },
                         authenticator: new ModularRealmAuthenticator(
                             authenticationStrategy: new FirstSuccessfulStrategy(),
                         ),
                         authorizer: new ModularRealmAuthorizer(),
                         realms: realms,
+                        cacheManager: settings.getString('security.cache', MemoryCacheManager.name).with { it.trim().length() == 0 ? null : injector.getInstance(Thread.currentThread().contextClassLoader.loadClass(it)) as CacheManager },
                     )
                     SecurityUtils.securityManager = manager
                     return manager

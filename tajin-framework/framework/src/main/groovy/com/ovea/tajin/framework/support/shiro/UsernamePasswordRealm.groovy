@@ -39,6 +39,8 @@ class UsernamePasswordRealm extends AuthorizingRealm {
     AccountRepository accountRepository
 
     UsernamePasswordRealm() {
+        authenticationCachingEnabled = true
+        authorizationCachingEnabled = true
         authenticationTokenClass = UsernamePasswordToken
         credentialsMatcher = new HashedCredentialsMatcher(
             storedCredentialsHexEncoded: true,
