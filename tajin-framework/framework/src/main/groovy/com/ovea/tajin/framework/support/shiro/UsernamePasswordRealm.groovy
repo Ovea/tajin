@@ -39,10 +39,9 @@ class UsernamePasswordRealm extends AuthorizingRealm {
     @Inject
     AccountRepository accountRepository
 
-    @Inject
-    PropertySettings settings
 
-    UsernamePasswordRealm() {
+    @Inject
+    UsernamePasswordRealm(PropertySettings settings) {
         authenticationCachingEnabled = true
         authorizationCachingEnabled = true
         authenticationTokenClass = UsernamePasswordToken

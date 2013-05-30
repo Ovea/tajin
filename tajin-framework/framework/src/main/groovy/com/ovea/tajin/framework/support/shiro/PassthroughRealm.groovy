@@ -15,14 +15,21 @@
  */
 package com.ovea.tajin.framework.support.shiro
 
+import com.ovea.tajin.framework.util.PropertySettings
 import org.apache.shiro.authc.credential.AllowAllCredentialsMatcher
+
+import javax.inject.Inject
 
 /**
  * @author Mathieu Carbou (mathieu.carbou@gmail.com)
  */
 class PassthroughRealm extends UsernamePasswordRealm {
-    PassthroughRealm() {
+
+    @Inject
+    PassthroughRealm(PropertySettings settings) {
+        super(settings)
         authenticationTokenClass = PassthroughToken
         credentialsMatcher = new AllowAllCredentialsMatcher()
     }
+
 }
