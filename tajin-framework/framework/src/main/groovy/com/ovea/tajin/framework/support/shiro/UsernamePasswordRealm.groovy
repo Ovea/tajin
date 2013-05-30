@@ -15,6 +15,7 @@
  */
 package com.ovea.tajin.framework.support.shiro
 
+import com.ovea.tajin.framework.util.PropertySettings
 import org.apache.shiro.authc.AuthenticationInfo
 import org.apache.shiro.authc.AuthenticationToken
 import org.apache.shiro.authc.UsernamePasswordToken
@@ -38,13 +39,17 @@ class UsernamePasswordRealm extends AuthorizingRealm {
     @Inject
     AccountRepository accountRepository
 
+    @Inject
+    PropertySettings settings
+
     UsernamePasswordRealm() {
         authenticationCachingEnabled = true
         authorizationCachingEnabled = true
         authenticationTokenClass = UsernamePasswordToken
         credentialsMatcher = new HashedCredentialsMatcher(
             storedCredentialsHexEncoded: true,
-            hashAlgorithmName: Sha512Hash.ALGORITHM_NAME
+            hashAlgorithmName: Sha512Hash.ALGORITHM_NAME,
+            hashIterations: settings.getInt('security.hashIterations', 3)
         )
     }
 
