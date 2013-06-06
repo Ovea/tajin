@@ -16,10 +16,13 @@
 package com.ovea.tajin.framework.scheduling
 
 import com.google.common.cache.LoadingCache
+import com.ovea.tajin.framework.util.PropertySettings
 
 import javax.annotation.PostConstruct
 import javax.annotation.PreDestroy
 import javax.inject.Inject
+import java.util.concurrent.ScheduledExecutorService
+import java.util.concurrent.ScheduledThreadPoolExecutor
 
 /**
  * @author Mathieu Carbou (mathieu.carbou@gmail.com)
@@ -34,14 +37,23 @@ class AsyncJobScheduler implements JobScheduler {
     @Inject
     JobRepository repository
 
+    @Inject
+    PropertySettings settings
+
+    ScheduledExecutorService service
+
     @PostConstruct
-    void start() {
+    void init() {
+        service = new ScheduledThreadPoolExecutor(
+            settings.getInt('scheduling.pool.size', Runtime.runtime.availableProcessors() * 2),
+
+        )
         repository.listPendingJobs().each { doSchedule(it) }
     }
 
     @PreDestroy
-    void stop() {
-        println "STOP"
+    void close() {
+
     }
 
     @Override
@@ -58,7 +70,6 @@ class AsyncJobScheduler implements JobScheduler {
     }
 
     private void doSchedule(Job job) {
-        println "schedule " + job
         executors.get(job.name).execute(job.data)
     }
 

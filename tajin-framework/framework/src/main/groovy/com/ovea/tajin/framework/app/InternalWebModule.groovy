@@ -24,6 +24,7 @@ import com.ovea.tajin.framework.i18n.I18NHandler
 import com.ovea.tajin.framework.i18n.I18NService
 import com.ovea.tajin.framework.i18n.I18NServiceFactory
 import com.ovea.tajin.framework.i18n.JsonI18NServiceFactory
+import com.ovea.tajin.framework.scheduling.SchedulingModule
 import com.ovea.tajin.framework.security.TokenBuilder
 import com.ovea.tajin.framework.support.guice.*
 import com.ovea.tajin.framework.support.jersey.AuditResourceFilterFactory
@@ -51,6 +52,8 @@ import org.apache.shiro.web.mgt.DefaultWebSecurityManager
 import org.apache.shiro.web.mgt.WebSecurityManager
 import org.apache.shiro.web.session.mgt.ServletContainerSessionManager
 import org.eclipse.jetty.servlets.CrossOriginFilter
+import org.slf4j.Logger
+import org.slf4j.LoggerFactory
 
 import javax.inject.Inject
 
@@ -59,6 +62,8 @@ import javax.inject.Inject
  * @date 2013-04-26
  */
 class InternalWebModule extends ServletModule {
+
+    private static final Logger LOGGER = LoggerFactory.getLogger(Tajin)
 
     private static final int DAY_SEC = 60 * 60 * 24
 
@@ -77,12 +82,20 @@ class InternalWebModule extends ServletModule {
 
         // bind TokenBuilder if needed
         settings.getString('token.key', null)?.with { String key ->
+            LOGGER.info(" + TokenBuilder support")
             bind(TokenBuilder).toProvider(new Provider<TokenBuilder>() {
                 TokenBuilder get() { new TokenBuilder(Hex.decode(key)) }
             }).in(javax.inject.Singleton)
         }
 
+        // bind schedueler if needed
+        if (settings.getBoolean('scheduling.enabled', false)) {
+            LOGGER.info(" + JobScheduler support")
+            install(new SchedulingModule())
+        }
+
         // setup groovy templating system
+        LOGGER.info(" + @Template support")
         bind(TemplateCompiler).toProvider(new Provider<TemplateCompiler>() {
             @Override
             TemplateCompiler get() {
@@ -108,6 +121,7 @@ class InternalWebModule extends ServletModule {
         binder().bindListener(Matchers.any(), new TmplHandler());
 
         // setup i18n
+        LOGGER.info(" + @Bundle support (i18n)")
         bind(I18NServiceFactory).toProvider(new Provider<I18NServiceFactory>() {
             @Override
             I18NServiceFactory get() {
@@ -126,15 +140,9 @@ class InternalWebModule extends ServletModule {
         // support method expanders
         TajinGuice.in(binder()).handleMethodAfterInjection(Expand, ExpandHandler)
 
-        // configure discovered applications
-        WebBinder webBinder = new WebBinder(binder())
-        applications.each {
-            it.onInit(webBinder, settings)
-            bind(it.class).toInstance(it)
-        }
-
         // configure CORS filter if desired
         settings.getString('cors.allowedOrigins', null)?.with { String origin ->
+            LOGGER.info(" + CORS support")
             filter('/*').through(CrossOriginFilter, [
                 allowedMethods: 'GET,POST,HEAD,PUT,DELETE',
                 allowedOrigins: origin
@@ -147,6 +155,7 @@ class InternalWebModule extends ServletModule {
         // setup security layer if required
         boolean secured = settings.getBoolean('security.enabled', false)
         if (secured) {
+            LOGGER.info(" + Securtity support")
             bind(org.apache.shiro.mgt.SecurityManager).to(WebSecurityManager)
             bind(WebSecurityManager).toProvider(new Provider<WebSecurityManager>() {
                 @Inject Injector injector
@@ -184,6 +193,7 @@ class InternalWebModule extends ServletModule {
 
         // setup performance logger
         if (settings.getBoolean('logging.perf', false)) {
+            LOGGER.info(" + Performance logging support")
             filter('/*').through(RequestLog, [
                 secured: secured as String
             ])
@@ -201,6 +211,14 @@ class InternalWebModule extends ServletModule {
                 "com.sun.jersey.spi.container.ContainerResponseFilters": GzipEncoder.name,
                 "com.sun.jersey.spi.container.ResourceFilters": "${AuditResourceFilterFactory.name}" as String
             ])
+        }
+
+        // configure discovered applications
+        WebBinder webBinder = new WebBinder(binder())
+        applications.each {
+            LOGGER.info("Configuring application: ${it.class.simpleName}")
+            it.onInit(webBinder, settings)
+            bind(it.class).toInstance(it)
         }
 
     }
