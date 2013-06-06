@@ -16,13 +16,17 @@
 package com.ovea.tajin.framework.scheduling
 
 import com.google.common.cache.LoadingCache
+import com.google.common.util.concurrent.ThreadFactoryBuilder
 import com.ovea.tajin.framework.util.PropertySettings
+import org.slf4j.Logger
+import org.slf4j.LoggerFactory
 
 import javax.annotation.PostConstruct
 import javax.annotation.PreDestroy
 import javax.inject.Inject
 import java.util.concurrent.ScheduledExecutorService
 import java.util.concurrent.ScheduledThreadPoolExecutor
+import java.util.concurrent.TimeUnit
 
 /**
  * @author Mathieu Carbou (mathieu.carbou@gmail.com)
@@ -30,6 +34,8 @@ import java.util.concurrent.ScheduledThreadPoolExecutor
  */
 @javax.inject.Singleton
 class AsyncJobScheduler implements JobScheduler {
+
+    private static final Logger LOGGER = LoggerFactory.getLogger(AsyncJobScheduler)
 
     @Inject
     LoadingCache<String, JobExecutor> executors
@@ -46,14 +52,26 @@ class AsyncJobScheduler implements JobScheduler {
     void init() {
         service = new ScheduledThreadPoolExecutor(
             settings.getInt('scheduling.pool.size', Runtime.runtime.availableProcessors() * 2),
-
+            new ThreadFactoryBuilder()
+                .setDaemon(false)
+                .setNameFormat("${AsyncJobScheduler.simpleName}-thread-%d")
+                .setUncaughtExceptionHandler(new Thread.UncaughtExceptionHandler() {
+                @Override
+                void uncaughtException(Thread t, Throwable e) {
+                    LOGGER.error("Job execution error: ${e.message}", e)
+                }
+            }).build()
         )
         repository.listPendingJobs().each { doSchedule(it) }
     }
 
     @PreDestroy
     void close() {
-
+        service.shutdownNow()
+        try {
+            service.awaitTermination(10, TimeUnit.SECONDS)
+        } catch (ignored) {
+        }
     }
 
     @Override
@@ -70,7 +88,21 @@ class AsyncJobScheduler implements JobScheduler {
     }
 
     private void doSchedule(Job job) {
-        executors.get(job.name).execute(job.data)
+        if (!service.shutdown) {
+            service.schedule(new JobRunner(job), 0, TimeUnit.MILLISECONDS)
+        }
     }
 
+    private class JobRunner implements Runnable {
+        final Job job
+
+        JobRunner(Job job) {
+            this.job = job
+        }
+
+        @Override
+        void run() {
+            executors.get(job.name).execute(job.data)
+        }
+    }
 }
