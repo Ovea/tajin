@@ -33,3 +33,5 @@ DOC
   * Jersey / Groovy integration
   * Cookie management
   * JNDI configuration
+
+  * GENERER DOC AVEC http://ricostacruz.com/flatdoc/
