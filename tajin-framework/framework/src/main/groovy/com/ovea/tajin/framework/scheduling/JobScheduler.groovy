@@ -15,10 +15,48 @@
  */
 package com.ovea.tajin.framework.scheduling
 
+import com.ovea.tajin.framework.scheduling.JobScheduler.OnError
+import org.slf4j.LoggerFactory
+
 /**
  * @author Mathieu Carbou (mathieu.carbou@gmail.com)
  * @date 2013-06-06
  */
 interface JobScheduler {
+
+    /**
+     * Schedules a job in the future
+     */
     void schedule(String jobName, Date time, Map<String, ?> data)
+
+    /**
+     * Schedules a job for execution as soon as possible
+     */
+    void schedule(String jobName, Map<String, ?> data)
+
+    static interface OnError {
+
+        void onError(Job job, Throwable t) throws Throwable
+
+        static final OnError RETHROW = new OnError() {
+            @Override
+            void onError(Job job, Throwable t) throws Throwable {
+                throw t
+            }
+        }
+
+        static final OnError LOG = new OnError() {
+            @Override
+            void onError(Job job, Throwable t) throws Throwable {
+                LoggerFactory.getLogger(OnError).error("Error executing ${job} : ${t.message}", t)
+            }
+        }
+
+        static final OnError IGNORE = new OnError() {
+            @Override
+            void onError(Job job, Throwable t) throws Throwable {
+            }
+        }
+    }
+
 }

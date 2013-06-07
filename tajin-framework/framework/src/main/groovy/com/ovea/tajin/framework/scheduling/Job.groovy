@@ -22,7 +22,7 @@ import groovy.transform.ToString
  * @author Mathieu Carbou (mathieu.carbou@gmail.com)
  * @date 2013-06-06
  */
-@ToString(includes = ['id', 'name', 'start'])
+@ToString(includes = ['id', 'name', 'start', 'retry'])
 class Job {
     String id = Uuid.generate()
     Date createdDate = new Date()
@@ -30,5 +30,6 @@ class Job {
     Date start = createdDate
     String name
     Date end
+    int retry
     Map<String, ?> data = [:]
 }
