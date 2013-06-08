@@ -44,10 +44,6 @@ class AsyncJobScheduler implements JobScheduler, JmxSelfNaming {
     private static final long MINS_5 = TimeUnit.MILLISECONDS.convert(5, TimeUnit.MINUTES)
     private static final AtomicLong INSTANCES = new AtomicLong(-1)
 
-    AsyncJobScheduler() {
-        INSTANCES.incrementAndGet()
-    }
-
     @Inject
     LoadingCache<String, JobExecutor> executors
 
@@ -62,14 +58,19 @@ class AsyncJobScheduler implements JobScheduler, JmxSelfNaming {
     private ScheduledExecutorService service
     private int maxRetry = -1
 
-    private ConcurrentHashMap<Job, Object> scheduledJobs = new ConcurrentHashMap<>()
-    private AtomicLong nScheduled = new AtomicLong()
-    private AtomicLong nRunning = new AtomicLong()
-    private AtomicLong nRan = new AtomicLong()
-    private AtomicLong nFailed = new AtomicLong()
+    private final ConcurrentHashMap<Job, Object> scheduledJobs = new ConcurrentHashMap<>()
+    private final AtomicLong nRunning = new AtomicLong()
+    private final AtomicLong nRan = new AtomicLong()
+    private final AtomicLong nFailed = new AtomicLong()
+    private final SynchronousQueue<JobSaver> saveQueue = new SynchronousQueue<>()
+    private Thread saver
+
+    AsyncJobScheduler() {
+        INSTANCES.incrementAndGet()
+    }
 
     @JmxProperty
-    long getScheduledCount() { nScheduled.get() }
+    long getScheduledCount() { scheduledJobs.size() }
 
     @JmxProperty
     long getRunningCount() { nRunning.get() }
@@ -81,7 +82,10 @@ class AsyncJobScheduler implements JobScheduler, JmxSelfNaming {
     long getFailedCount() { nFailed.get() }
 
     @JmxProperty
-    Collection<String> getScheduledJobs() { scheduledJobs.collect { k, v -> "${k.id}:${k.name}" as String } }
+    Collection<String> getScheduledJobs() {
+        long now = System.currentTimeMillis()
+        scheduledJobs.collect { k, v -> "${k.id} ${k.name} in ${Math.max(0, k.start.time - now) / 1000}s" as String }
+    }
 
     @Override
     ObjectName getObjectName() throws MalformedObjectNameException {
@@ -103,6 +107,23 @@ class AsyncJobScheduler implements JobScheduler, JmxSelfNaming {
                 }
             }).build()
         )
+        saver = Thread.start "${AsyncJobScheduler.simpleName}-Saver-thread", {
+            while (!Thread.currentThread().interrupted) {
+                JobSaver saver
+                try {
+                    saver = saveQueue.take()
+                } catch (InterruptedException ignored) {
+                    // stop this thread if interrupted
+                    Thread.currentThread().interrupt()
+                    break
+                }
+                try {
+                    saver.run()
+                } catch (e) {
+                    LOGGER.error("UncaughtException in Job Saver: ${e.message}", e)
+                }
+            }
+        }
 
         List<Job> jobs = repository.listPendingJobs()
         // filter jobs that can be retried
@@ -119,6 +140,8 @@ class AsyncJobScheduler implements JobScheduler, JmxSelfNaming {
             service.awaitTermination(10, TimeUnit.SECONDS)
         } catch (ignored) {
         }
+        saver.interrupt()
+        saver = null
     }
 
     @Override
@@ -143,17 +166,8 @@ class AsyncJobScheduler implements JobScheduler, JmxSelfNaming {
     private void doSchedule(Job job) {
         if (!service.shutdown && !service.terminated) {
             long diff = Math.max(0, job.start.time - System.currentTimeMillis())
-            LOGGER.trace("Scheduling: ${job} in ${diff}ms")
-            service.schedule(new FutureTask(new JobRunner(job), null) {
-                @Override
-                protected void done() {
-                    scheduledJobs.remove(job)
-                    nScheduled.decrementAndGet()
-                    nRunning.decrementAndGet()
-                    nRan.incrementAndGet()
-                }
-            }, diff, TimeUnit.MILLISECONDS)
-            nScheduled.incrementAndGet()
+            LOGGER.trace("Scheduling: ${job} in ${diff / 1000}s")
+            service.schedule(new JobRunner(job), diff, TimeUnit.MILLISECONDS)
             scheduledJobs.put(job, Void)
         } else {
             throw new IllegalStateException('Job Scheduler is closing or closed and cannot accept new job. Job ' + job + ' will be executed at next startup.')
@@ -161,10 +175,24 @@ class AsyncJobScheduler implements JobScheduler, JmxSelfNaming {
     }
 
     private save(Job job, Closure<?> then = Closure.IDENTITY) {
-        //TODO ASYNC
-        job.updatedDate = new Date()
-        repository.save(job)
-        then()
+        saveQueue.offer(new JobSaver(job, then))
+    }
+
+    private class JobSaver implements Runnable {
+        final Job job
+        final Closure<?> then
+
+        JobSaver(Job job, Closure<?> then = Closure.IDENTITY) {
+            this.job = job
+            this.then = then
+        }
+
+        @Override
+        void run() {
+            job.updatedDate = new Date()
+            repository.save(job)
+            then()
+        }
     }
 
     private class JobRunner implements Runnable {
@@ -180,9 +208,11 @@ class AsyncJobScheduler implements JobScheduler, JmxSelfNaming {
             try {
                 nRunning.incrementAndGet()
                 executors.get(job.name).execute(job.data)
+                scheduledJobs.remove(job)
                 job.end = new Date()
                 save(job)
             } catch (e) {
+                scheduledJobs.remove(job)
                 nFailed.incrementAndGet()
                 job.start = new Date(System.currentTimeMillis() + MINS_5)
                 job.retry++
@@ -190,6 +220,9 @@ class AsyncJobScheduler implements JobScheduler, JmxSelfNaming {
                     doSchedule(job)
                     onError.onError(job, e)
                 }
+            } finally {
+                nRunning.decrementAndGet()
+                nRan.incrementAndGet()
             }
         }
     }
