@@ -99,7 +99,9 @@ class Container {
         server = new Server()
         server.stopAtShutdown = true
         server.handler = handlers
-        server.addBean(new MBeanContainer(ManagementFactory.platformMBeanServer))
+        if (settings.getBoolean('jmx.enabled', true)) {
+            server.addBean(new MBeanContainer(ManagementFactory.platformMBeanServer))
+        }
 
         // configure HTTP connector
         HttpConfiguration httpConf = new HttpConfiguration(

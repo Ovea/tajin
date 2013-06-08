@@ -19,19 +19,26 @@ import com.google.inject.TypeLiteral
 import com.google.inject.matcher.AbstractMatcher
 import com.google.inject.matcher.Matcher
 
+import java.lang.reflect.AnnotatedElement
+
 /**
  * @author Mathieu Carbou (mathieu.carbou@gmail.com)
  * @date 2013-06-06
  */
 class ClassToTypeLiteralMatcherAdapter extends AbstractMatcher<TypeLiteral<?>> {
-    private final Matcher<Class> classMatcher
+    private final Matcher<TypeLiteral<?>> m
 
-    ClassToTypeLiteralMatcherAdapter(Matcher<Class> classMatcher) {
-        this.classMatcher = classMatcher;
+    ClassToTypeLiteralMatcherAdapter(final Matcher<? extends AnnotatedElement> classMatcher) {
+        this.m = new AbstractMatcher<TypeLiteral<?>>() {
+            @Override
+            boolean matches(TypeLiteral<?> t) {
+                return classMatcher.matches(t.rawType)
+            }
+        }
     }
 
     @Override
-    boolean matches(TypeLiteral<?> typeLiteral) { classMatcher.matches(typeLiteral.getRawType()) }
+    boolean matches(TypeLiteral<?> typeLiteral) { m.matches(typeLiteral) }
 
-    static Matcher<TypeLiteral<?>> adapt(Matcher<Class> classMatcher) { new ClassToTypeLiteralMatcherAdapter(classMatcher) }
+    static Matcher<TypeLiteral<?>> adapt(Matcher<? extends AnnotatedElement> classMatcher) { new ClassToTypeLiteralMatcherAdapter(classMatcher) }
 }

@@ -17,29 +17,36 @@ package com.ovea.tajin.framework.scheduling
 
 import com.google.common.cache.LoadingCache
 import com.google.common.util.concurrent.ThreadFactoryBuilder
+import com.ovea.tajin.framework.jmx.JmxSelfNaming
+import com.ovea.tajin.framework.jmx.annotation.JmxBean
+import com.ovea.tajin.framework.jmx.annotation.JmxProperty
 import com.ovea.tajin.framework.util.PropertySettings
-import org.eclipse.jetty.util.annotation.ManagedObject
 import org.slf4j.Logger
 import org.slf4j.LoggerFactory
 
 import javax.annotation.PostConstruct
 import javax.annotation.PreDestroy
 import javax.inject.Inject
-import java.util.concurrent.ScheduledExecutorService
-import java.util.concurrent.ScheduledThreadPoolExecutor
-import java.util.concurrent.TimeUnit
+import javax.management.MalformedObjectNameException
+import javax.management.ObjectName
+import java.util.concurrent.*
+import java.util.concurrent.atomic.AtomicLong
 
 /**
  * @author Mathieu Carbou (mathieu.carbou@gmail.com)
  * @date 2013-06-06
  */
 @javax.inject.Singleton
-@ManagedObject("Job Scheduler")
-//TODO JMX support
-class AsyncJobScheduler implements JobScheduler {
+@JmxBean
+class AsyncJobScheduler implements JobScheduler, JmxSelfNaming {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(AsyncJobScheduler)
     private static final long MINS_5 = TimeUnit.MILLISECONDS.convert(5, TimeUnit.MINUTES)
+    private static final AtomicLong INSTANCES = new AtomicLong(-1)
+
+    AsyncJobScheduler() {
+        INSTANCES.incrementAndGet()
+    }
 
     @Inject
     LoadingCache<String, JobExecutor> executors
@@ -51,8 +58,35 @@ class AsyncJobScheduler implements JobScheduler {
     PropertySettings settings
 
     JobScheduler.OnError onError = JobScheduler.OnError.LOG
-    ScheduledExecutorService service
-    int maxRetry = -1
+
+    private ScheduledExecutorService service
+    private int maxRetry = -1
+
+    private ConcurrentHashMap<Job, Object> scheduledJobs = new ConcurrentHashMap<>()
+    private AtomicLong nScheduled = new AtomicLong()
+    private AtomicLong nRunning = new AtomicLong()
+    private AtomicLong nRan = new AtomicLong()
+    private AtomicLong nFailed = new AtomicLong()
+
+    @JmxProperty
+    long getScheduledCount() { nScheduled.get() }
+
+    @JmxProperty
+    long getRunningCount() { nRunning.get() }
+
+    @JmxProperty
+    long getTotalExecutionCount() { nRan.get() }
+
+    @JmxProperty
+    long getFailedCount() { nFailed.get() }
+
+    @JmxProperty
+    Collection<String> getScheduledJobs() { scheduledJobs.collect { k, v -> "${k.id}:${k.name}" as String } }
+
+    @Override
+    ObjectName getObjectName() throws MalformedObjectNameException {
+        return new ObjectName("com.ovea.tajin:type=${getClass().simpleName},name=${INSTANCES.get()}")
+    }
 
     @PostConstruct
     void init() {
@@ -108,9 +142,19 @@ class AsyncJobScheduler implements JobScheduler {
 
     private void doSchedule(Job job) {
         if (!service.shutdown && !service.terminated) {
-            long diff = Math.max(0, System.currentTimeMillis() - job.start.time)
+            long diff = Math.max(0, job.start.time - System.currentTimeMillis())
             LOGGER.trace("Scheduling: ${job} in ${diff}ms")
-            service.schedule(new JobRunner(job), diff, TimeUnit.MILLISECONDS)
+            service.schedule(new FutureTask(new JobRunner(job), null) {
+                @Override
+                protected void done() {
+                    scheduledJobs.remove(job)
+                    nScheduled.decrementAndGet()
+                    nRunning.decrementAndGet()
+                    nRan.incrementAndGet()
+                }
+            }, diff, TimeUnit.MILLISECONDS)
+            nScheduled.incrementAndGet()
+            scheduledJobs.put(job, Void)
         } else {
             throw new IllegalStateException('Job Scheduler is closing or closed and cannot accept new job. Job ' + job + ' will be executed at next startup.')
         }
@@ -127,18 +171,25 @@ class AsyncJobScheduler implements JobScheduler {
         final Job job
 
         JobRunner(Job job) {
+            super()
             this.job = job
         }
 
         @Override
         void run() {
             try {
+                nRunning.incrementAndGet()
                 executors.get(job.name).execute(job.data)
                 job.end = new Date()
+                save(job)
             } catch (e) {
+                nFailed.incrementAndGet()
                 job.start = new Date(System.currentTimeMillis() + MINS_5)
                 job.retry++
-                save job, { onError.onError(job, e) }
+                save job, {
+                    doSchedule(job)
+                    onError.onError(job, e)
+                }
             }
         }
     }

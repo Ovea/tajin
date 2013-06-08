@@ -24,6 +24,7 @@ import com.ovea.tajin.framework.i18n.I18NHandler
 import com.ovea.tajin.framework.i18n.I18NService
 import com.ovea.tajin.framework.i18n.I18NServiceFactory
 import com.ovea.tajin.framework.i18n.JsonI18NServiceFactory
+import com.ovea.tajin.framework.jmx.JmxModule
 import com.ovea.tajin.framework.scheduling.SchedulingModule
 import com.ovea.tajin.framework.security.TokenBuilder
 import com.ovea.tajin.framework.support.guice.*
@@ -92,6 +93,11 @@ class InternalWebModule extends ServletModule {
         if (settings.getBoolean('scheduling.enabled', false)) {
             LOGGER.info(" + JobScheduler support")
             install(new SchedulingModule())
+        }
+
+        if (settings.getBoolean('jmx.enabled', true)) {
+            LOGGER.info(" + JMX support")
+            install(new JmxModule())
         }
 
         // setup groovy templating system
