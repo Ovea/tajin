@@ -25,14 +25,19 @@ import org.slf4j.LoggerFactory
 interface JobScheduler {
 
     /**
-     * Schedules a job in the future
+     * Schedules a job in the future. The job being scheduled is returned after being saved
      */
-    void schedule(String jobName, Date time, Map<String, ?> data)
+    Job schedule(String jobName, Date time, Map<String, ?> data)
 
     /**
-     * Schedules a job for execution as soon as possible
+     * Schedules a job for execution as soon as possible. The job being scheduled is returned after being saved
      */
-    void schedule(String jobName, Map<String, ?> data)
+    Job schedule(String jobName, Map<String, ?> data)
+
+    /**
+     * Cancels a job by its id
+     */
+    Job cancel(String jobId)
 
     static interface OnError {
 

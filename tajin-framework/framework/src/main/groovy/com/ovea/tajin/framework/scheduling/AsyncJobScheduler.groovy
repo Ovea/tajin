@@ -62,7 +62,7 @@ class AsyncJobScheduler implements JobScheduler, JmxSelfNaming {
     private final AtomicLong nRunning = new AtomicLong()
     private final AtomicLong nRan = new AtomicLong()
     private final AtomicLong nFailed = new AtomicLong()
-    private final SynchronousQueue<JobSaver> saveQueue = new SynchronousQueue<>()
+    private final SynchronousQueue<JobSaver> persistQueue = new SynchronousQueue<>()
     private Thread saver
 
     AsyncJobScheduler() {
@@ -111,7 +111,7 @@ class AsyncJobScheduler implements JobScheduler, JmxSelfNaming {
             while (!Thread.currentThread().interrupted) {
                 JobSaver saver
                 try {
-                    saver = saveQueue.take()
+                    saver = persistQueue.take()
                 } catch (InterruptedException ignored) {
                     // stop this thread if interrupted
                     Thread.currentThread().interrupt()
@@ -145,10 +145,18 @@ class AsyncJobScheduler implements JobScheduler, JmxSelfNaming {
     }
 
     @Override
-    void schedule(String jobName, Map<String, ?> data) { schedule(jobName, new Date(), data) }
+    Job schedule(String jobName, Map<String, ?> data) { schedule(jobName, new Date(), data) }
 
     @Override
-    void schedule(String jobName, Date time, Map<String, ?> data) {
+    Job cancel(String jobId) {
+        //TODO CANCEL
+        Job job =
+        persistQueue.offer(new JobRemove(job))
+        return null
+    }
+
+    @Override
+    Job schedule(String jobName, Date time, Map<String, ?> data) {
         if (!jobName) throw new IllegalArgumentException('Missing jobName')
         if (!time) throw new IllegalArgumentException('Missing time')
         // will fail if jobName not found
@@ -160,7 +168,8 @@ class AsyncJobScheduler implements JobScheduler, JmxSelfNaming {
             data: data ?: [:]
         )
         // save the job then after save, schedule it
-        save job, { doSchedule(job) }
+        persistQueue.offer(new JobSaver(job, { doSchedule(job) }))
+        return job
     }
 
     private void doSchedule(Job job) {
@@ -172,10 +181,6 @@ class AsyncJobScheduler implements JobScheduler, JmxSelfNaming {
         } else {
             throw new IllegalStateException('Job Scheduler is closing or closed and cannot accept new job. Job ' + job + ' will be executed at next startup.')
         }
-    }
-
-    private save(Job job, Closure<?> then = Closure.IDENTITY) {
-        saveQueue.offer(new JobSaver(job, then))
     }
 
     private class JobSaver implements Runnable {
@@ -195,6 +200,23 @@ class AsyncJobScheduler implements JobScheduler, JmxSelfNaming {
         }
     }
 
+    private class JobRemove implements Runnable {
+        final Job job
+        final Closure<?> then
+
+        JobRemove(Job job, Closure<?> then = Closure.IDENTITY) {
+            this.job = job
+            this.then = then
+        }
+
+        @Override
+        void run() {
+            job.updatedDate = new Date()
+            repository.delete(job)
+            then()
+        }
+    }
+
     private class JobRunner implements Runnable {
         final Job job
 
@@ -210,7 +232,7 @@ class AsyncJobScheduler implements JobScheduler, JmxSelfNaming {
                 executors.get(job.name).execute(job.data)
                 scheduledJobs.remove(job)
                 job.end = new Date()
-                save(job)
+                persistQueue.offer(new JobSaver(job))
             } catch (e) {
                 scheduledJobs.remove(job)
                 nFailed.incrementAndGet()
