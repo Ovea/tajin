@@ -36,4 +36,4 @@ DOC
 
   * GENERER DOC AVEC http://ricostacruz.com/flatdoc/
 
-  * Switch to Jersey 2
+  * Switch to Jersey 2 / Add async support
