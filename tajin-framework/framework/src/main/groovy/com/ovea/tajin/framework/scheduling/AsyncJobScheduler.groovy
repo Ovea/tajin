@@ -129,13 +129,17 @@ class AsyncJobScheduler implements JobScheduler, JmxSelfNaming {
     Job schedule(String jobName, Map<String, ?> data) { schedule(jobName, new Date(), data) }
 
     @Override
-    Job cancel(String jobId) {
-        def e = scheduledJobs.find { k, v -> k.id == jobId }
-        e?.value?.cancel(false)
-        e.key.updatedDate = new Date()
-        repository.delete(e.key)
-        scheduledJobs.remove(e.key)
-        return e.key
+    void cancel(Collection<String> jobIds) {
+        if (jobIds) {
+            def entries = scheduledJobs.find { k, v -> k.id in jobIds }
+            def now = new Date()
+            entries.each {
+                it.value.cancel(false)
+                it.key.updatedDate = now
+                scheduledJobs.remove(it.key)
+            }
+            repository.delete(entries.collect { it.key })
+        }
     }
 
     @Override

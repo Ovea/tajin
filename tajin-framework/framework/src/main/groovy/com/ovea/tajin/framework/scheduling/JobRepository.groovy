@@ -21,6 +21,6 @@ package com.ovea.tajin.framework.scheduling
  */
 interface JobRepository {
     void save(Job job)
-    void delete(Job job)
+    void delete(Collection<Job> jobs)
     List<Job> listPendingJobs()
 }

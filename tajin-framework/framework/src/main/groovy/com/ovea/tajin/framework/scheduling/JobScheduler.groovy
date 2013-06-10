@@ -35,9 +35,9 @@ interface JobScheduler {
     Job schedule(String jobName, Map<String, ?> data)
 
     /**
-     * Cancels a job by its id
+     * Cancels jobs by ids
      */
-    Job cancel(String jobId)
+    void cancel(Collection<String> jobIds)
 
     static interface OnError {
 
