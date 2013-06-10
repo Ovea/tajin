@@ -58,12 +58,10 @@ class AsyncJobScheduler implements JobScheduler, JmxSelfNaming {
     private ScheduledExecutorService service
     private int maxRetry = -1
 
-    private final ConcurrentHashMap<Job, Object> scheduledJobs = new ConcurrentHashMap<>()
+    private final ConcurrentHashMap<Job, ScheduledFuture<?>> scheduledJobs = new ConcurrentHashMap<>()
     private final AtomicLong nRunning = new AtomicLong()
     private final AtomicLong nRan = new AtomicLong()
     private final AtomicLong nFailed = new AtomicLong()
-    private final SynchronousQueue<JobSaver> persistQueue = new SynchronousQueue<>()
-    private Thread saver
 
     AsyncJobScheduler() {
         INSTANCES.incrementAndGet()
@@ -107,24 +105,6 @@ class AsyncJobScheduler implements JobScheduler, JmxSelfNaming {
                 }
             }).build()
         )
-        saver = Thread.start "${AsyncJobScheduler.simpleName}-Saver-thread", {
-            while (!Thread.currentThread().interrupted) {
-                JobSaver saver
-                try {
-                    saver = persistQueue.take()
-                } catch (InterruptedException ignored) {
-                    // stop this thread if interrupted
-                    Thread.currentThread().interrupt()
-                    break
-                }
-                try {
-                    saver.run()
-                } catch (e) {
-                    LOGGER.error("UncaughtException in Job Saver: ${e.message}", e)
-                }
-            }
-        }
-
         List<Job> jobs = repository.listPendingJobs()
         // filter jobs that can be retried
         if (maxRetry > -1) {
@@ -135,13 +115,14 @@ class AsyncJobScheduler implements JobScheduler, JmxSelfNaming {
 
     @PreDestroy
     void close() {
-        service.shutdownNow()
+        while (scheduledJobs) {
+            scheduledJobs.keySet().each { scheduledJobs.remove(it)?.cancel(false) }
+        }
+        service.shutdown()
         try {
             service.awaitTermination(10, TimeUnit.SECONDS)
         } catch (ignored) {
         }
-        saver.interrupt()
-        saver = null
     }
 
     @Override
@@ -149,10 +130,12 @@ class AsyncJobScheduler implements JobScheduler, JmxSelfNaming {
 
     @Override
     Job cancel(String jobId) {
-        //TODO CANCEL
-        Job job =
-        persistQueue.offer(new JobRemove(job))
-        return null
+        def e = scheduledJobs.find { k, v -> k.id == jobId }
+        e?.value?.cancel(false)
+        e.key.updatedDate = new Date()
+        repository.delete(e.key)
+        scheduledJobs.remove(e.key)
+        return e.key
     }
 
     @Override
@@ -168,7 +151,7 @@ class AsyncJobScheduler implements JobScheduler, JmxSelfNaming {
             data: data ?: [:]
         )
         // save the job then after save, schedule it
-        persistQueue.offer(new JobSaver(job, { doSchedule(job) }))
+        save job, { doSchedule(job) }
         return job
     }
 
@@ -176,45 +159,17 @@ class AsyncJobScheduler implements JobScheduler, JmxSelfNaming {
         if (!service.shutdown && !service.terminated) {
             long diff = Math.max(0, job.start.time - System.currentTimeMillis())
             LOGGER.trace("Scheduling: ${job} in ${diff / 1000}s")
-            service.schedule(new JobRunner(job), diff, TimeUnit.MILLISECONDS)
-            scheduledJobs.put(job, Void)
+            ScheduledFuture<?> future = service.schedule(new JobRunner(job), diff, TimeUnit.MILLISECONDS)
+            scheduledJobs.put(job, future)
         } else {
             throw new IllegalStateException('Job Scheduler is closing or closed and cannot accept new job. Job ' + job + ' will be executed at next startup.')
         }
     }
 
-    private class JobSaver implements Runnable {
-        final Job job
-        final Closure<?> then
-
-        JobSaver(Job job, Closure<?> then = Closure.IDENTITY) {
-            this.job = job
-            this.then = then
-        }
-
-        @Override
-        void run() {
-            job.updatedDate = new Date()
-            repository.save(job)
-            then()
-        }
-    }
-
-    private class JobRemove implements Runnable {
-        final Job job
-        final Closure<?> then
-
-        JobRemove(Job job, Closure<?> then = Closure.IDENTITY) {
-            this.job = job
-            this.then = then
-        }
-
-        @Override
-        void run() {
-            job.updatedDate = new Date()
-            repository.delete(job)
-            then()
-        }
+    private void save(Job job, Closure<?> then = Closure.IDENTITY) {
+        job.updatedDate = new Date()
+        repository.save(job)
+        then()
     }
 
     private class JobRunner implements Runnable {
@@ -232,7 +187,7 @@ class AsyncJobScheduler implements JobScheduler, JmxSelfNaming {
                 executors.get(job.name).execute(job.data)
                 scheduledJobs.remove(job)
                 job.end = new Date()
-                persistQueue.offer(new JobSaver(job))
+                save job
             } catch (e) {
                 scheduledJobs.remove(job)
                 nFailed.incrementAndGet()
