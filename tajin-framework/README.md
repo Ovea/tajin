@@ -35,3 +35,5 @@ DOC
   * JNDI configuration
 
   * GENERER DOC AVEC http://ricostacruz.com/flatdoc/
+
+  * Switch to Jersey 2
