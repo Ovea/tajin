@@ -152,7 +152,7 @@ class AsyncJobScheduler implements JobScheduler, JmxSelfNaming {
         Job job = new Job(
             name: jobName,
             start: time,
-            data: data ?: [:]
+            data: data ? data.deepClone() : [:]
         )
         // save the job then after save, schedule it
         save job, { doSchedule(job) }

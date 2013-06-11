@@ -1,0 +1,4 @@
+moduleName=tajin-framework
+moduleVersion=1
+extensionClasses=com.ovea.tajin.framework.support.groovy.GroovyObjectExtension
+staticExtensionClasses=
