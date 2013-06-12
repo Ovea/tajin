@@ -20,7 +20,6 @@
         <module>tajin-js</module>
         <module>tajin-framework</module>
         <module>tajin-event</module>
-        <module>tajin-tools</module>
         <module>tajin-servers</module>
         <module>tajin-samples</module>
     </modules>
