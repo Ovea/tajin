@@ -44,9 +44,7 @@ public class GuiceListener extends GuiceServletContextListener {
 
     @Override
     protected Injector getInjector() {
-        Collection<Module> modules = new LinkedList<>(this.modules);
-        modules.add(ServiceModules.loadFromClasspath(Module.class));
-        return Jsr250.createInjector(Stage.PRODUCTION, Modules.override(modules).with(HttpContext.MODULE));
+        return Jsr250.createInjector(Stage.PRODUCTION, Modules.override(Modules.override(this.modules).with(ServiceModules.loadFromClasspath(Module.class))).with(HttpContext.MODULE));
     }
 
     @Override
