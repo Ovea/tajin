@@ -17,8 +17,10 @@ package com.ovea.tajin.framework.scheduling
 
 import com.google.common.cache.LoadingCache
 import com.google.common.util.concurrent.ThreadFactoryBuilder
+import com.ovea.tajin.framework.jmx.Access
 import com.ovea.tajin.framework.jmx.JmxSelfNaming
 import com.ovea.tajin.framework.jmx.annotation.JmxBean
+import com.ovea.tajin.framework.jmx.annotation.JmxField
 import com.ovea.tajin.framework.jmx.annotation.JmxProperty
 import com.ovea.tajin.framework.util.PropertySettings
 import org.slf4j.Logger
@@ -41,7 +43,6 @@ import java.util.concurrent.atomic.AtomicLong
 class AsyncJobScheduler implements JobScheduler, JmxSelfNaming {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(AsyncJobScheduler)
-    private static final long MINS_5 = TimeUnit.MILLISECONDS.convert(5, TimeUnit.MINUTES)
     private static final AtomicLong INSTANCES = new AtomicLong(-1)
 
     @Inject
@@ -55,9 +56,13 @@ class AsyncJobScheduler implements JobScheduler, JmxSelfNaming {
 
     JobScheduler.OnError onError = JobScheduler.OnError.LOG
 
-    private ScheduledExecutorService service
-    private int maxRetry = -1
+    @JmxField(access = Access.RW)
+    int maxRetry = -1
 
+    @JmxField(access = Access.RW)
+    int retryDelay = 300
+
+    private ScheduledExecutorService service
     private final ConcurrentHashMap<Job, ScheduledFuture<?>> scheduledJobs = new ConcurrentHashMap<>()
     private final AtomicLong nRunning = new AtomicLong()
     private final AtomicLong nRan = new AtomicLong()
@@ -93,6 +98,7 @@ class AsyncJobScheduler implements JobScheduler, JmxSelfNaming {
     @PostConstruct
     void init() {
         maxRetry = settings.getInt('scheduling.maxRetry', -1)
+        retryDelay = settings.getInt('scheduling.retryDelay', 300)
         service = new ScheduledThreadPoolExecutor(
             settings.getInt('scheduling.pool.size', Runtime.runtime.availableProcessors() * 2),
             new ThreadFactoryBuilder()
@@ -195,7 +201,7 @@ class AsyncJobScheduler implements JobScheduler, JmxSelfNaming {
             } catch (e) {
                 scheduledJobs.remove(job)
                 nFailed.incrementAndGet()
-                job.start = new Date(System.currentTimeMillis() + MINS_5)
+                job.start = new Date(System.currentTimeMillis() + retryDelay * 1000)
                 job.retry++
                 save job, {
                     doSchedule(job)
