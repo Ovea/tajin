@@ -17,6 +17,7 @@ package com.ovea.tajin.framework.util
 
 import com.ovea.tajin.framework.jmx.annotation.JmxBean
 import com.ovea.tajin.framework.jmx.annotation.JmxMethod
+import com.ovea.tajin.framework.jmx.annotation.JmxProperty
 
 import javax.inject.Inject
 
@@ -39,7 +40,7 @@ class PropertySettingsMBean {
     @JmxMethod
     void unset(String key) { settings.properties.remove(key) }
 
-    @JmxMethod
+    @JmxProperty
     Map<String,String> getProperties() { new TreeMap<String, String>(settings.properties) }
 
 }
