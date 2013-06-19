@@ -40,6 +40,6 @@ class PropertySettingsMBean {
     void unset(String key) { settings.properties.remove(key) }
 
     @JmxMethod
-    Map<String,String> list() { new TreeMap<String, String>(settings.properties) }
+    Map<String,String> getProperties() { new TreeMap<String, String>(settings.properties) }
 
 }
