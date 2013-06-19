@@ -38,6 +38,7 @@ import com.ovea.tajin.framework.support.shiro.SecurityFilter
 import com.ovea.tajin.framework.support.shiro.VersionedRememberMeManager
 import com.ovea.tajin.framework.template.*
 import com.ovea.tajin.framework.util.PropertySettings
+import com.ovea.tajin.framework.util.PropertySettingsMBean
 import com.ovea.tajin.framework.web.CookieLocaleManager
 import com.ovea.tajin.framework.web.RequestLog
 import com.sun.jersey.guice.spi.container.servlet.GuiceContainer
@@ -79,6 +80,7 @@ class InternalWebModule extends ServletModule {
     @Override
     protected void configureServlets() {
         bind(PropertySettings).toInstance(settings)
+        bind(PropertySettingsMBean)
         bind(Locale).toProvider(CookieLocaleManager).in(RequestScoped)
 
         // bind TokenBuilder if needed
