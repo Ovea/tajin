@@ -25,14 +25,24 @@ import org.slf4j.LoggerFactory
 interface JobScheduler {
 
     /**
-     * Schedules a job in the future. The job being scheduled is returned after being saved
+     * Schedules a persistent job in the future. The job being scheduled is returned after being saved
      */
     Job schedule(String jobName, Date time, Map<String, ?> data)
 
     /**
-     * Schedules a job for execution as soon as possible. The job being scheduled is returned after being saved
+     * Schedules a job in the future. The job being scheduled is returned after being saved
+     */
+    Job schedule(String jobName, Date time, Map<String, ?> data, boolean persistent)
+
+    /**
+     * Schedules a persistent job for execution as soon as possible. The job being scheduled is returned after being saved
      */
     Job schedule(String jobName, Map<String, ?> data)
+
+    /**
+     * Schedules a job for execution as soon as possible. The job being scheduled is returned after being saved
+     */
+    Job schedule(String jobName, Map<String, ?> data, boolean persistent)
 
     /**
      * Cancels jobs by ids

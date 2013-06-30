@@ -132,7 +132,7 @@ class AsyncJobScheduler implements JobScheduler, JmxSelfNaming {
     }
 
     @Override
-    Job schedule(String jobName, Map<String, ?> data) { schedule(jobName, new Date(), data) }
+    Job schedule(String jobName, Map<String, ?> data, boolean persistent = true) { schedule(jobName, new Date(), data, persistent) }
 
     @Override
     void cancel(Collection<String> jobIds) {
@@ -149,7 +149,7 @@ class AsyncJobScheduler implements JobScheduler, JmxSelfNaming {
     }
 
     @Override
-    Job schedule(String jobName, Date time, Map<String, ?> data) {
+    Job schedule(String jobName, Date time, Map<String, ?> data, boolean persistent = true) {
         if (!jobName) throw new IllegalArgumentException('Missing jobName')
         if (!time) throw new IllegalArgumentException('Missing time')
         // will fail if jobName not found
@@ -161,7 +161,11 @@ class AsyncJobScheduler implements JobScheduler, JmxSelfNaming {
             data: data ? data.deepClone() : [:]
         )
         // save the job then after save, schedule it
-        save job, { doSchedule(job) }
+        if(persistent) {
+            save job, { doSchedule(job) }
+        } else {
+            doSchedule(job)
+        }
         return job
     }
 
