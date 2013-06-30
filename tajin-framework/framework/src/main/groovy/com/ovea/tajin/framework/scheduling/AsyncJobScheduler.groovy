@@ -161,19 +161,19 @@ class AsyncJobScheduler implements JobScheduler, JmxSelfNaming {
             data: data ? data.deepClone() : [:]
         )
         // save the job then after save, schedule it
-        if(persistent) {
-            save job, { doSchedule(job) }
+        if (persistent) {
+            save job, { doSchedule(job, persistent) }
         } else {
-            doSchedule(job)
+            doSchedule(job, persistent)
         }
         return job
     }
 
-    private void doSchedule(Job job) {
+    private void doSchedule(Job job, boolean persistent) {
         if (!service.shutdown && !service.terminated) {
             long diff = Math.max(0, job.start.time - System.currentTimeMillis())
             LOGGER.trace("Scheduling: ${job} in ${diff / 1000}s")
-            ScheduledFuture<?> future = service.schedule(new JobRunner(job), diff, TimeUnit.MILLISECONDS)
+            ScheduledFuture<?> future = service.schedule(new JobRunner(job, persistent), diff, TimeUnit.MILLISECONDS)
             scheduledJobs.put(job, future)
         } else {
             throw new IllegalStateException('Job Scheduler is closing or closed and cannot accept new job. Job ' + job + ' will be executed at next startup.')
@@ -188,10 +188,11 @@ class AsyncJobScheduler implements JobScheduler, JmxSelfNaming {
 
     private class JobRunner implements Runnable {
         final Job job
+        final boolean persistent
 
-        JobRunner(Job job) {
-            super()
+        JobRunner(Job job, boolean persistent) {
             this.job = job
+            this.persistent = persistent
         }
 
         @Override
@@ -201,14 +202,19 @@ class AsyncJobScheduler implements JobScheduler, JmxSelfNaming {
                 executors.get(job.name).execute(job.data)
                 scheduledJobs.remove(job)
                 job.end = new Date()
-                save job
+                if (persistent) save job
             } catch (e) {
                 scheduledJobs.remove(job)
                 nFailed.incrementAndGet()
                 job.start = new Date(System.currentTimeMillis() + retryDelay * 1000)
                 job.retry++
-                save job, {
-                    doSchedule(job)
+                if (persistent) {
+                    save job, {
+                        doSchedule(job, persistent)
+                        onError.onError(job, e)
+                    }
+                } else {
+                    doSchedule(job, persistent)
                     onError.onError(job, e)
                 }
             } finally {
