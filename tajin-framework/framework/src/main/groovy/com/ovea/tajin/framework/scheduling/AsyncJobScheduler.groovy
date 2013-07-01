@@ -116,7 +116,7 @@ class AsyncJobScheduler implements JobScheduler, JmxSelfNaming {
         if (maxRetry > -1) {
             jobs = jobs.findAll { it.retry <= maxRetry }
         }
-        jobs.each { doSchedule(it) }
+        jobs.each { doSchedule(it, true) }
     }
 
     @PreDestroy
@@ -130,9 +130,6 @@ class AsyncJobScheduler implements JobScheduler, JmxSelfNaming {
         } catch (ignored) {
         }
     }
-
-    @Override
-    Job schedule(String jobName, Map<String, ?> data, boolean persistent = true) { schedule(jobName, new Date(), data, persistent) }
 
     @Override
     void cancel(Collection<String> jobIds) {
@@ -149,7 +146,29 @@ class AsyncJobScheduler implements JobScheduler, JmxSelfNaming {
     }
 
     @Override
-    Job schedule(String jobName, Date time, Map<String, ?> data, boolean persistent = true) {
+    Job submit(String jobName, Map<String, ?> data) { submit(jobName, new Date(), data) }
+
+    @Override
+    Job submit(String jobName, Date time, Map<String, ?> data) {
+        if (!jobName) throw new IllegalArgumentException('Missing jobName')
+        if (!time) throw new IllegalArgumentException('Missing time')
+        // will fail if jobName not found
+        executors.get(jobName)
+        // create and process job
+        Job job = new Job(
+            name: jobName,
+            start: time,
+            data: data ? data.deepClone() : [:]
+        )
+        doSchedule(new JobRunner(job))
+        return job
+    }
+
+    @Override
+    Job schedule(String jobName, Map<String, ?> data) { schedule(jobName, new Date(), data) }
+
+    @Override
+    Job schedule(String jobName, Date time, Map<String, ?> data) {
         if (!jobName) throw new IllegalArgumentException('Missing jobName')
         if (!time) throw new IllegalArgumentException('Missing time')
         // will fail if jobName not found
@@ -161,66 +180,77 @@ class AsyncJobScheduler implements JobScheduler, JmxSelfNaming {
             data: data ? data.deepClone() : [:]
         )
         // save the job then after save, schedule it
-        if (persistent) {
-            save job, { doSchedule(job, persistent) }
-        } else {
-            doSchedule(job, persistent)
-        }
+        save job
+        doSchedule new PersistentJobRunner(job)
         return job
     }
 
-    private void doSchedule(Job job, boolean persistent) {
+    private void doSchedule(JobRunner jobRunner) {
         if (!service.shutdown && !service.terminated) {
-            long diff = Math.max(0, job.start.time - System.currentTimeMillis())
-            LOGGER.trace("Scheduling: ${job} in ${diff / 1000}s")
-            ScheduledFuture<?> future = service.schedule(new JobRunner(job, persistent), diff, TimeUnit.MILLISECONDS)
-            scheduledJobs.put(job, future)
+            long diff = Math.max(0, jobRunner.job.start.time - System.currentTimeMillis())
+            LOGGER.trace("Scheduling: ${jobRunner.job} in ${diff / 1000}s")
+            ScheduledFuture<?> future = service.schedule(jobRunner, diff, TimeUnit.MILLISECONDS)
+            scheduledJobs.put(jobRunner.job, future)
         } else {
-            throw new IllegalStateException('Job Scheduler is closing or closed and cannot accept new job. Job ' + job + ' will be executed at next startup.')
+            throw new IllegalStateException('Job Scheduler is closing or closed and cannot accept new job. Job ' + jobRunner.job + ' will be executed at next startup.')
         }
     }
 
-    private void save(Job job, Closure<?> then = Closure.IDENTITY) {
+    private void save(Job job) {
         job.updatedDate = new Date()
         repository.save(job)
-        then()
     }
 
     private class JobRunner implements Runnable {
         final Job job
-        final boolean persistent
 
-        JobRunner(Job job, boolean persistent) {
+        JobRunner(Job job) {
             this.job = job
-            this.persistent = persistent
         }
 
         @Override
-        void run() {
+        final void run() {
             try {
                 nRunning.incrementAndGet()
                 executors.get(job.name).execute(job.data)
                 scheduledJobs.remove(job)
                 job.end = new Date()
-                if (persistent) save job
+                onComplete()
             } catch (e) {
                 scheduledJobs.remove(job)
                 nFailed.incrementAndGet()
-                job.start = new Date(System.currentTimeMillis() + retryDelay * 1000)
                 job.retry++
-                if (persistent) {
-                    save job, {
-                        doSchedule(job, persistent)
-                        onError.onError(job, e)
-                    }
-                } else {
-                    doSchedule(job, persistent)
-                    onError.onError(job, e)
+                onFailure()
+                if (retryable) {
+                    job.start = new Date(System.currentTimeMillis() + retryDelay * 1000)
+                    doSchedule this
                 }
+                onError.onError(job, e)
             } finally {
                 nRunning.decrementAndGet()
                 nRan.incrementAndGet()
             }
         }
+
+        void onComplete() {}
+
+        void onFailure() {}
+
+        boolean isRetryable() { false }
+    }
+
+    private class PersistentJobRunner extends JobRunner {
+        PersistentJobRunner(Job job) {
+            super(job)
+        }
+
+        @Override
+        void onComplete() { save job }
+
+        @Override
+        void onFailure() { save job }
+
+        @Override
+        boolean isRetryable() { maxRetry == -1 || job.retry < maxRetry }
     }
 }

@@ -30,9 +30,9 @@ interface JobScheduler {
     Job schedule(String jobName, Date time, Map<String, ?> data)
 
     /**
-     * Schedules a job in the future. The job being scheduled is returned after being saved
+     * Submit a non persistent job in the future which will not be retried if failed. Uses the executor thread pool.
      */
-    Job schedule(String jobName, Date time, Map<String, ?> data, boolean persistent)
+    Job submit(String jobName, Date time, Map<String, ?> data)
 
     /**
      * Schedules a persistent job for execution as soon as possible. The job being scheduled is returned after being saved
@@ -40,9 +40,9 @@ interface JobScheduler {
     Job schedule(String jobName, Map<String, ?> data)
 
     /**
-     * Schedules a job for execution as soon as possible. The job being scheduled is returned after being saved
+     * Submit a non persistent job in the future which will not be retried if failed. Uses the executor thread pool. Task will be executed as soon as possible
      */
-    Job schedule(String jobName, Map<String, ?> data, boolean persistent)
+    Job submit(String jobName, Map<String, ?> data)
 
     /**
      * Cancels jobs by ids
