@@ -1,0 +1,4 @@
+moduleName=tajin-framework
+moduleVersion=1
+extensionClasses=com.ovea.tajin.framework.support.groovy.GroovyObjectExtension,org.codehaus.groovy.jsr223.ScriptExtensions,org.codehaus.groovy.runtime.SqlGroovyMethods,org.codehaus.groovy.runtime.SwingGroovyMethods,org.codehaus.groovy.runtime.XmlGroovyMethods
+staticExtensionClasses=org.codehaus.groovy.jsr223.ScriptStaticExtensions
