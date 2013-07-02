@@ -116,7 +116,7 @@ class AsyncJobScheduler implements JobScheduler, JmxSelfNaming {
         if (maxRetry > -1) {
             jobs = jobs.findAll { it.retry <= maxRetry }
         }
-        jobs.each { doSchedule(it, true) }
+        jobs.each { doSchedule(new PersistentJobRunner(it)) }
     }
 
     @PreDestroy
