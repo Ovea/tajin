@@ -15,6 +15,7 @@
  */
 package com.ovea.tajin.framework.support.guice;
 
+import com.google.common.collect.Lists;
 import com.google.inject.Provider;
 import com.google.inject.TypeLiteral;
 import com.google.inject.spi.InjectionListener;
@@ -23,6 +24,7 @@ import com.google.inject.spi.TypeListener;
 
 import java.lang.annotation.Annotation;
 import java.lang.reflect.Field;
+import java.util.List;
 
 import static com.ovea.tajin.framework.util.Reflect.annotatedBy;
 import static com.ovea.tajin.framework.util.Reflect.findFields;
@@ -42,13 +44,16 @@ final class FieldHandlerTypeListener<A extends Annotation> implements TypeListen
     @Override
     public <I> void hear(final TypeLiteral<I> type, TypeEncounter<I> encounter) {
         final Provider<? extends FieldHandler<A>> provider = encounter.getProvider(handlerClass);
-        encounter.register(new InjectionListener<I>() {
-            @Override
-            public void afterInjection(I injectee) {
-                FieldHandler<A> handler = provider.get();
-                for (Field field : findFields(type.getRawType(), annotatedBy(annotationType)))
-                    handler.handle(type, injectee, field, field.getAnnotation(annotationType));
-            }
-        });
+        final List<Field> fields = Lists.newLinkedList(findFields(type.getRawType(), annotatedBy(annotationType)));
+        if (!fields.isEmpty()) {
+            encounter.register(new InjectionListener<I>() {
+                @Override
+                public void afterInjection(I injectee) {
+                    FieldHandler<A> handler = provider.get();
+                    for (Field field : fields)
+                        handler.handle(type, injectee, field, field.getAnnotation(annotationType));
+                }
+            });
+        }
     }
 }
