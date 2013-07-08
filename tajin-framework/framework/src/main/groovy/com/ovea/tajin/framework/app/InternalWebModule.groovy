@@ -209,17 +209,16 @@ class InternalWebModule extends ServletModule {
 
         // setup REST API
         bind(RootPath)
-        if (secured) {
-            serve("/*").with(GuiceContainer, [
-                "com.sun.jersey.spi.container.ContainerResponseFilters": GzipEncoder.name,
-                "com.sun.jersey.spi.container.ResourceFilters": "${AuditResourceFilterFactory.name};${SecurityResourceFilterFactory.name};${PermissionResourceFilterFactory.name}" as String
-            ])
-        } else {
-            serve("/*").with(GuiceContainer, [
-                "com.sun.jersey.spi.container.ContainerResponseFilters": GzipEncoder.name,
-                "com.sun.jersey.spi.container.ResourceFilters": "${AuditResourceFilterFactory.name}" as String
-            ])
+        def initParams = [:]
+        if (settings.getBoolean('output.gzip', false)) {
+            initParams << ["com.sun.jersey.spi.container.ContainerResponseFilters": GzipEncoder.name]
         }
+        if (secured) {
+            initParams << ["com.sun.jersey.spi.container.ResourceFilters": "${AuditResourceFilterFactory.name};${SecurityResourceFilterFactory.name};${PermissionResourceFilterFactory.name}" as String]
+        } else {
+            initParams << ["com.sun.jersey.spi.container.ResourceFilters": "${AuditResourceFilterFactory.name}" as String]
+        }
+        serve("/*").with(GuiceContainer, initParams)
 
         // configure discovered applications
         WebBinder webBinder = new WebBinder(binder())
