@@ -40,7 +40,7 @@ import com.ovea.tajin.framework.template.*
 import com.ovea.tajin.framework.util.PropertySettings
 import com.ovea.tajin.framework.util.PropertySettingsMBean
 import com.ovea.tajin.framework.web.CookieLocaleManager
-import com.ovea.tajin.framework.web.RequestLog
+import com.ovea.tajin.framework.web.PerfLog
 import com.sun.jersey.guice.spi.container.servlet.GuiceContainer
 import org.apache.shiro.SecurityUtils
 import org.apache.shiro.authc.pam.FirstSuccessfulStrategy
@@ -202,8 +202,9 @@ class InternalWebModule extends ServletModule {
         // setup performance logger
         if (settings.getBoolean('logging.perf', false)) {
             LOGGER.info(" + Performance logging support")
-            filter('/*').through(RequestLog, [
-                secured: secured as String
+            filter('/*').through(PerfLog, [
+                secured: secured as String,
+                ignores: settings.getString('logging.request.ignores', '')
             ])
         }
 
