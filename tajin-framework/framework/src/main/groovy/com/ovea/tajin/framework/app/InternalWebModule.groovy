@@ -204,7 +204,7 @@ class InternalWebModule extends ServletModule {
             LOGGER.info(" + Performance logging support")
             filter('/*').through(PerfLog, [
                 secured: secured as String,
-                ignores: settings.getString('logging.request.ignores', '')
+                ignores: settings.getString('logging.perf.ignores', '')
             ])
         }
 

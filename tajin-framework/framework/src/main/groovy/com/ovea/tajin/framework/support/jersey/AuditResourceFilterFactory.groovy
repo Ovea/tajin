@@ -38,7 +38,7 @@ class AuditResourceFilterFactory implements ResourceFilterFactory {
 
         @Override
         public ContainerRequest filter(ContainerRequest request) {
-            LOGGER.info("${request.method} ${request.path} => ${arm.method.declaringClass.simpleName}.${arm.method.name}")
+            LOGGER.fine("${request.method} ${request.path} => ${arm.method.declaringClass.simpleName}.${arm.method.name}")
             return request;
         }
 
