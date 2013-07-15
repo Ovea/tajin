@@ -24,7 +24,7 @@ import com.sun.jersey.api.client.filter.ClientFilter
  * @author Mathieu Carbou (mathieu.carbou@gmail.com)
  * @date 2013-04-30
  */
-class CookieTracking extends ClientFilter {
+class CookieTracker extends ClientFilter {
     final Map<String, String> cookies = [:]
 
     @Override
