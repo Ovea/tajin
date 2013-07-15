@@ -15,28 +15,32 @@
  */
 package com.ovea.tajin.framework.support.jersey
 
-import com.sun.jersey.api.client.ClientHandlerException
-import com.sun.jersey.api.client.ClientRequest
-import com.sun.jersey.api.client.ClientResponse
-import com.sun.jersey.api.client.filter.ClientFilter
+import javax.ws.rs.WebApplicationException
+import javax.ws.rs.core.Cookie
+import javax.ws.rs.core.HttpHeaders
+import javax.ws.rs.ext.ReaderInterceptor
+import javax.ws.rs.ext.ReaderInterceptorContext
+import javax.ws.rs.ext.WriterInterceptor
+import javax.ws.rs.ext.WriterInterceptorContext
 
 /**
  * @author Mathieu Carbou (mathieu.carbou@gmail.com)
  * @date 2013-04-30
  */
-class CookieTracker extends ClientFilter {
-    final Map<String, String> cookies = [:]
+//TODO MATHIEU - JERSEY 2 REVIEW & TEST
+class CookieTracker implements ReaderInterceptor, WriterInterceptor {
+    final Map<String, Cookie> cookies = [:]
 
     @Override
-    ClientResponse handle(ClientRequest request) throws ClientHandlerException {
-        if (cookies) {
-            request.headers.add("Cookie", cookies.collect { k, v -> "${k}=${v}" }.join("; "))
-        }
-        ClientResponse response = next.handle(request)
-        response.cookies?.each {
-            cookies.put(it.name, it.value)
-        }
-        return response
+    Object aroundReadFrom(ReaderInterceptorContext context) throws IOException, WebApplicationException {
+        cookies = getRequestCookies(context)
+        return context.proceed()
+    }
+
+    @Override
+    void aroundWriteTo(WriterInterceptorContext context) throws IOException, WebApplicationException {
+        cookies.each { k, v -> context.headers.add(HttpHeaders.COOKIE, v) }
+        context.proceed()
     }
 
 }
