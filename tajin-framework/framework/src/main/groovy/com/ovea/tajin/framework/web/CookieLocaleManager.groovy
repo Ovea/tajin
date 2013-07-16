@@ -41,13 +41,17 @@ final class CookieLocaleManager implements Provider<Locale> {
     PropertySettings settings
 
     public void set(Locale locale) {
-        newLocaleCookie().withValue(locale.toString().replace('_', '-')).saveTo(request.get(), response.get())
+        boolean useCookie = settings.getBoolean('locale.cookie.enabled', false)
+        if (useCookie) {
+            newLocaleCookie().withValue(locale.toString().replace('_', '-')).saveTo(request.get(), response.get())
+        }
     }
 
     @Override
     public Locale get() {
+        boolean useCookie = settings.getBoolean('locale.cookie.enabled', false)
         // first try to get value from cookie
-        Locale found = LocaleUtil.valueOf(newLocaleCookie().readValue(request.get()))
+        Locale found = useCookie ? LocaleUtil.valueOf(newLocaleCookie().readValue(request.get())) : null
         if (!found) {
             // when using cors, check the request parameters if a cookie is not present
             found = LocaleUtil.valueOf(request.get().getParameter(settings.getString('locale.cookie.name', DEFAULT_NAME)))
@@ -60,15 +64,18 @@ final class CookieLocaleManager implements Provider<Locale> {
                 found = LocaleUtil.valueOf(settings.getString('locale.default', 'en_US'), Locale.US)
             }
             // set locale cookie at the end
-            set(found)
+            if (useCookie) {
+                set(found)
+            }
         }
         return found
     }
 
     Cookie newLocaleCookie() {
+        int days = settings.getInt('locale.cookie.days', -1)
         return new HttpCookie(
             name: settings.getString('locale.cookie.name', DEFAULT_NAME),
-            maxAge: settings.getInt('locale.cookie.days', 365) * DAY_SEC,
+            maxAge: days <= 0 ? -1 : days * DAY_SEC,
             httpOnly: false
         )
     }
