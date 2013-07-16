@@ -1,5 +1,1 @@
 # Tajin Servers #
-
-## TODO ##
-
-  * DOC
