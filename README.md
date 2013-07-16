@@ -31,3 +31,8 @@ Each module has its own documentation:
  | [tajin-servers](https://github.com/Ovea/tajin/blob/master/tajin-servers/README.md)
  | [tajin-event](https://github.com/Ovea/tajin/blob/master/tajin-event/README.md)
  | 
+
+## TODO ##
+
+  * UPDATE THIS DOC
+  * WIKI
