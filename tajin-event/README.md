@@ -1,7 +1,11 @@
-# TODO #
+# Tajin Event #
 
-  * support event server-side & client transparent a travers comnetd ou autre
-  * batchs sur un event
-  * RIA
-  * cf meteor
-  * cf pusher
+## TODO ##
+
+  * Diagramme Archi
+  * Use Tajin Framework
+  * cf RIA, meteor, pusher
+  * API key
+  * session clustering
+  * callbacks, jsonp, bi-dir com
+

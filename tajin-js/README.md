@@ -1,4 +1,6 @@
-# TODO #
+# Tajin Javascript Library #
+
+## TODO ##
 
   * PLUGIN MODEL
     * creation a partir d un objet array ou json
@@ -15,10 +17,7 @@
     * https://github.com/thedersen/backbone.validation
     * https://github.com/powmedia/backbone-forms
 
-DOC:
+  * PLUGIN REMOTE EVENT
+    * ajouter
 
-
-A client-side JS library with a modular architecture:
-
-  * Client-side I18N
-  * A complete Event-Driven system to develop Event-Driven applications
+  * DOCUMENTATION
