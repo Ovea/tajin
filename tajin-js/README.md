@@ -20,4 +20,7 @@
   * PLUGIN REMOTE EVENT
     * ajouter
 
+  * PLUGIN TIMERS
+    * ajout longjob.run() in timers (p187 JS for ninja)
+
   * DOCUMENTATION
