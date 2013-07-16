@@ -27,10 +27,11 @@ import javax.servlet.http.HttpServletRequest
  * @date 2013-05-23
  */
 @javax.inject.Singleton
-class RequestLog implements Filter {
+class PerfLog implements Filter {
 
-    private static final Logger LOGGER = LoggerFactory.getLogger(RequestLog)
+    private static final Logger LOGGER = LoggerFactory.getLogger(PerfLog)
     boolean secured
+    List<String> ignores = []
 
     @Override
     void destroy() {
@@ -40,21 +41,27 @@ class RequestLog implements Filter {
     @Override
     void init(FilterConfig filterConfig) throws ServletException {
         secured = Boolean.parseBoolean(filterConfig.getInitParameter('secured') ?: 'false')
+        ignores = ((filterConfig.getInitParameter('ignores') ?: '').split(",|;") as List).collect { it.trim() }
     }
 
     @Override
     void doFilter(ServletRequest request, ServletResponse response, FilterChain chain) throws IOException {
         HttpServletRequest req = (HttpServletRequest) request
-        long time = System.currentTimeMillis()
-        try {
+        if (req.requestURI in ignores) {
             chain.doFilter(request, response)
-        } finally {
-            time = System.currentTimeMillis() - time
-            if (secured) {
-                LOGGER.info("| ${(time as String).padLeft(5)} | ${req.method.padLeft(6)} | ${req.requestURI} | auth=${SecurityUtils.subject.authenticated ? 1 : 0} | rmb=${SecurityUtils.subject.remembered ? 1 : 0} | ${req.userPrincipal} |")
-            } else {
-                LOGGER.info("| ${(time as String).padLeft(5)} | ${req.method.padLeft(6)} | ${req.requestURI} |")
+        } else {
+            long time = System.currentTimeMillis()
+            try {
+                chain.doFilter(request, response)
+            } finally {
+                time = System.currentTimeMillis() - time
+                if (secured) {
+                    LOGGER.info("| ${(time as String).padLeft(5)} | ${req.method.padLeft(6)} | ${req.requestURI} | auth=${SecurityUtils.subject.authenticated ? 1 : 0} | rmb=${SecurityUtils.subject.remembered ? 1 : 0} | ${req.userPrincipal} |")
+                } else {
+                    LOGGER.info("| ${(time as String).padLeft(5)} | ${req.method.padLeft(6)} | ${req.requestURI} |")
+                }
             }
         }
     }
+
 }
