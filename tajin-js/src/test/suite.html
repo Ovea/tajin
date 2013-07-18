@@ -7,16 +7,9 @@
     <title>Jasmine Spec Runner</title>
 
     <link rel="stylesheet" type="text/css" href="lib/jasmine.css">
-    <link rel="stylesheet" href="lib/jquery.mobile.custom.structure.css"/>
-    <link rel="stylesheet" href="lib/jquery.mobile.custom.theme.css"/>
-
-    <script type="text/javascript" src="lib/jquery-1.8.3.js"></script>
-    <script type="text/javascript" src="lib/jquery.mobile.custom.js"></script>
-
+    <script type="text/javascript" src="lib/jquery-2.0.3.min.js"></script>
     <script type="text/javascript" src="lib/jasmine.js"></script>
     <script type="text/javascript" src="lib/jasmine-html.js"></script>
-
-    <script type="text/javascript" src="lib/handlebars-1.0.rc.1.js"></script>
 
     <script type="text/javascript">
         window.tajin_init = {
@@ -87,7 +80,6 @@
     <script type="text/javascript" src="../main/js/tajin/tajin.timer.js"></script>
     <script type="text/javascript" src="../main/js/tajin/tajin.store.js"></script>
     <script type="text/javascript" src="../main/js/tajin/tajin.dom.js"></script>
-    <script type="text/javascript" src="../main/js/tajin/tajin.jqm.js"></script>
 
     <script type="text/javascript" src="test.module.js"></script>
 
@@ -99,7 +91,6 @@
     <script type="text/javascript" src="spec/timer.spec.js"></script>
     <script type="text/javascript" src="spec/store.spec.js"></script>
     <script type="text/javascript" src="spec/dom.spec.js"></script>
-    <script type="text/javascript" src="spec/jqm.spec.js"></script>
 
     <script type="text/javascript">
         $(function () {
@@ -116,21 +107,6 @@
 
 </head>
 <body>
-
-<div style="position: absolute;bottom: 0px;right: 0px;width: 300px;height: 40px;font-size: smaller;overflow: visible; margin: 0;">
-    <div data-role="page">
-        <div data-role="content">
-            displayed once - cannot come back, NO ID !
-            <div><a href="page_1.html" data-role="button">-> page 1</a></div>
-        </div>
-    </div>
-    <div id="i18n">
-        <span data-i18n="msg3"></span>
-        <a href="i18n[link]">lien</a>
-
-        <div custom-attr="i18n[link]">tag</div>
-    </div>
-</div>
 
 </body>
 </html>
