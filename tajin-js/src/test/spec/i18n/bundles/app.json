@@ -1,9 +1,0 @@
-{
-    "msg1": "english 1",
-    "msg2": "english 2",
-    "msg3": "english 3",
-    "inner": {
-        "msg": "english"
-    },
-    "link": "http://goto/default"
-}
