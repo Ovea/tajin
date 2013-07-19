@@ -85,9 +85,7 @@
                                         <include>${project.build.outputDirectory}/tajin/tajin.event.js</include>
                                         <include>${project.build.outputDirectory}/tajin/tajin.timer.js</include>
                                         <include>${project.build.outputDirectory}/tajin/tajin.store.js</include>
-                                        <include>${project.build.outputDirectory}/tajin/tajin.i18n.js</include>
                                         <include>${project.build.outputDirectory}/tajin/tajin.dom.js</include>
-                                        <include>${project.build.outputDirectory}/tajin/tajin.jqm.js</include>
                                         <include>${project.build.outputDirectory}/tajin/tajin.autoinit.js</include>
                                     </includes>
                                 </aggregation>
@@ -106,15 +104,6 @@
                     </execution>
                 </executions>
             </plugin>
-            <!--<plugin>
-                <groupId>com.github.searls</groupId>
-                <artifactId>jasmine-maven-plugin</artifactId>
-                <configuration>
-                    <sourceIncludes>
-                        <sourceInclude>lib/*.js</sourceInclude>
-                    </sourceIncludes>
-                </configuration>
-            </plugin>-->
         </plugins>
     </build>
 
