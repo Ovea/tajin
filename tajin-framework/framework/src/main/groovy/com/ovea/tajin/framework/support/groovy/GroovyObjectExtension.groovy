@@ -30,4 +30,16 @@ class GroovyObjectExtension {
         return ois.readObject() as T
     }
 
+    public static Map merge(Map to, Map from) {
+        Map r = new LinkedHashMap(to)
+        from.each { k, v ->
+            if (r[k] == null) {
+                r[k] = v
+            } else if (r[k] instanceof Map && v instanceof Map) {
+                r[k] = merge(r[k] as Map, v as Map)
+            }
+        }
+        return r
+    }
+
 }
