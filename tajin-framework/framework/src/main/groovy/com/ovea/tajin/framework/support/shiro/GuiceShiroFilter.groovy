@@ -15,7 +15,7 @@
  */
 package com.ovea.tajin.framework.support.shiro
 
-import com.ovea.tajin.framework.support.guice.HttpContext
+import com.mycila.guice.ext.web.HttpContext
 import org.apache.shiro.web.filter.mgt.FilterChainResolver
 import org.apache.shiro.web.mgt.WebSecurityManager
 import org.apache.shiro.web.servlet.AbstractShiroFilter
@@ -57,7 +57,7 @@ class GuiceShiroFilter extends AbstractShiroFilter {
     @Override
     void executeChain(final ServletRequest request, final ServletResponse response, final FilterChain origChain) throws IOException, ServletException {
         try {
-            HttpContext.start((HttpServletRequest) request, (HttpServletResponse) response);
+            HttpContext.change((HttpServletRequest) request, (HttpServletResponse) response);
             super.executeChain(request, response, origChain);
         } finally {
             HttpContext.end();

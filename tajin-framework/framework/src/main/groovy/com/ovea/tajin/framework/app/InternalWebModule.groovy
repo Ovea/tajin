@@ -20,6 +20,8 @@ import com.google.inject.Provider
 import com.google.inject.matcher.Matchers
 import com.google.inject.servlet.RequestScoped
 import com.google.inject.servlet.ServletModule
+import com.mycila.guice.ext.injection.MBinder
+import com.mycila.guice.ext.web.HttpContextFilter
 import com.ovea.tajin.framework.i18n.I18NHandler
 import com.ovea.tajin.framework.i18n.I18NService
 import com.ovea.tajin.framework.i18n.I18NServiceFactory
@@ -144,9 +146,6 @@ class InternalWebModule extends ServletModule {
         // bind filters
         bind(GuiceContainer).in(javax.inject.Singleton)
         bind(CrossOriginFilter).in(javax.inject.Singleton)
-
-        // support method expanders
-        TajinGuice.in(binder()).handleMethodAfterInjection(Expand, ExpandHandler)
 
         // configure CORS filter if desired
         settings.getString('cors.allowedOrigins', null)?.with { String origin ->
