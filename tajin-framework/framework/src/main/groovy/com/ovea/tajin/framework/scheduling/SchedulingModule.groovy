@@ -24,10 +24,10 @@ import com.google.inject.TypeLiteral
 import com.google.inject.matcher.Matchers
 import com.google.inject.spi.TypeEncounter
 import com.google.inject.spi.TypeListener
+import com.mycila.guice.ext.injection.ClassToTypeLiteralMatcherAdapter
 
 import javax.inject.Named
 
-import static com.ovea.tajin.framework.support.guice.ClassToTypeLiteralMatcherAdapter.adapt
 
 /**
  * @author Mathieu Carbou (mathieu.carbou@gmail.com)
@@ -55,7 +55,7 @@ class SchedulingModule extends AbstractModule {
             }
         }).in(javax.inject.Singleton)
 
-        bindListener(adapt(Matchers.subclassesOf(JobExecutor)), new TypeListener() {
+        bindListener(ClassToTypeLiteralMatcherAdapter.adapt(Matchers.subclassesOf(JobExecutor)), new TypeListener() {
             @Override
             <I> void hear(TypeLiteral<I> type, TypeEncounter<I> encounter) {
                 Class<? extends JobExecutor> executorClass = type.rawType

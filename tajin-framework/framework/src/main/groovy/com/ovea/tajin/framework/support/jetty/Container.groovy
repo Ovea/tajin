@@ -17,8 +17,8 @@ package com.ovea.tajin.framework.support.jetty
 
 import com.google.inject.Module
 import com.google.inject.servlet.GuiceFilter
+import com.mycila.guice.ext.web.MycilaGuiceListener
 import com.ovea.tajin.framework.app.Application
-import com.ovea.tajin.framework.support.guice.GuiceListener
 import com.ovea.tajin.framework.util.PropertySettings
 import org.eclipse.jetty.jmx.MBeanContainer
 import org.eclipse.jetty.server.*
@@ -55,7 +55,7 @@ class Container {
         context.addServlet(DefaultServlet, '/*')
         context.setInitParameter('org.eclipse.jetty.servlet.SessionIdPathParameterName', 'none')
         context.setInitParameter('org.eclipse.jetty.servlet.SessionCookie', settings.getString('session.cookie.name', 'id'))
-        context.addEventListener(new GuiceListener([module]))
+        context.addEventListener(new MycilaGuiceListener(module))
         context.addEventListener(new ServletContextListener() {
             @Override
             void contextDestroyed(ServletContextEvent sce) {

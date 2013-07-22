@@ -20,7 +20,7 @@ import com.google.inject.MembersInjector;
 import com.google.inject.TypeLiteral;
 import com.google.inject.spi.TypeEncounter;
 import com.google.inject.spi.TypeListener;
-import com.ovea.tajin.framework.util.Reflect;
+import com.mycila.guice.ext.injection.Reflect;
 
 import javax.inject.Provider;
 import java.lang.reflect.Field;
@@ -29,7 +29,7 @@ public final class TmplHandler implements TypeListener {
 
     @Override
     public <I> void hear(final TypeLiteral<I> type, TypeEncounter<I> encounter) {
-        final Iterable<Field> fields = Reflect.findFields(type.getRawType(), Reflect.annotatedBy(Template.class));
+        final Iterable<Field> fields = Reflect.findAllAnnotatedFields(type.getRawType(), Template.class);
         if (!Iterables.isEmpty(fields)) {
             final Provider<TemplateResolver> resolver = encounter.getProvider(TemplateResolver.class);
             encounter.register(new MembersInjector<I>() {
