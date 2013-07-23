@@ -57,7 +57,7 @@ class GuiceShiroFilter extends AbstractShiroFilter {
     @Override
     void executeChain(final ServletRequest request, final ServletResponse response, final FilterChain origChain) throws IOException, ServletException {
         try {
-            HttpContext.start((HttpServletRequest) request, (HttpServletResponse) response);
+            HttpContext.change((HttpServletRequest) request, (HttpServletResponse) response);
             super.executeChain(request, response, origChain);
         } finally {
             HttpContext.end();

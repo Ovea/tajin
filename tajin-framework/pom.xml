@@ -196,22 +196,22 @@
             <dependency>
                 <groupId>com.mycila.guice.extensions</groupId>
                 <artifactId>mycila-guice-web</artifactId>
-                <version>3.0.rc1-SNAPSHOT</version>
+                <version>3.0.rc1</version>
             </dependency>
             <dependency>
                 <groupId>com.mycila.guice.extensions</groupId>
                 <artifactId>mycila-guice-groovy</artifactId>
-                <version>3.0.rc1-SNAPSHOT</version>
+                <version>3.0.rc1</version>
             </dependency>
             <dependency>
                 <groupId>com.mycila.guice.extensions</groupId>
                 <artifactId>mycila-guice-jsr250</artifactId>
-                <version>3.0.rc1-SNAPSHOT</version>
+                <version>3.0.rc1</version>
             </dependency>
             <dependency>
                 <groupId>com.mycila.guice.extensions</groupId>
                 <artifactId>mycila-guice-servlet</artifactId>
-                <version>3.0.rc1-SNAPSHOT</version>
+                <version>3.0.rc1</version>
             </dependency>
 
         </dependencies>
