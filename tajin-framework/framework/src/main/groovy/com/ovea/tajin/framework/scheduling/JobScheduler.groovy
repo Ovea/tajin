@@ -16,7 +16,6 @@
 package com.ovea.tajin.framework.scheduling
 
 import com.ovea.tajin.framework.scheduling.JobScheduler.OnError
-import org.slf4j.LoggerFactory
 
 /**
  * @author Mathieu Carbou (mathieu.carbou@gmail.com)
@@ -49,7 +48,7 @@ interface JobScheduler {
      */
     void cancel(Collection<String> jobIds)
 
-    static interface OnError {
+    interface OnError {
 
         void onError(Job job, Throwable t) throws Throwable
 
@@ -63,7 +62,7 @@ interface JobScheduler {
         static final OnError LOG = new OnError() {
             @Override
             void onError(Job job, Throwable t) throws Throwable {
-                LoggerFactory.getLogger(OnError).error("Error executing ${job} : ${t.message}", t)
+                org.slf4j.LoggerFactory.getLogger(JobScheduler.OnError).error("Error executing ${job} : ${t.message}", t)
             }
         }
 
