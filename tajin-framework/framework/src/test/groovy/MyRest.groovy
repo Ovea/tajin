@@ -20,6 +20,9 @@ import javax.ws.rs.core.MediaType
 class MyRest {
 
     @Inject
+    Service service
+
+    @Inject
     Provider<Locale> locale
 
     @Template('classpath:tmpl.txt')

@@ -20,7 +20,6 @@ import com.google.inject.Provider
 import com.google.inject.matcher.Matchers
 import com.google.inject.servlet.RequestScoped
 import com.google.inject.servlet.ServletModule
-import com.mycila.guice.ext.injection.MBinder
 import com.mycila.guice.ext.web.HttpContextFilter
 import com.ovea.tajin.framework.i18n.I18NHandler
 import com.ovea.tajin.framework.i18n.I18NService
@@ -29,7 +28,7 @@ import com.ovea.tajin.framework.i18n.JsonI18NServiceFactory
 import com.ovea.tajin.framework.jmx.JmxModule
 import com.ovea.tajin.framework.scheduling.SchedulingModule
 import com.ovea.tajin.framework.security.TokenBuilder
-import com.ovea.tajin.framework.support.guice.*
+import com.ovea.tajin.framework.support.guice.WebBinder
 import com.ovea.tajin.framework.support.jersey.AuditResourceFilterFactory
 import com.ovea.tajin.framework.support.jersey.GzipEncoder
 import com.ovea.tajin.framework.support.jersey.PermissionResourceFilterFactory

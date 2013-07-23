@@ -16,10 +16,6 @@
     <build>
         <plugins>
             <plugin>
-                <groupId>org.codehaus.gmaven</groupId>
-                <artifactId>gmaven-plugin</artifactId>
-            </plugin>
-            <plugin>
                 <groupId>com.mycila.maven-license-plugin</groupId>
                 <artifactId>maven-license-plugin</artifactId>
                 <configuration>
@@ -157,11 +153,15 @@
         </dependency>
         <dependency>
             <groupId>com.mycila.guice.extensions</groupId>
+            <artifactId>mycila-guice-groovy</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>com.mycila.guice.extensions</groupId>
             <artifactId>mycila-guice-jsr250</artifactId>
         </dependency>
         <dependency>
             <groupId>com.mycila.guice.extensions</groupId>
-            <artifactId>mycila-guice-groovy</artifactId>
+            <artifactId>mycila-guice-servlet</artifactId>
         </dependency>
 
     </dependencies>
