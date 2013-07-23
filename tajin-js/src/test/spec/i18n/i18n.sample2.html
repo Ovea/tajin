@@ -48,8 +48,7 @@
                     console.info('7: msg1', bundle.value('msg1'));
                 });
 
-                // resource samples
-
+                // Resource samples
                 var res_fr_CA = tajin.i18n.resources('fr-CA');
                 console.info('8: ' + res_fr_CA.url('contents/pub.html'));
                 console.info('8: ' + res_fr_CA.url('pub.html'));
@@ -59,7 +58,7 @@
                 console.info('9: ' + res_en.url('contents/pub.html'));
 
                 res_fr_CA.image('pub.jpg', function (url, error) {
-                    // this is the image as a jQuery object $("<img />")
+                    // This is the image as a jQuery object $("<img />")
                     if (error) {
                         $('body').append('<span>Error for image ' + url + '</span>')
                     } else {
@@ -67,7 +66,7 @@
                     }
                 });
 
-                // more complex sample
+                // More complex sample
                 tajin.i18n.load('app', 'fr_CA', function (bundle) {
                     bundle.localize(document);
                     var res_fr_CA = tajin.i18n.resources('fr-CA');
@@ -89,7 +88,6 @@
 
     <script type="text/javascript" src="../../../main/js/tajin/tajin.core.js"></script>
     <script type="text/javascript" src="../../../main/js/tajin/tajin.util.js"></script>
-    <script type="text/javascript" src="../../../main/js/tajin/tajin.config.js"></script>
     <script type="text/javascript" src="../../../main/js/tajin/tajin.event.js"></script>
     <script type="text/javascript" src="../../../main/js/tajin/tajin.log.js"></script>
     <script type="text/javascript" src="../../../main/js/tajin/tajin.i18n.js"></script>
