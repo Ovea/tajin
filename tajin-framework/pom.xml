@@ -132,6 +132,11 @@
                     </exclusion>
                 </exclusions>
             </dependency>
+            <dependency>
+                <groupId>com.mycila</groupId>
+                <artifactId>mycila-jmx</artifactId>
+                <version>1.0.rc1-SNAPSHOT</version>
+            </dependency>
 
             <!-- logging -->
             <dependency>

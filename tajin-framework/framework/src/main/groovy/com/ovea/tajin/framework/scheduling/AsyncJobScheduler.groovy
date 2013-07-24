@@ -17,11 +17,11 @@ package com.ovea.tajin.framework.scheduling
 
 import com.google.common.cache.LoadingCache
 import com.google.common.util.concurrent.ThreadFactoryBuilder
-import com.ovea.tajin.framework.jmx.Access
-import com.ovea.tajin.framework.jmx.JmxSelfNaming
-import com.ovea.tajin.framework.jmx.annotation.JmxBean
-import com.ovea.tajin.framework.jmx.annotation.JmxField
-import com.ovea.tajin.framework.jmx.annotation.JmxProperty
+import com.mycila.jmx.Access
+import com.mycila.jmx.JmxSelfNaming
+import com.mycila.jmx.annotation.JmxBean
+import com.mycila.jmx.annotation.JmxField
+import com.mycila.jmx.annotation.JmxProperty
 import com.ovea.tajin.framework.util.PropertySettings
 import org.slf4j.Logger
 import org.slf4j.LoggerFactory

@@ -109,6 +109,10 @@
             <groupId>commons-codec</groupId>
             <artifactId>commons-codec</artifactId>
         </dependency>
+        <dependency>
+            <groupId>com.mycila</groupId>
+            <artifactId>mycila-jmx</artifactId>
+        </dependency>
 
         <!-- logging -->
         <dependency>
