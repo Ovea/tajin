@@ -53,8 +53,15 @@ class Container {
         context.classLoader = Thread.currentThread().contextClassLoader
         context.addFilter(GuiceFilter, '/*', EnumSet.allOf(DispatcherType))
         context.addServlet(DefaultServlet, '/*')
-        context.setInitParameter('org.eclipse.jetty.servlet.SessionIdPathParameterName', 'none')
-        context.setInitParameter('org.eclipse.jetty.servlet.SessionCookie', settings.getString('session.cookie.name', 'id'))
+        context.setInitParameter(SessionManager.__SessionIdPathParameterNameProperty, 'none')
+        context.setInitParameter(SessionManager.__SessionCookieProperty, settings.getString('session.cookie.name', 'id'))
+        context.setInitParameter(SessionManager.__SessionCookieProperty, settings.getString('session.cookie.name', 'id'))
+        if (settings.has('session.cookie.domain')) {
+            context.setInitParameter(SessionManager.__SessionDomainProperty, settings.getString('session.cookie.domain'))
+        }
+        if (settings.has('session.cookie.path')) {
+            context.setInitParameter(SessionManager.__SessionPathProperty, settings.getString('session.cookie.path'))
+        }
         context.addEventListener(new MycilaGuiceListener(module))
         context.addEventListener(new ServletContextListener() {
             @Override

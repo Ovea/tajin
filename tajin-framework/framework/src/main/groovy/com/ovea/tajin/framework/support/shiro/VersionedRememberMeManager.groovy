@@ -20,6 +20,7 @@ import org.apache.shiro.subject.PrincipalCollection
 import org.apache.shiro.subject.SimplePrincipalCollection
 import org.apache.shiro.subject.SubjectContext
 import org.apache.shiro.web.mgt.CookieRememberMeManager
+import org.apache.shiro.web.servlet.Cookie
 import org.apache.shiro.web.servlet.ShiroHttpServletRequest
 import org.apache.shiro.web.subject.WebSubjectContext
 import org.apache.shiro.web.util.WebUtils
@@ -48,8 +49,7 @@ public class VersionedRememberMeManager extends CookieRememberMeManager {
         int version = -1;
         try {
             version = (Integer) principalCollection.fromRealm("_v_").iterator().next();
-        } catch (Exception e) {
-            version = -1;
+        } catch (Exception ignored) {
         }
         // if version missmatch, the cookie must be regenerated
         if (version != this.version) {
@@ -91,7 +91,7 @@ public class VersionedRememberMeManager extends CookieRememberMeManager {
             return super.getRememberedSerializedIdentity(subjectContext);
         }
 
-        if (org.apache.shiro.web.servlet.Cookie.DELETED_COOKIE_VALUE.equals(base64)) return null;
+        if (Cookie.DELETED_COOKIE_VALUE.equals(base64)) return null;
 
         base64 = ensurePadding(base64);
         if (LOGGER.isLoggable(Level.FINE)) {

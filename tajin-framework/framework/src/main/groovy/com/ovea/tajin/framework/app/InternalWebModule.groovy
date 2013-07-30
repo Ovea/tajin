@@ -52,6 +52,7 @@ import org.apache.shiro.io.DefaultSerializer
 import org.apache.shiro.realm.Realm
 import org.apache.shiro.web.mgt.DefaultWebSecurityManager
 import org.apache.shiro.web.mgt.WebSecurityManager
+import org.apache.shiro.web.servlet.SimpleCookie
 import org.apache.shiro.web.session.mgt.ServletContainerSessionManager
 import org.eclipse.jetty.servlets.CrossOriginFilter
 import org.slf4j.Logger
@@ -170,11 +171,17 @@ class InternalWebModule extends ServletModule {
                             version: settings.getInt('rememberme.cookie.version', 1),
                             serializer: new DefaultSerializer<>(),
                             cipherKey: Hex.decode(settings.getString('rememberme.cookie.key')),
-                            cookie: new com.ovea.tajin.framework.web.HttpCookie(
-                                name: settings.getString("rememberme.cookie.name"),
-                                httpOnly: true,
-                                maxAge: settings.getInt("rememberme.cookie.days", 365) * DAY_SEC
-                            )
+                            cookie: new SimpleCookie(settings.getString("rememberme.cookie.name")).with {
+                                it.httpOnly = true
+                                it.maxAge = settings.getInt("rememberme.cookie.days", 365) * DAY_SEC
+                                if (settings.has("rememberme.cookie.domain")) {
+                                    it.domain = settings.getString("rememberme.cookie.domain")
+                                }
+                                if (settings.has("rememberme.cookie.path")) {
+                                    it.path = settings.getString("rememberme.cookie.path")
+                                }
+                                return it
+                            }
                         ),
                         authenticator: new ModularRealmAuthenticator(
                             authenticationStrategy: new FirstSuccessfulStrategy(),
