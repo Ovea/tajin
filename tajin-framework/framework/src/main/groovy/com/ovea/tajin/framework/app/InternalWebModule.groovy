@@ -39,6 +39,7 @@ import com.ovea.tajin.framework.support.shiro.VersionedRememberMeManager
 import com.ovea.tajin.framework.template.*
 import com.ovea.tajin.framework.util.PropertySettings
 import com.ovea.tajin.framework.util.PropertySettingsMBean
+import com.ovea.tajin.framework.web.CookieCleaner
 import com.ovea.tajin.framework.web.CookieLocaleManager
 import com.ovea.tajin.framework.web.PerfLog
 import com.sun.jersey.guice.spi.container.servlet.GuiceContainer
@@ -152,6 +153,12 @@ class InternalWebModule extends ServletModule {
 
         // important filter to manage HTTP contextual scopes
         filter('/*').through(HttpContextFilter)
+
+        // setup cookie cleaner if required
+        if(!settings.getList('cookies.delete').empty) {
+            LOGGER.info(" + Cookie cleaner support")
+            filter('/*').through(CookieCleaner)
+        }
 
         // setup security layer if required
         boolean secured = settings.getBoolean('security.enabled', false)
