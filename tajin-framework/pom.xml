@@ -13,7 +13,7 @@
     <artifactId>tajin-framework-pom</artifactId>
     <version>3.0-SNAPSHOT</version>
     <packaging>pom</packaging>
-    <name>Tajin :: Framework :: POM</name>
+    <name>Tajin :: Framework</name>
 
     <scm>
         <connection>scm:git:git@github.com:Ovea/tajin.git</connection>
