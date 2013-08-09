@@ -66,7 +66,7 @@
             <artifactId>javax.servlet</artifactId>
         </dependency>
 
-        <!-- lang -->
+        <!-- groovy -->
         <dependency>
             <groupId>org.codehaus.groovy</groupId>
             <artifactId>groovy-all</artifactId>
@@ -90,6 +90,16 @@
         <dependency>
             <groupId>org.apache.shiro</groupId>
             <artifactId>shiro-web</artifactId>
+        </dependency>
+
+        <!-- mycila -->
+        <dependency>
+            <groupId>com.mycila.guice</groupId>
+            <artifactId>mycila-guice-all</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>com.mycila</groupId>
+            <artifactId>mycila-jmx</artifactId>
         </dependency>
 
         <!-- tools -->
@@ -148,24 +158,6 @@
         <dependency>
             <groupId>com.sun.jersey</groupId>
             <artifactId>jersey-client</artifactId>
-        </dependency>
-
-        <!-- ioc -->
-        <dependency>
-            <groupId>com.mycila.guice.extensions</groupId>
-            <artifactId>mycila-guice-web</artifactId>
-        </dependency>
-        <dependency>
-            <groupId>com.mycila.guice.extensions</groupId>
-            <artifactId>mycila-guice-groovy</artifactId>
-        </dependency>
-        <dependency>
-            <groupId>com.mycila.guice.extensions</groupId>
-            <artifactId>mycila-guice-jsr250</artifactId>
-        </dependency>
-        <dependency>
-            <groupId>com.mycila.guice.extensions</groupId>
-            <artifactId>mycila-guice-servlet</artifactId>
         </dependency>
 
     </dependencies>

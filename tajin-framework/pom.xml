@@ -63,7 +63,7 @@
                 <version>3.0.0.v201112011016</version>
             </dependency>
 
-            <!-- lang -->
+            <!-- groovy -->
             <dependency>
                 <groupId>org.codehaus.groovy</groupId>
                 <artifactId>groovy-all</artifactId>
@@ -100,6 +100,18 @@
                 <version>1.2.2</version>
             </dependency>
 
+            <!-- mycila -->
+            <dependency>
+                <groupId>com.mycila.guice</groupId>
+                <artifactId>mycila-guice-all</artifactId>
+                <version>3.2.ga</version>
+            </dependency>
+            <dependency>
+                <groupId>com.mycila</groupId>
+                <artifactId>mycila-jmx</artifactId>
+                <version>1.1.ga</version>
+            </dependency>
+
             <!-- tools -->
             <dependency>
                 <groupId>com.beust</groupId>
@@ -121,11 +133,6 @@
                         <artifactId>jsr305</artifactId>
                     </exclusion>
                 </exclusions>
-            </dependency>
-            <dependency>
-                <groupId>com.mycila</groupId>
-                <artifactId>mycila-jmx</artifactId>
-                <version>1.0.rc1</version>
             </dependency>
 
             <!-- logging -->
@@ -155,7 +162,7 @@
                 <version>1.0.13</version>
             </dependency>
 
-            <!-- rest -->
+            <!-- jersey -->
             <dependency>
                 <groupId>com.sun.jersey</groupId>
                 <artifactId>jersey-server</artifactId>
@@ -185,28 +192,6 @@
                 <groupId>com.sun.jersey</groupId>
                 <artifactId>jersey-client</artifactId>
                 <version>1.17.1</version>
-            </dependency>
-
-            <!-- ioc -->
-            <dependency>
-                <groupId>com.mycila.guice.extensions</groupId>
-                <artifactId>mycila-guice-web</artifactId>
-                <version>3.0.rc1</version>
-            </dependency>
-            <dependency>
-                <groupId>com.mycila.guice.extensions</groupId>
-                <artifactId>mycila-guice-groovy</artifactId>
-                <version>3.0.rc1</version>
-            </dependency>
-            <dependency>
-                <groupId>com.mycila.guice.extensions</groupId>
-                <artifactId>mycila-guice-jsr250</artifactId>
-                <version>3.0.rc1</version>
-            </dependency>
-            <dependency>
-                <groupId>com.mycila.guice.extensions</groupId>
-                <artifactId>mycila-guice-servlet</artifactId>
-                <version>3.0.rc1</version>
             </dependency>
 
         </dependencies>
