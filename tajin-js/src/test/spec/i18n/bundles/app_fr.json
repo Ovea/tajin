@@ -1,0 +1,7 @@
+{
+    "msg2":"french 2",
+    "msg3":"french 3",
+    "inner":{
+        "msg":"french"
+    }
+}

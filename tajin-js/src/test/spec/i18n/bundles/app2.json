@@ -1,0 +1,8 @@
+{
+    "msg1":"bundle 2 english 1",
+    "msg2":"bundle 2 english 2",
+    "msg3":"bundle 2 english 3",
+    "inner":{
+        "msg":"bundle 2 english"
+    }
+}

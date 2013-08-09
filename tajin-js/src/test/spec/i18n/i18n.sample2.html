@@ -1,0 +1,103 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN"
+        "http://www.w3.org/TR/html4/loose.dtd">
+<html>
+<head>
+    <title></title>
+    <script type="text/javascript" src="../../lib/jquery-2.0.3.min.js"></script>
+    <script type="text/javascript" src="../../lib/handlebars-1.0.0.js"></script>
+
+    <script type="text/javascript">
+        tajin_init = {
+            debug: true,
+            onready: function () {
+
+                // i18n samples
+                tajin.i18n.load('app', '', function (bundle) {
+                    console.info('0: ' + bundle);
+                    console.info('0: msg3', bundle.value('msg3'));
+                    console.info('0: inexisting', bundle.value('inexisting'));
+                    $(function () {
+                        bundle.localize(document);
+                    });
+                });
+                tajin.i18n.load('app', 'fr_CA', function (bundle) {
+                    console.info('1: ' + bundle);
+                    console.info('1: msg3', bundle.value('msg3'));
+                    $(function () {
+                        bundle.localize(document);
+                    });
+                });
+                tajin.i18n.load('app', 'fr', function (bundle) {
+                    console.info('2: ' + bundle);
+                });
+                tajin.i18n.load('app', 'en', function (bundle) {
+                    console.info('3: ' + bundle);
+                });
+                tajin.i18n.load('app', 'en_US', function (bundle) {
+                    console.info('4: ' + bundle);
+                    console.info('4: inner.msg', bundle.value('inner.msg'));
+                });
+                tajin.i18n.load('app2', 'fr', function (bundle) {
+                    console.info('5: ' + bundle);
+                });
+                tajin.i18n.load('app2', 'fr_CA', function (bundle) {
+                    console.info('6: ' + bundle);
+                });
+                tajin.i18n.load('app3', 'fr_CA', function (bundle) {
+                    console.info('7: ' + bundle);
+                    console.info('7: msg1', bundle.value('msg1'));
+                });
+
+                // Resource samples
+                var res_fr_CA = tajin.i18n.resources('fr-CA');
+                console.info('8: ' + res_fr_CA.url('contents/pub.html'));
+                console.info('8: ' + res_fr_CA.url('pub.html'));
+                console.info('8: ' + res_fr_CA.url('inexisting'));
+
+                var res_en = tajin.i18n.resources('en-US');
+                console.info('9: ' + res_en.url('contents/pub.html'));
+
+                res_fr_CA.image('pub.jpg', function (url, error) {
+                    // This is the image as a jQuery object $("<img />")
+                    if (error) {
+                        $('body').append('<span>Error for image ' + url + '</span>')
+                    } else {
+                        $('body').append(this.attr('alt', url).attr('preloaded', 'true'));
+                    }
+                });
+
+                // More complex sample
+                tajin.i18n.load('app', 'fr_CA', function (bundle) {
+                    bundle.localize(document);
+                    var res_fr_CA = tajin.i18n.resources('fr-CA');
+                    res_fr_CA.html('pub.html', function (url) {
+                        console.log(this);
+                        var template = Handlebars.compile(this);
+                        var html = $(template({
+                            title: "My New Post",
+                            body: "This is my first post!",
+                            url: res_fr_CA.url('pub.jpg')
+                        }));
+                        bundle.localize(html);
+                        $('body').append(html);
+                    });
+                });
+            }
+        };
+    </script>
+
+    <script type="text/javascript" src="../../../main/js/tajin/tajin.core.js"></script>
+    <script type="text/javascript" src="../../../main/js/tajin/tajin.util.js"></script>
+    <script type="text/javascript" src="../../../main/js/tajin/tajin.event.js"></script>
+    <script type="text/javascript" src="../../../main/js/tajin/tajin.log.js"></script>
+    <script type="text/javascript" src="../../../main/js/tajin/tajin.i18n.js"></script>
+    <script type="text/javascript" src="../../../main/js/tajin/tajin.autoinit.js"></script>
+
+</head>
+<body>
+<span rel="localize[msg3]"></span>
+<a href="localize[link]">lien</a>
+
+<div custom-attr="localize[link]">tag</div>
+</body>
+</html>

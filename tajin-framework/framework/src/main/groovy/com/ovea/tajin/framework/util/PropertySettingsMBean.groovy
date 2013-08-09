@@ -15,9 +15,9 @@
  */
 package com.ovea.tajin.framework.util
 
-import com.ovea.tajin.framework.jmx.annotation.JmxBean
-import com.ovea.tajin.framework.jmx.annotation.JmxMethod
-import com.ovea.tajin.framework.jmx.annotation.JmxProperty
+import com.mycila.jmx.annotation.JmxBean
+import com.mycila.jmx.annotation.JmxMethod
+import com.mycila.jmx.annotation.JmxProperty
 
 import javax.inject.Inject
 

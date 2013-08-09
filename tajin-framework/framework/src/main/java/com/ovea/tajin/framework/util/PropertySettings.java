@@ -18,15 +18,14 @@ package com.ovea.tajin.framework.util;
 import com.google.common.base.Function;
 import com.google.common.collect.Iterables;
 import com.google.common.collect.Lists;
+import com.google.common.collect.Multimap;
+import com.google.common.collect.TreeMultimap;
 import com.ovea.tajin.framework.io.Resource;
 
 import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
-import java.util.Arrays;
-import java.util.List;
-import java.util.Map;
-import java.util.Properties;
+import java.util.*;
 
 public final class PropertySettings {
 
@@ -174,4 +173,26 @@ public final class PropertySettings {
     public boolean has(String key) {
         return resolve(key) != null;
     }
+
+    public List<Map<String, String>> getList(String prefix) {
+        Multimap<Integer, String> map = TreeMultimap.create();
+        prefix = prefix + '.';
+        for (String s : properties.stringPropertyNames()) {
+            if (s.startsWith(prefix)) {
+                int end = s.indexOf('.', prefix.length());
+                map.put(Integer.parseInt(s.substring(prefix.length(), end)), s.substring(end + 1));
+            }
+        }
+        List<Map<String, String>> list = new ArrayList<>(map.size());
+        for (Integer i : new TreeSet<>(map.keySet())) {
+            Map<String, String> o = new HashMap<>();
+            for (String prop : map.get(i)) {
+                String v = resolve(prefix + i + '.' + prop);
+                o.put(prop, v == null ? null : v.trim());
+            }
+            list.add(o);
+        }
+        return list;
+    }
+
 }

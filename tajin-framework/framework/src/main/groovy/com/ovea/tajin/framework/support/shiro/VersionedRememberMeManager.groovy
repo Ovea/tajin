@@ -20,6 +20,7 @@ import org.apache.shiro.subject.PrincipalCollection
 import org.apache.shiro.subject.SimplePrincipalCollection
 import org.apache.shiro.subject.SubjectContext
 import org.apache.shiro.web.mgt.CookieRememberMeManager
+import org.apache.shiro.web.servlet.Cookie
 import org.apache.shiro.web.servlet.ShiroHttpServletRequest
 import org.apache.shiro.web.subject.WebSubjectContext
 import org.apache.shiro.web.util.WebUtils
@@ -34,36 +35,41 @@ import java.util.logging.Logger
  */
 public class VersionedRememberMeManager extends CookieRememberMeManager {
 
-    private static final Logger LOGGER = Logger.getLogger(VersionedRememberMeManager.class.getName());
+    private static final Logger LOGGER = Logger.getLogger(VersionedRememberMeManager.class.getName())
 
-    private int version = 0;
+    private int version = 0
 
     public void setVersion(int version) {
-        this.version = version;
+        this.version = version
     }
 
     @Override
     protected PrincipalCollection convertBytesToPrincipals(byte[] bytes, SubjectContext subjectContext) {
-        PrincipalCollection principalCollection = super.convertBytesToPrincipals(bytes, subjectContext);
-        int version = -1;
+        PrincipalCollection principalCollection
         try {
-            version = (Integer) principalCollection.fromRealm("_v_").iterator().next();
-        } catch (Exception e) {
-            version = -1;
+            principalCollection = super.convertBytesToPrincipals(bytes, subjectContext)
+        } catch (e) {
+            LOGGER.info("Forcing cookie regeneration due to malformed rememberMe cookie: " + e.message)
+            return null
+        }
+        int version = -1
+        try {
+            version = (Integer) principalCollection.fromRealm("_v_").iterator().next()
+        } catch (Exception ignored) {
         }
         // if version missmatch, the cookie must be regenerated
         if (version != this.version) {
-            LOGGER.fine("Forcing cookie regeneration: member=" + principalCollection.getPrimaryPrincipal() + ", cookie-version=" + version + ", current-version=" + this.version);
-            return null;
+            LOGGER.info("Forcing cookie regeneration: member=" + principalCollection.getPrimaryPrincipal() + ", cookie-version=" + version + ", current-version=" + this.version)
+            return null
         } else {
-            return principalCollection;
+            return principalCollection
         }
     }
 
     @Override
     protected byte[] convertPrincipalsToBytes(PrincipalCollection principals) {
-        ((SimplePrincipalCollection) principals).add(this.version, "_v_");
-        return super.convertPrincipalsToBytes(principals);
+        ((SimplePrincipalCollection) principals).add(this.version, "_v_")
+        return super.convertPrincipalsToBytes(principals)
     }
 
     @Override
@@ -72,56 +78,56 @@ public class VersionedRememberMeManager extends CookieRememberMeManager {
             if (LOGGER.isLoggable(Level.FINE)) {
                 String msg = "SubjectContext argument is not an HTTP-aware instance.  This is required to obtain a " +
                     "servlet request and response in order to retrieve the rememberMe cookie. Returning " +
-                    "immediately and ignoring rememberMe operation.";
-                LOGGER.fine(msg);
+                    "immediately and ignoring rememberMe operation."
+                LOGGER.fine(msg)
             }
-            return null;
+            return null
         }
 
-        WebSubjectContext wsc = (WebSubjectContext) subjectContext;
+        WebSubjectContext wsc = (WebSubjectContext) subjectContext
         if (isIdentityRemoved(wsc)) {
-            return null;
+            return null
         }
 
-        HttpServletRequest request = WebUtils.getHttpRequest(wsc);
+        HttpServletRequest request = WebUtils.getHttpRequest(wsc)
 
         // Check in parameter for CORS support in IE first
-        String base64 = request.getParameter(this.getCookie().getName());
+        String base64 = request.getParameter(this.getCookie().getName())
         if (base64 == null || base64.isEmpty()) {
-            return super.getRememberedSerializedIdentity(subjectContext);
+            return super.getRememberedSerializedIdentity(subjectContext)
         }
 
-        if (org.apache.shiro.web.servlet.Cookie.DELETED_COOKIE_VALUE.equals(base64)) return null;
+        if (Cookie.DELETED_COOKIE_VALUE.equals(base64)) return null
 
-        base64 = ensurePadding(base64);
+        base64 = ensurePadding(base64)
         if (LOGGER.isLoggable(Level.FINE)) {
-            LOGGER.fine("Acquired Base64 encoded identity [" + base64 + "]");
+            LOGGER.fine("Acquired Base64 encoded identity [" + base64 + "]")
         }
-        byte[] decoded = Base64.decodeBase64(base64);
+        byte[] decoded = Base64.decodeBase64(base64)
         if (LOGGER.isLoggable(Level.FINE)) {
-            LOGGER.fine("Base64 decoded byte array length: " + (decoded != null ? decoded.length : 0) + " bytes.");
+            LOGGER.fine("Base64 decoded byte array length: " + (decoded != null ? decoded.length : 0) + " bytes.")
         }
-        return decoded;
+        return decoded
     }
 
     private boolean isIdentityRemoved(WebSubjectContext subjectContext) {
-        ServletRequest request = subjectContext.resolveServletRequest();
+        ServletRequest request = subjectContext.resolveServletRequest()
         if (request != null) {
-            Boolean removed = (Boolean) request.getAttribute(ShiroHttpServletRequest.IDENTITY_REMOVED_KEY);
-            return removed != null && removed;
+            Boolean removed = (Boolean) request.getAttribute(ShiroHttpServletRequest.IDENTITY_REMOVED_KEY)
+            return removed != null && removed
         }
-        return false;
+        return false
     }
 
     private String ensurePadding(String base64) {
-        int length = base64.length();
+        int length = base64.length()
         if (length % 4 != 0) {
-            StringBuilder sb = new StringBuilder(base64);
+            StringBuilder sb = new StringBuilder(base64)
             for (int i = 0; i < length % 4; ++i) {
-                sb.append('=');
+                sb.append('=')
             }
-            base64 = sb.toString();
+            base64 = sb.toString()
         }
-        return base64;
+        return base64
     }
 }

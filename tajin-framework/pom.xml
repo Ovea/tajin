@@ -79,14 +79,14 @@
             <dependency>
                 <groupId>org.eclipse.jetty.aggregate</groupId>
                 <artifactId>jetty-all</artifactId>
-                <version>9.0.2.v20130417</version>
+                <version>9.0.4.v20130625</version>
             </dependency>
 
             <!-- security -->
             <dependency>
                 <groupId>org.apache.shiro</groupId>
                 <artifactId>shiro-core</artifactId>
-                <version>1.2.1</version>
+                <version>1.2.2</version>
                 <exclusions>
                     <exclusion>
                         <groupId>commons-beanutils</groupId>
@@ -97,7 +97,7 @@
             <dependency>
                 <groupId>org.apache.shiro</groupId>
                 <artifactId>shiro-web</artifactId>
-                <version>1.2.1</version>
+                <version>1.2.2</version>
             </dependency>
 
             <!-- tools -->
@@ -107,19 +107,9 @@
                 <version>1.30</version>
             </dependency>
             <dependency>
-                <groupId>cglib</groupId>
-                <artifactId>cglib</artifactId>
-                <version>2.2.2</version>
-            </dependency>
-            <dependency>
-                <groupId>asm</groupId>
-                <artifactId>asm</artifactId>
-                <version>3.3.1</version>
-            </dependency>
-            <dependency>
                 <groupId>commons-codec</groupId>
                 <artifactId>commons-codec</artifactId>
-                <version>1.6</version>
+                <version>1.8</version>
             </dependency>
             <dependency>
                 <groupId>com.google.guava</groupId>
@@ -131,6 +121,11 @@
                         <artifactId>jsr305</artifactId>
                     </exclusion>
                 </exclusions>
+            </dependency>
+            <dependency>
+                <groupId>com.mycila</groupId>
+                <artifactId>mycila-jmx</artifactId>
+                <version>1.0.rc1</version>
             </dependency>
 
             <!-- logging -->
@@ -152,12 +147,12 @@
             <dependency>
                 <groupId>ch.qos.logback</groupId>
                 <artifactId>logback-core</artifactId>
-                <version>1.0.9</version>
+                <version>1.0.13</version>
             </dependency>
             <dependency>
                 <groupId>ch.qos.logback</groupId>
                 <artifactId>logback-classic</artifactId>
-                <version>1.0.9</version>
+                <version>1.0.13</version>
             </dependency>
 
             <!-- rest -->

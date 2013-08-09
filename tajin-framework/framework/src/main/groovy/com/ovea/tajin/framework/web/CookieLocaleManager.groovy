@@ -17,6 +17,8 @@ package com.ovea.tajin.framework.web
 
 import com.ovea.tajin.framework.util.LocaleUtil
 import com.ovea.tajin.framework.util.PropertySettings
+import org.apache.shiro.web.servlet.Cookie
+import org.apache.shiro.web.servlet.SimpleCookie
 
 import javax.inject.Inject
 import javax.inject.Provider
@@ -43,7 +45,9 @@ final class CookieLocaleManager implements Provider<Locale> {
     public void set(Locale locale) {
         boolean useCookie = settings.getBoolean('locale.cookie.enabled', false)
         if (useCookie) {
-            newLocaleCookie().withValue(locale.toString().replace('_', '-')).saveTo(request.get(), response.get())
+            Cookie cookie = newLocaleCookie()
+            cookie.value = locale.toString().replace('_', '-')
+            cookie.saveTo(request.get(), response.get())
         }
     }
 
@@ -51,7 +55,7 @@ final class CookieLocaleManager implements Provider<Locale> {
     public Locale get() {
         boolean useCookie = settings.getBoolean('locale.cookie.enabled', false)
         // first try to get value from cookie
-        Locale found = useCookie ? LocaleUtil.valueOf(newLocaleCookie().readValue(request.get())) : null
+        Locale found = useCookie ? LocaleUtil.valueOf(newLocaleCookie().readValue(request.get(), null)) : null
         if (!found) {
             // when using cors, check the request parameters if a cookie is not present
             found = LocaleUtil.valueOf(request.get().getParameter(settings.getString('locale.cookie.name', DEFAULT_NAME)))
@@ -73,10 +77,11 @@ final class CookieLocaleManager implements Provider<Locale> {
 
     Cookie newLocaleCookie() {
         int days = settings.getInt('locale.cookie.days', -1)
-        return new HttpCookie(
-            name: settings.getString('locale.cookie.name', DEFAULT_NAME),
-            maxAge: days <= 0 ? -1 : days * DAY_SEC,
-            httpOnly: false
-        )
+        return new SimpleCookie(settings.getString('locale.cookie.name', DEFAULT_NAME)).with {
+            it.maxAge = days <= 0 ? -1 : days * DAY_SEC
+            it.httpOnly = false
+            return it
+        }
     }
+
 }
