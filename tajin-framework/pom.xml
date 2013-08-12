@@ -5,12 +5,12 @@
     <parent>
         <groupId>com.ovea.tajin</groupId>
         <artifactId>tajin-pom</artifactId>
-        <version>3</version>
+        <version>4</version>
         <relativePath>../tajin-pom</relativePath>
     </parent>
 
     <groupId>com.ovea.tajin.framework</groupId>
-    <artifactId>tajin-framework-pom</artifactId>
+    <artifactId>tajin-framework</artifactId>
     <version>3.0-SNAPSHOT</version>
     <packaging>pom</packaging>
     <name>Tajin :: Framework</name>
@@ -23,33 +23,40 @@
     </scm>
 
     <modules>
-        <module>framework</module>
+        <module>core</module>
+        <module>groovy</module>
+        <module>async</module>
+        <module>i18n</module>
+        <module>templating</module>
         <module>all</module>
     </modules>
-
-    <build>
-        <plugins>
-            <plugin>
-                <groupId>com.mycila.maven-license-plugin</groupId>
-                <artifactId>maven-license-plugin</artifactId>
-                <configuration>
-                    <excludes>
-                        <exclude>src/test/**</exclude>
-                        <exclude>todo/**</exclude>
-                        <exclude>.idea/**</exclude>
-                        <exclude>.gitignore</exclude>
-                    </excludes>
-                </configuration>
-            </plugin>
-        </plugins>
-    </build>
 
     <dependencyManagement>
 
         <dependencies>
             <dependency>
                 <groupId>com.ovea.tajin.framework</groupId>
-                <artifactId>tajin-framework</artifactId>
+                <artifactId>tajin-core</artifactId>
+                <version>${project.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>com.ovea.tajin.framework</groupId>
+                <artifactId>tajin-groovy</artifactId>
+                <version>${project.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>com.ovea.tajin.framework</groupId>
+                <artifactId>tajin-async</artifactId>
+                <version>${project.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>com.ovea.tajin.framework</groupId>
+                <artifactId>tajin-i18n</artifactId>
+                <version>${project.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>com.ovea.tajin.framework</groupId>
+                <artifactId>tajin-templating</artifactId>
                 <version>${project.version}</version>
             </dependency>
 
