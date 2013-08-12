@@ -13,7 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package com.ovea.tajin.framework.util
+package com.ovea.tajin.framework.json
 
 import com.ovea.tajin.framework.support.jersey.JsonSupport
 import groovy.json.JsonBuilder

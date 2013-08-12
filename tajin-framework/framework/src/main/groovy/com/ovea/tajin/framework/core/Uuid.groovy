@@ -13,7 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package com.ovea.tajin.framework.util
+package com.ovea.tajin.framework.core
 
 import org.apache.commons.codec.binary.Base64
 

@@ -15,7 +15,7 @@
  */
 package com.ovea.tajin.framework.template;
 
-import com.ovea.tajin.framework.io.Resource;
+import com.ovea.tajin.framework.core.Resource;
 
 import java.util.Locale;
 

@@ -19,7 +19,7 @@ import com.beust.jcommander.JCommander
 import com.beust.jcommander.Parameter
 import com.beust.jcommander.ParameterException
 import com.google.common.collect.Lists
-import com.ovea.tajin.framework.io.Resource
+import com.ovea.tajin.framework.core.Resource
 import com.ovea.tajin.framework.support.jetty.Container
 import com.ovea.tajin.framework.support.logback.LogbackConfigurator
 import com.ovea.tajin.framework.util.PropertySettings

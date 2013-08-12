@@ -15,7 +15,7 @@
  */
 package com.ovea.tajin.framework.scheduling
 
-import com.ovea.tajin.framework.util.Uuid
+import com.ovea.tajin.framework.core.Uuid
 import groovy.transform.ToString
 
 /**

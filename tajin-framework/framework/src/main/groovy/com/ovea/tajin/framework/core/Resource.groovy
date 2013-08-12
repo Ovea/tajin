@@ -13,7 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package com.ovea.tajin.framework.io
+package com.ovea.tajin.framework.core
 
 import org.codehaus.groovy.runtime.IOGroovyMethods
 

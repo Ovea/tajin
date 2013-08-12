@@ -15,7 +15,7 @@
  */
 package com.ovea.tajin.framework.app
 
-import com.ovea.tajin.framework.io.Resource
+import com.ovea.tajin.framework.core.Resource
 import com.ovea.tajin.framework.util.PropertySettings
 
 /**

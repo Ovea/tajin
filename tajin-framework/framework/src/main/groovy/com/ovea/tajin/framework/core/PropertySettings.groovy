@@ -1,45 +1,30 @@
+package com.ovea.tajin.framework.core
+
+import com.google.common.base.Function
+import com.google.common.collect.Iterables
+import com.google.common.collect.Lists
+import com.google.common.collect.Multimap
+import com.google.common.collect.TreeMultimap
+import com.ovea.tajin.framework.util.MissingPropertySettingException
+import com.ovea.tajin.framework.util.PropertyPlaceholderResolver
+import com.ovea.tajin.framework.util.SystemPropertiesMode
+
 /**
- * Copyright (C) 2011 Ovea <dev@ovea.com>
- *
- * Licensed under the Apache License, Version 2.0 (the "License");
- * you may not use this file except in compliance with the License.
- * You may obtain a copy of the License at
- *
- * http://www.apache.org/licenses/LICENSE-2.0
- *
- * Unless required by applicable law or agreed to in writing, software
- * distributed under the License is distributed on an "AS IS" BASIS,
- * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- * See the License for the specific language governing permissions and
- * limitations under the License.
+ * @author Mathieu Carbou (mathieu.carbou@gmail.com)
+ * @date 2013-08-12
  */
-package com.ovea.tajin.framework.util;
-
-import com.google.common.base.Function;
-import com.google.common.collect.Iterables;
-import com.google.common.collect.Lists;
-import com.google.common.collect.Multimap;
-import com.google.common.collect.TreeMultimap;
-import com.ovea.tajin.framework.core.Resource;
-
-import java.io.File;
-import java.io.IOException;
-import java.io.InputStream;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.Properties;
-import java.util.TreeSet;
-
-public final class PropertySettings {
+final class PropertySettings {
 
     private final PropertyPlaceholderResolver resolver = new PropertyPlaceholderResolver();
     private final Properties properties;
 
     public PropertySettings() {
         this(new Properties());
+    }
+
+    public PropertySettings(Map map) {
+        this()
+        map?.each { k, v -> properties.setProperty(k as String, v as String) }
     }
 
     public PropertySettings(Properties properties) {
@@ -74,32 +59,40 @@ public final class PropertySettings {
         return new File(getRequired(key));
     }
 
-    public File getPath(String key, File def) {
+    public File getPath(String key, File
+
+    def) {
         String v = resolve(key);
-        return v == null ? def : new File(v);
+        return v == null ? def: new File(v);
     }
 
     public String getString(String key) {
         return getRequired(key);
     }
 
-    public String getString(String key, String def) {
+    public String getString(String key, String
+
+    def) {
         String v = resolve(key);
-        return v == null ? def : v;
+        return v == null ? def: v;
     }
 
     public List<String> getStrings(String key) {
         return split(getRequired(key));
     }
 
-    public List<String> getStrings(String key, String... def) {
+    public List<String> getStrings(String key, String...
+
+    def) {
         String v = resolve(key);
         return v == null ? Arrays.asList(def) : split(v);
     }
 
-    public List<String> getStrings(String key, List<String> def) {
+    public List<String> getStrings(String key, List<String>
+
+    def) {
         String v = resolve(key);
-        return v == null ? def : split(v);
+        return v == null ? def: split(v);
     }
 
     private List<String> split(String s) {
@@ -115,9 +108,11 @@ public final class PropertySettings {
         return Resource.resource(getRequired(key));
     }
 
-    public Resource getResource(String key, String def) {
+    public Resource getResource(String key, String
+
+    def) {
         String v = resolve(key);
-        return Resource.resource(v == null ? def : v);
+        return Resource.resource(v == null ? def: v);
     }
 
     private String getRequired(String key) throws MissingPropertySettingException {
@@ -144,36 +139,44 @@ public final class PropertySettings {
         return Long.parseLong(getRequired(key));
     }
 
-    public long getLong(String key, long def) {
+    public long getLong(String key, long
+
+    def) {
         String v = resolve(key);
-        return v == null ? def : Long.parseLong(v);
+        return v == null ? def: Long.parseLong(v);
     }
 
     public int getInt(String key) {
         return Integer.parseInt(getRequired(key));
     }
 
-    public int getInt(String key, int def) {
+    public int getInt(String key, int
+
+    def) {
         String v = resolve(key);
-        return v == null ? def : Integer.parseInt(v);
+        return v == null ? def: Integer.parseInt(v);
     }
 
     public boolean getBoolean(String key) {
         return Boolean.valueOf(getRequired(key));
     }
 
-    public boolean getBoolean(String key, boolean def) {
+    public boolean getBoolean(String key, boolean
+
+    def) {
         String v = resolve(key);
-        return v == null ? def : Boolean.valueOf(v);
+        return v == null ? def: Boolean.valueOf(v);
     }
 
     public <E extends Enum<E>> E getEnum(Class<E> type, String key) {
         return Enum.valueOf(type, getRequired(key));
     }
 
-    public <E extends Enum<E>> E getEnum(Class<E> type, String key, E def) {
+    public <E extends Enum<E>> E getEnum(Class<E> type, String key, E
+
+    def) {
         String v = resolve(key);
-        return v == null ? def : Enum.valueOf(type, v);
+        return v == null ? def: Enum.valueOf(type, v);
     }
 
     public boolean has(String key) {
