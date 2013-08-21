@@ -54,8 +54,8 @@ public class Container {
         // TODO: take them from tajin options
         def exts = ['html', 'html']
 
-        exts.each { context.addServlet(SSIServlet, "*.${it}") }
-        context.addServlet(DefaultServlet, '*')
+        exts.each { context.addServlet(SSIServlet, "/*.${it}") }
+        context.addServlet(DefaultServlet, '/*')
 
         context.setInitParameter('inputEncoding', 'UTF-8')
         context.setInitParameter('outputEncoding', 'UTF-8')
