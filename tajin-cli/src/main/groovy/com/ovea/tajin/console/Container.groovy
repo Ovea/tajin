@@ -53,7 +53,7 @@ public class Container {
         ServletHandler servletHandler = new ServletHandler()
         ServletHolder holder = new ServletHolder()
         holder.name = SSIServlet.class.name
-        holder.className = SSIServlet.class.getName()
+        holder.className = SSIServlet.class.name
         holder.setInitParameter('inputEncoding', 'UTF-8')
         holder.setInitParameter('outputEncoding', 'UTF-8')
         holder.setInitParameter('buffered', 'false')
