@@ -15,15 +15,15 @@
  */
 package com.ovea.tajin.console
 
-import org.apache.catalina.ssi.SSIServlet
+import org.apache.catalina.ssi.SSIFilter
 import org.eclipse.jetty.server.HttpConnectionFactory
 import org.eclipse.jetty.server.Server
 import org.eclipse.jetty.server.ServerConnector
-import org.eclipse.jetty.server.handler.HandlerList
-import org.eclipse.jetty.server.handler.ResourceHandler
-import org.eclipse.jetty.servlet.ServletHandler
-import org.eclipse.jetty.servlet.ServletHolder
-import org.eclipse.jetty.servlet.ServletMapping
+import org.eclipse.jetty.server.handler.HandlerCollection
+import org.eclipse.jetty.servlet.DefaultServlet
+import org.eclipse.jetty.servlet.ServletContextHandler
+
+import javax.servlet.DispatcherType
 
 /**
  * @author David Avenante (d.avenante@gmail.com)
@@ -41,35 +41,31 @@ public class Container {
         connector.setPort(port())
         jetty.addConnector(connector)
 
-        HandlerList handlers = new HandlerList()
+        // create a programmatic context for defined context path
+        ServletContextHandler context = new ServletContextHandler(
+            contextPath: '/',
+            resourceBase: webappRoot().absolutePath
+        )
 
-        ResourceHandler resource_handler = new ResourceHandler()
-        resource_handler.directoriesListed = true
-        resource_handler.welcomeFiles = ['index.html']
-        resource_handler.resourceBase = webappRoot().absolutePath
+        context.addFilter(SSIFilter, '*.html', EnumSet.allOf(DispatcherType))
+        context.addServlet(DefaultServlet, '/*')
 
-        handlers.addHandler(resource_handler)
+        context.setInitParameter('inputEncoding', 'UTF-8')
+        context.setInitParameter('outputEncoding', 'UTF-8')
+        context.setInitParameter('buffered', 'false')
+        context.setInitParameter('expires', '0')
+        context.setInitParameter('expires', '0')
 
-        ServletHandler servletHandler = new ServletHandler()
-        ServletHolder holder = new ServletHolder()
-        holder.name = SSIServlet.class.name
-        holder.className = SSIServlet.class.getName()
-        holder.setInitParameter('inputEncoding', 'UTF-8')
-        holder.setInitParameter('outputEncoding', 'UTF-8')
-        holder.setInitParameter('buffered', 'false')
-        holder.setInitParameter('expires', '0')
+//       See default servlet doc to set init param to set these values
+//        resource_handler.directoriesListed = true
+//        resource_handler.welcomeFiles = ['index.html']
+//        resource_handler.resourceBase =
 
-        servletHandler.setServlets([holder] as ServletHolder[])
+        HandlerCollection handlers = new HandlerCollection()
+        handlers.addHandler(context)
 
-        ServletMapping mapping = new ServletMapping();
-        mapping.pathSpec = '/*.html';
-        mapping.servletName = SSIServlet.class.name
+        jetty.handler = handlers
 
-        servletHandler.servletMappings = [mapping]
-
-        handlers.addHandler(servletHandler)
-
-        jetty.setHandler(handlers);
     }
 
     void start() {
