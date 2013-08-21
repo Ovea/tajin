@@ -16,6 +16,7 @@
 package com.ovea.tajin.console
 
 import org.apache.catalina.ssi.SSIFilter
+import org.apache.catalina.ssi.SSIServlet
 import org.eclipse.jetty.server.HttpConnectionFactory
 import org.eclipse.jetty.server.Server
 import org.eclipse.jetty.server.ServerConnector
@@ -38,17 +39,23 @@ public class Container {
         jetty = new Server()
 
         ServerConnector connector = new ServerConnector(jetty, new HttpConnectionFactory())
-        connector.setPort(port())
+        connector.port = port()
         jetty.addConnector(connector)
 
         // create a programmatic context for defined context path
         ServletContextHandler context = new ServletContextHandler(
             contextPath: '/',
-            resourceBase: webappRoot().absolutePath
+            resourceBase: webappRoot().absolutePath,
+            welcomeFiles: ['index.html', 'home.html'] as String[]
         )
 
         context.addFilter(SSIFilter, '*.html', EnumSet.allOf(DispatcherType))
-        context.addServlet(DefaultServlet, '/*')
+
+        // TODO: take them from tajin options
+        def exts = ['html', 'html']
+
+        exts.each { context.addServlet(SSIServlet, "*.${it}") }
+        context.addServlet(DefaultServlet, '*')
 
         context.setInitParameter('inputEncoding', 'UTF-8')
         context.setInitParameter('outputEncoding', 'UTF-8')
@@ -56,10 +63,7 @@ public class Container {
         context.setInitParameter('expires', '0')
         context.setInitParameter('expires', '0')
 
-//       See default servlet doc to set init param to set these values
-//        resource_handler.directoriesListed = true
-//        resource_handler.welcomeFiles = ['index.html']
-//        resource_handler.resourceBase =
+        context.setInitParameter('org.eclipse.jetty.servlet.Default.dirAllowed', 'true')
 
         HandlerCollection handlers = new HandlerCollection()
         handlers.addHandler(context)
