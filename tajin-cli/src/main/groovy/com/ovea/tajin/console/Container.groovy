@@ -44,16 +44,16 @@ public class Container {
         HandlerList handlers = new HandlerList()
 
         ResourceHandler resource_handler = new ResourceHandler()
-        resource_handler.setDirectoriesListed(true)
-        resource_handler.setWelcomeFiles(['index.html'] as String[])
-        resource_handler.setResourceBase(webappRoot().absolutePath)
+        resource_handler.directoriesListed = true
+        resource_handler.welcomeFiles = ['index.html']
+        resource_handler.resourceBase = webappRoot().absolutePath
 
         handlers.addHandler(resource_handler)
 
         ServletHandler servletHandler = new ServletHandler()
         ServletHolder holder = new ServletHolder()
-        holder.setName(SSIServlet.class.getName())
-        holder.setClassName(SSIServlet.class.getName())
+        holder.name = SSIServlet.class.name
+        holder.className = SSIServlet.class.getName()
         holder.setInitParameter('inputEncoding', 'UTF-8')
         holder.setInitParameter('outputEncoding', 'UTF-8')
         holder.setInitParameter('buffered', 'false')
@@ -62,10 +62,10 @@ public class Container {
         servletHandler.setServlets([holder] as ServletHolder[])
 
         ServletMapping mapping = new ServletMapping();
-        mapping.setPathSpec('/*.html');
-        mapping.setServletName(SSIServlet.class.getName());
+        mapping.pathSpec = '/*.html';
+        mapping.servletName = SSIServlet.class.name
 
-        servletHandler.setServletMappings([mapping] as ServletMapping[])
+        servletHandler.servletMappings = [mapping]
 
         handlers.addHandler(servletHandler)
 
