@@ -16,13 +16,14 @@
 package com.ovea.tajin.console
 
 import org.apache.catalina.ssi.SSIFilter
-import org.apache.catalina.ssi.SSIServlet
 import org.eclipse.jetty.server.HttpConnectionFactory
 import org.eclipse.jetty.server.Server
 import org.eclipse.jetty.server.ServerConnector
 import org.eclipse.jetty.server.handler.HandlerCollection
 import org.eclipse.jetty.servlet.DefaultServlet
+import org.eclipse.jetty.servlet.FilterHolder
 import org.eclipse.jetty.servlet.ServletContextHandler
+import org.eclipse.jetty.servlet.ServletHolder
 
 import javax.servlet.DispatcherType
 
@@ -42,31 +43,28 @@ public class Container {
         connector.port = port()
         jetty.addConnector(connector)
 
+        HandlerCollection handlers = new HandlerCollection()
+
         // create a programmatic context for defined context path
         ServletContextHandler context = new ServletContextHandler(
-            contextPath: '/',
+            contextPath: '',
             resourceBase: webappRoot().absolutePath,
             welcomeFiles: ['index.html', 'home.html'] as String[]
         )
 
-        context.addFilter(SSIFilter, '*.html', EnumSet.allOf(DispatcherType))
-
-        // TODO: take them from tajin options
-        def exts = ['html', 'html']
-
-        exts.each { context.addServlet(SSIServlet, "/*.${it}") }
-        context.addServlet(DefaultServlet, '/*')
-
-        context.setInitParameter('inputEncoding', 'UTF-8')
-        context.setInitParameter('outputEncoding', 'UTF-8')
-        context.setInitParameter('buffered', 'false')
-        context.setInitParameter('expires', '0')
-        context.setInitParameter('expires', '0')
-
-        context.setInitParameter('org.eclipse.jetty.servlet.Default.dirAllowed', 'true')
-
-        HandlerCollection handlers = new HandlerCollection()
         handlers.addHandler(context)
+
+        new FilterHolder(SSIFilter).with {
+            it.setInitParameter('isVirtualWebappRelative', 'true')
+            it.setInitParameter('contentType', 'text/html')
+            it.setInitParameter('expires', '0')
+            context.addFilter(it, "/*", EnumSet.allOf(DispatcherType))
+        }
+
+        new ServletHolder(DefaultServlet).with {
+            it.setInitParameter('dirAllowed', 'true')
+            context.addServlet(it, '/*')
+        }
 
         jetty.handler = handlers
 
