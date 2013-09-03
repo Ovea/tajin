@@ -29,6 +29,15 @@ class BundleInjector {
         this.i18NService = i18NService
     }
 
+    void inject(Object instance) {
+        List<Field> fields = new LinkedList<>()
+        Class c = instance.class
+        for (c; c != null && c != Object; c = c.superclass) {
+            fields.addAll(c.getDeclaredFields().findAll { it.isAnnotationPresent(Bundle) })
+        }
+        inject(instance, fields)
+    }
+
     void inject(Object instance, List<Field> fields) {
         for (Field field : fields) {
             Bundle annotation = field.getAnnotation(Bundle.class);
