@@ -42,10 +42,10 @@
     <modules>
         <module>core</module>
         <module>i18n</module>
-
-        <!--<module>groovy</module>
         <module>async</module>
-        <module>templating</module>-->
+        
+        <!--<module>groovy</module>-->
+        <!--<module>templating</module>-->
 
         <module>all</module>
     </modules>
@@ -77,16 +77,18 @@
                 <artifactId>tajin-i18n</artifactId>
                 <version>${project.version}</version>
             </dependency>
+            <dependency>
+                <groupId>com.ovea.tajin.framework</groupId>
+                <artifactId>tajin-async</artifactId>
+                <version>${project.version}</version>
+            </dependency>
+
             <!--<dependency>-->
             <!--<groupId>com.ovea.tajin.framework</groupId>-->
             <!--<artifactId>tajin-groovy</artifactId>-->
             <!--<version>${project.version}</version>-->
             <!--</dependency>-->
-            <!--<dependency>-->
-            <!--<groupId>com.ovea.tajin.framework</groupId>-->
-            <!--<artifactId>tajin-async</artifactId>-->
-            <!--<version>${project.version}</version>-->
-            <!--</dependency>-->
+
             <!--<dependency>-->
             <!--<groupId>com.ovea.tajin.framework</groupId>-->
             <!--<artifactId>tajin-templating</artifactId>-->

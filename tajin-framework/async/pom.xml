@@ -31,7 +31,10 @@
     <name>Tajin :: Framework :: Async</name>
 
     <dependencies>
-
+        <dependency>
+            <groupId>com.ovea.tajin.framework</groupId>
+            <artifactId>tajin-core</artifactId>
+        </dependency>
     </dependencies>
 
 </project>

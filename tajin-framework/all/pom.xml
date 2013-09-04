@@ -96,14 +96,16 @@
             <groupId>com.ovea.tajin.framework</groupId>
             <artifactId>tajin-i18n</artifactId>
         </dependency>
+        <dependency>
+            <groupId>com.ovea.tajin.framework</groupId>
+            <artifactId>tajin-async</artifactId>
+        </dependency>
+
         <!--<dependency>-->
             <!--<groupId>com.ovea.tajin.framework</groupId>-->
             <!--<artifactId>tajin-groovy</artifactId>-->
         <!--</dependency>-->
-        <!--<dependency>-->
-            <!--<groupId>com.ovea.tajin.framework</groupId>-->
-            <!--<artifactId>tajin-async</artifactId>-->
-        <!--</dependency>-->
+
         <!--<dependency>-->
             <!--<groupId>com.ovea.tajin.framework</groupId>-->
             <!--<artifactId>tajin-templating</artifactId>-->
