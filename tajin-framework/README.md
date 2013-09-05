@@ -4,6 +4,33 @@
 
 ### tajin-i18n ###
 
+Tajin I18N support.
+
+__Features__
+
+ - Automatic bundle reloading
+ - Caching
+ - JSON bundle support
+ - Javascript bundle support
+ - ResourceBundle support
+ - Google Guice integration
+
+__Usage__
+
+Add a field annotated with `@Bundle` in your class with type `I18NBundlerProvider`, with the wanted bundle. Then access the bundle for a locale and translate.
+
+```
+static class MyClass {
+
+    @Bundle('classpath:bundle.js')
+    I18NBundlerProvider i18n
+
+    void aMethod() {
+        i18n.getBundle(Locale.CANADA_FRENCH).getValue('mykey', ['10', 'seconds'])
+    }
+}
+```
+
 __Settings__
 
  - `tajin.i18n.miss`: Specify behavior on key not found.

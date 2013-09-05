@@ -55,4 +55,14 @@ class I18nTest {
         }
     }
 
+    static class MyClass {
+
+        @Bundle('classpath:bundle.js')
+        I18NBundlerProvider i18n
+
+        void aMethod() {
+            i18n.getBundle(Locale.CANADA_FRENCH).getValue('mykey', ['10', 'seconds'])
+        }
+    }
+
 }
