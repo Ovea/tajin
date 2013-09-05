@@ -14,13 +14,9 @@
  * limitations under the License.
  */
 package com.ovea.tajin.framework.i18n
-
-import groovy.transform.CompileStatic
-
 /**
  * @author Mathieu Carbou (mathieu.carbou@gmail.com)
  */
-@CompileStatic
 class MissingKeyException extends RuntimeException {
     public MissingKeyException(String bundleName, Locale locale, String key) {
         super("Missing key '" + key + "' in bundle '" + bundleName + "' for locale '" + locale + "'");

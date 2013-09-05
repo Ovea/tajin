@@ -15,32 +15,14 @@
  */
 package com.ovea.tajin.framework.i18n
 
-import java.util.concurrent.ConcurrentHashMap
-import java.util.concurrent.ConcurrentMap
-
 /**
  * @author Mathieu Carbou (mathieu.carbou@gmail.com)
+ * @date 2013-09-05
  */
-class JsonI18NService implements I18NService {
-
-    private final ConcurrentMap<String, I18NBundlerProvider> providers = new ConcurrentHashMap<String, I18NBundlerProvider>();
-
-    boolean cache = true;
-    MissingKeyBehaviour missingKeyBehaviour = MissingKeyBehaviour.THROW_EXCEPTION;
-
+class JsI18NService extends JsonI18NService {
     @Override
-    public I18NBundlerProvider getBundleProvider(String bundleName) {
-        bundleName = bundleName.startsWith("/") ? bundleName.substring(1) : bundleName;
-        I18NBundlerProvider service = providers.get(bundleName);
-        if (service == null) {
-            providers.putIfAbsent(bundleName, newProvider(bundleName));
-            service = providers.get(bundleName);
-        }
-        return service;
-    }
-
     I18NBundlerProvider newProvider(String bundleName) {
-        JsonI18NBundlerProvider service = new JsonI18NBundlerProvider(bundleName)
+        JsI18NBundlerProvider service = new JsI18NBundlerProvider(bundleName)
         service.cache = this.cache
         service.missingKeyBehaviour = this.missingKeyBehaviour
         return service

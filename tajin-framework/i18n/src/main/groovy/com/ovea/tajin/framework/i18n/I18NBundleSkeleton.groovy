@@ -15,14 +15,11 @@
  */
 package com.ovea.tajin.framework.i18n
 
-import groovy.transform.CompileStatic
-
 import java.text.MessageFormat
 
 /**
  * @author Mathieu Carbou (mathieu.carbou@gmail.com)
  */
-@CompileStatic
 public abstract class I18NBundleSkeleton implements I18NBundle {
 
     final ClassLoader loader;
@@ -38,10 +35,10 @@ public abstract class I18NBundleSkeleton implements I18NBundle {
     }
 
     @Override
-    public final String getValue(String key) throws MissingKeyException { getValue(key, new Object[0]); }
+    public final String getValue(String key) throws MissingKeyException { getValue(key, []); }
 
     @Override
-    public final String getValue(String key, Object... params) throws MissingKeyException {
+    public final String getValue(String key, List params) throws MissingKeyException {
         if (key == null)
             throw new IllegalArgumentException("Missing key !");
         String str = doGetValue(key);
@@ -56,7 +53,7 @@ public abstract class I18NBundleSkeleton implements I18NBundle {
                     throw new MissingKeyException(bundleName, locale, key);
             }
         }
-        return params == null || params.length == 0 ? str : MessageFormat.format(str, params);
+        return params == null || params.empty ? str : MessageFormat.format(str, params as Object[]);
     }
 
     @Override

@@ -15,12 +15,26 @@
  */
 package com.ovea.tajin.framework.i18n
 
-interface I18NBundle {
-    List<String> getKeys();
+import com.ovea.tajin.framework.core.Resource
 
-    boolean contains(String key);
+import javax.script.ScriptEngine
+import javax.script.ScriptEngineManager
 
-    String getValue(String key, List params) throws MissingKeyException;
+/**
+ * @author Mathieu Carbou (mathieu.carbou@gmail.com)
+ * @date 2013-09-05
+ */
+class JsI18NBundlerProvider extends JsonI18NBundlerProvider {
 
-    String getValue(String key) throws MissingKeyException;
+    private final ScriptEngine scriptEngine
+
+    JsI18NBundlerProvider(String bundleName) {
+        super(bundleName)
+        scriptEngine = new ScriptEngineManager().getEngineByExtension('js')
+        scriptEngine.eval("function add_bundle(b) { return JSON.stringify(b); }")
+    }
+
+    @Override
+    String loadAsjson(Resource resource) { scriptEngine.eval(resource.getText()) }
+
 }

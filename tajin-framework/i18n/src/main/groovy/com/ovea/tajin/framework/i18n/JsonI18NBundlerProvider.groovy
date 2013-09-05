@@ -17,7 +17,6 @@ package com.ovea.tajin.framework.i18n
 
 import com.ovea.tajin.framework.core.Resource
 import groovy.json.JsonSlurper
-import groovy.transform.CompileStatic
 
 import java.util.logging.Level
 import java.util.logging.Logger
@@ -25,7 +24,6 @@ import java.util.logging.Logger
 /**
  * @author Mathieu Carbou (mathieu.carbou@gmail.com)
  */
-@CompileStatic
 public class JsonI18NBundlerProvider extends I18NBundlerProviderSkeleton {
 
     private static final Logger LOGGER = Logger.getLogger(JsonI18NBundlerProvider.class.getName());
@@ -50,7 +48,7 @@ public class JsonI18NBundlerProvider extends I18NBundlerProviderSkeleton {
 
             private Properties getBundle() {
                 if (_bundle != null) return _bundle
-                if (cache) {
+                if (JsonI18NBundlerProvider.this.cache) {
                     _bundle = load();
                     return _bundle;
                 } else {
@@ -74,7 +72,9 @@ public class JsonI18NBundlerProvider extends I18NBundlerProviderSkeleton {
 
     }
 
-    private static void load(String bundleName, Properties target, String lc) {
+    String loadAsjson(Resource resource) { resource.getText() }
+
+    private void load(String bundleName, Properties target, String lc) {
         Resource resource = null;
         try {
             String b = bundleName;
@@ -83,7 +83,7 @@ public class JsonI18NBundlerProvider extends I18NBundlerProviderSkeleton {
                 throw new IllegalArgumentException("Illegal bundle name: extension needed");
             }
             resource = Resource.parse(b.substring(0, pos) + (lc.length() > 0 ? "_" + lc : lc) + b.substring(pos));
-            String content = resource.getText();
+            String content = loadAsjson(resource);
             if (content.length() > 0) {
                 //noinspection unchecked
                 parse(target, (Map<String, Object>) new JsonSlurper().parseText(content), "");

@@ -15,9 +15,6 @@
  */
 package com.ovea.tajin.framework.i18n
 
-import groovy.transform.CompileStatic
-
-@CompileStatic
 public class PropertyI18NBundlerProvider extends I18NBundlerProviderSkeleton {
 
     public PropertyI18NBundlerProvider(String bundleName) {
@@ -50,7 +47,7 @@ public class PropertyI18NBundlerProvider extends I18NBundlerProviderSkeleton {
                 if (b.endsWith(".properties")) {
                     b = b.substring(0, b.length() - 11);
                 }
-                if (cache) {
+                if (PropertyI18NBundlerProvider.this.cache) {
                     _bundle = ResourceBundle.getBundle(b, locale, loader);
                     return _bundle;
                 } else {

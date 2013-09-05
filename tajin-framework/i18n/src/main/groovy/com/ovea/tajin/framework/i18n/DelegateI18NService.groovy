@@ -20,8 +20,9 @@ package com.ovea.tajin.framework.i18n
  */
 class DelegateI18NService implements I18NService {
 
-    JsonI18NService jsonI18NService = new JsonI18NService()
-    PropertyI18NService propertyI18NService = new PropertyI18NService()
+    private JsonI18NService jsonI18NService = new JsonI18NService()
+    private PropertyI18NService propertyI18NService = new PropertyI18NService()
+    private JsI18NService jsI18NService = new JsI18NService()
 
     void setCache(boolean cache) {
         jsonI18NService.cache = cache
@@ -38,7 +39,9 @@ class DelegateI18NService implements I18NService {
         if (bundleName.endsWith('.json'))
             return jsonI18NService.getBundleProvider(bundleName)
         if (bundleName.endsWith('.properties'))
-            propertyI18NService.getBundleProvider(bundleName)
+            return propertyI18NService.getBundleProvider(bundleName)
+        if (bundleName.endsWith('.js'))
+            return jsI18NService.getBundleProvider(bundleName)
         throw new IllegalArgumentException(bundleName)
     }
 }

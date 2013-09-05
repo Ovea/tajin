@@ -15,15 +15,12 @@
  */
 package com.ovea.tajin.framework.i18n
 
-import groovy.transform.CompileStatic
-
 import java.util.concurrent.ConcurrentHashMap
 import java.util.concurrent.ConcurrentMap
 
 /**
  * @author Mathieu Carbou (mathieu.carbou@gmail.com)
  */
-@CompileStatic
 public class PropertyI18NService implements I18NService {
 
     private final ConcurrentMap<String, PropertyI18NBundlerProvider> providers = new ConcurrentHashMap<String, PropertyI18NBundlerProvider>();

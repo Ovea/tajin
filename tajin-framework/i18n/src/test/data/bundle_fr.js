@@ -1,0 +1,4 @@
+add_bundle({
+    msg2: 'message2 fr from {0} to {1}',
+    msg3: 'message3 fr from {0} to {1}'
+});
