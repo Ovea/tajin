@@ -22,6 +22,7 @@
         <module>tajin-event</module>
         <module>tajin-servers</module>
         <module>tajin-samples</module>
+        <module>tajin-cli</module>
     </modules>
 
 </project>
