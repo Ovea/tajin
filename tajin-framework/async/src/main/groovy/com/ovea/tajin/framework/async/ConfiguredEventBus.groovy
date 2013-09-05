@@ -21,6 +21,7 @@ import com.google.common.util.concurrent.ThreadFactoryBuilder
 
 import javax.annotation.PreDestroy
 import java.util.concurrent.*
+import java.util.logging.Level
 import java.util.logging.Logger
 
 /**
@@ -31,8 +32,21 @@ class ConfiguredEventBus implements Dispatcher {
 
     private static final Logger LOGGER = Logger.getLogger(ConfiguredEventBus.name)
 
-    private final EventBus eventBus
     private final ExecutorService executorService
+
+    final EventBus eventBus
+
+    ConfiguredEventBus(Executor executor) {
+        // executor managed elsewhere
+        this.executorService = null
+        this.eventBus = new AsyncEventBus(executor)
+    }
+
+    ConfiguredEventBus(ExecutorService executorService) {
+        // executor managed elsewhere
+        this.executorService = null
+        this.eventBus = new AsyncEventBus(executorService)
+    }
 
     ConfiguredEventBus(int minPoolSize, int maxPoolSize) {
         executorService = new ThreadPoolExecutor(
@@ -41,35 +55,33 @@ class ConfiguredEventBus implements Dispatcher {
             new SynchronousQueue<Runnable>(),
             new ThreadFactoryBuilder()
                 .setDaemon(false)
-                .setNameFormat("${AsyncDispatcher.simpleName}-thread-%d")
+                .setNameFormat("${Dispatcher.simpleName}-thread-%d")
                 .setUncaughtExceptionHandler(new Thread.UncaughtExceptionHandler() {
                 @Override
                 void uncaughtException(Thread t, Throwable e) {
-                    LOGGER.error("UncaughtException in Job Scheduler: ${e.message}", e)
+                    LOGGER.log(Level.SEVERE, "UncaughtException in ${Dispatcher.simpleName} thread '${t.name}': ${e.message}", e)
                 }
             }).build(),
             new RejectedExecutionHandler() {
                 @Override
                 void rejectedExecution(Runnable r, ThreadPoolExecutor executor) {
-
+                    // if the task cannot go within the pool, just run it in the current thread
+                    r.run()
                 }
             }
         )
         eventBus = new AsyncEventBus(executorService)
-        eventBus.unregister()
     }
 
-    Dispatcher getDispatcher() { return this }
-
-
-
     @Override
-    void broadcast(Object event) { post(event) }
+    void broadcast(Object event) { eventBus.post(event) }
 
     @PreDestroy
     void shutdown() {
-        executorService.shutdown()
-        executorService.awaitTermination(1, TimeUnit.MINUTES)
+        if (executorService) {
+            executorService.shutdown()
+            executorService.awaitTermination(1, TimeUnit.MINUTES)
+        }
     }
 
 }

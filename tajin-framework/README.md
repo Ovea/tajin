@@ -44,3 +44,18 @@ __Settings__
     - Default: `3600`
     - Set it to `-1` for no eviction
     - Set it to `0` for no cache at all
+
+### tajin-async ###
+
+Adds asynchronous Event support in your project. This module contains a `Dispatcher` based on Google Guava `EventBus`.
+
+__Settings__
+
+ - `tajin.async.dispatcher.minPoolSize`: Specify the minimum pool size for async events
+    - Default: `0`
+ - `tajin.async.dispatcher.maxPoolSize`: Specify the maximum pool size for async events. If the pool size is reached, events will be dispatched on the same thread firing them.
+    - Default: `100`
+
+### tajin-all ###
+
+This is a bundle containing all Tajin modules at once.

@@ -15,11 +15,18 @@
  */
 package com.ovea.tajin.framework.async.guice
 
-import com.google.inject.AbstractModule
-import com.google.inject.Provides
+import com.google.common.eventbus.EventBus
+import com.google.common.eventbus.Subscribe
+import com.google.inject.*
+import com.google.inject.matcher.Matchers
+import com.google.inject.spi.InjectionListener
+import com.google.inject.spi.TypeEncounter
+import com.google.inject.spi.TypeListener
 import com.ovea.tajin.framework.async.ConfiguredEventBus
 import com.ovea.tajin.framework.async.Dispatcher
 import com.ovea.tajin.framework.core.Settings
+
+import javax.inject.Provider
 
 /**
  * @author Mathieu Carbou (mathieu.carbou@gmail.com)
@@ -30,15 +37,40 @@ class AsyncModule extends AbstractModule {
     @Override
     protected void configure() {
         requireBinding(Settings)
+
+        bind(Dispatcher).to(ConfiguredEventBus)
+
+        bindListener(Matchers.any(), new TypeListener() {
+            @Override
+            def <I> void hear(TypeLiteral<I> type, TypeEncounter<I> encounter) {
+                if (type.rawType.getMethods().find { it.isAnnotationPresent(Subscribe) }) {
+                    Provider<Injector> i = encounter.getProvider(Injector)
+                    Provider<EventBus> e = encounter.getProvider(EventBus)
+                    encounter.register(new InjectionListener<I>() {
+                        @Override
+                        void afterInjection(I injectee) {
+                            if (!Scopes.isSingleton(i.get().getBinding(Key.get(type)))) {
+                                throw new IllegalStateException("Cannot register object " + injectee.class + " containing @Subscribe methods to EventBus because it is not registered as a singleton")
+                            }
+                            e.get().register(injectee)
+                        }
+                    })
+                }
+            }
+        })
     }
 
     @Provides
     @javax.inject.Singleton
-    Dispatcher getDispatcher(Settings settings) {
+    ConfiguredEventBus getConfiguredEventBus(Settings settings) {
         return new ConfiguredEventBus(
             settings.getInt('tajin.async.dispatcher.minPoolSize', 0),
             settings.getInt('tajin.async.dispatcher.maxPoolSize', 100)
         )
     }
+
+    @Provides
+    @javax.inject.Singleton
+    EventBus getEventBus(ConfiguredEventBus bus) { bus.eventBus }
 
 }
