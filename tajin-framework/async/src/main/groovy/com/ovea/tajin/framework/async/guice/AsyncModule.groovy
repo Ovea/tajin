@@ -15,9 +15,30 @@
  */
 package com.ovea.tajin.framework.async.guice
 
+import com.google.inject.AbstractModule
+import com.google.inject.Provides
+import com.ovea.tajin.framework.async.ConfiguredEventBus
+import com.ovea.tajin.framework.async.Dispatcher
+import com.ovea.tajin.framework.core.Settings
+
 /**
  * @author Mathieu Carbou (mathieu.carbou@gmail.com)
  * @date 2013-09-05
  */
-class AsyncModule {
+class AsyncModule extends AbstractModule {
+
+    @Override
+    protected void configure() {
+        requireBinding(Settings)
+    }
+
+    @Provides
+    @javax.inject.Singleton
+    Dispatcher getDispatcher(Settings settings) {
+        return new ConfiguredEventBus(
+            settings.getInt('tajin.async.dispatcher.minPoolSize', 0),
+            settings.getInt('tajin.async.dispatcher.maxPoolSize', 100)
+        )
+    }
+
 }
