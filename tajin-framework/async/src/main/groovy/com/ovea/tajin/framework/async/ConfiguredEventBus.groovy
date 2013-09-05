@@ -33,8 +33,7 @@ class ConfiguredEventBus implements Dispatcher {
     private static final Logger LOGGER = Logger.getLogger(ConfiguredEventBus.name)
 
     private final ExecutorService executorService
-
-    final EventBus eventBus
+    private final EventBus eventBus
 
     ConfiguredEventBus(Executor executor) {
         // executor managed elsewhere
@@ -71,6 +70,16 @@ class ConfiguredEventBus implements Dispatcher {
             }
         )
         eventBus = new AsyncEventBus(executorService)
+    }
+
+    void register(Object o) {
+        LOGGER.info('+subscriber ' + o.class.name)
+        eventBus.register(o)
+    }
+
+    void unregister(Object o) {
+        LOGGER.info('+subscriber ' + o.class.name)
+        eventBus.unregister(o)
     }
 
     @Override

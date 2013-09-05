@@ -15,7 +15,6 @@
  */
 package com.ovea.tajin.framework.async.guice
 
-import com.google.common.eventbus.EventBus
 import com.google.common.eventbus.Subscribe
 import com.google.inject.*
 import com.google.inject.matcher.Matchers
@@ -42,13 +41,13 @@ class AsyncModule extends AbstractModule {
 
         bindListener(Matchers.any(), new TypeListener() {
             @Override
-            def <I> void hear(TypeLiteral<I> type, TypeEncounter<I> encounter) {
+            public <I> void hear(TypeLiteral<I> type, TypeEncounter<I> encounter) {
                 if (type.rawType.getMethods().find { it.isAnnotationPresent(Subscribe) }) {
                     Provider<Injector> i = encounter.getProvider(Injector)
-                    Provider<EventBus> e = encounter.getProvider(EventBus)
-                    encounter.register(new InjectionListener<I>() {
+                    Provider<ConfiguredEventBus> e = encounter.getProvider(ConfiguredEventBus)
+                    encounter.register(new InjectionListener<Object>() {
                         @Override
-                        void afterInjection(I injectee) {
+                        void afterInjection(Object injectee) {
                             if (!Scopes.isSingleton(i.get().getBinding(Key.get(type)))) {
                                 throw new IllegalStateException("Cannot register object " + injectee.class + " containing @Subscribe methods to EventBus because it is not registered as a singleton")
                             }
@@ -68,9 +67,5 @@ class AsyncModule extends AbstractModule {
             settings.getInt('tajin.async.dispatcher.maxPoolSize', 100)
         )
     }
-
-    @Provides
-    @javax.inject.Singleton
-    EventBus getEventBus(ConfiguredEventBus bus) { bus.eventBus }
 
 }
