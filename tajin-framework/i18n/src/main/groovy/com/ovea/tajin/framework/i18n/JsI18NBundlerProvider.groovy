@@ -28,8 +28,8 @@ class JsI18NBundlerProvider extends JsonI18NBundlerProvider {
 
     private final ScriptEngine scriptEngine
 
-    JsI18NBundlerProvider(String bundleName) {
-        super(bundleName)
+    JsI18NBundlerProvider(String bundleName, int maximumSize, long expirationSeconds) {
+        super(bundleName, maximumSize, expirationSeconds)
         scriptEngine = new ScriptEngineManager().getEngineByExtension('js')
         scriptEngine.eval("function add_bundle(b) { return JSON.stringify(b); }")
     }

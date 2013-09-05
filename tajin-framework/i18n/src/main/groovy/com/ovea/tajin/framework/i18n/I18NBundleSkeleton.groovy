@@ -22,7 +22,6 @@ import java.text.MessageFormat
  */
 public abstract class I18NBundleSkeleton implements I18NBundle {
 
-    final ClassLoader loader;
     final String bundleName;
     final Locale locale;
     final MissingKeyBehaviour missingKeyBehaviour;
@@ -30,15 +29,14 @@ public abstract class I18NBundleSkeleton implements I18NBundle {
     protected I18NBundleSkeleton(String bundleName, Locale locale, MissingKeyBehaviour missingKeyBehaviour) {
         this.bundleName = bundleName;
         this.locale = locale;
-        this.loader = new URLClassLoader(new URL[0], Thread.currentThread().getContextClassLoader());
         this.missingKeyBehaviour = missingKeyBehaviour;
     }
 
     @Override
-    public final String getValue(String key) throws MissingKeyException { getValue(key, []); }
+    final String getValue(String key) throws MissingKeyException { getValue(key, []); }
 
     @Override
-    public final String getValue(String key, List params) throws MissingKeyException {
+    final String getValue(String key, List params) throws MissingKeyException {
         if (key == null)
             throw new IllegalArgumentException("Missing key !");
         String str = doGetValue(key);
@@ -57,7 +55,7 @@ public abstract class I18NBundleSkeleton implements I18NBundle {
     }
 
     @Override
-    public final String toString() { bundleName + " (" + locale + ")"; }
+    final String toString() { bundleName + " (" + locale + ")"; }
 
     abstract String doGetValue(String key);
 

@@ -59,8 +59,9 @@ class I18NModule extends AbstractModule {
     @Provides
     @javax.inject.Singleton
     I18NService getI18NService(Settings settings) {
-        return new DelegateI18NService(
-            cache: settings.getBoolean('tajin.i18n.cache', true),
+        return new Default18NService(
+            expirationSeconds: settings.getLong('tajin.i18n.cache.expirationSeconds', 3600),
+            maximumSize: settings.getLong('tajin.i18n.cache.maximumSize', 100),
             missingKeyBehaviour: settings.getEnum(MissingKeyBehaviour, 'tajin.i18n.miss', MissingKeyBehaviour.THROW_EXCEPTION)
         )
     }

@@ -28,48 +28,24 @@ public class JsonI18NBundlerProvider extends I18NBundlerProviderSkeleton {
 
     private static final Logger LOGGER = Logger.getLogger(JsonI18NBundlerProvider.class.getName());
 
-    public JsonI18NBundlerProvider(String bundleName) {
-        super(bundleName);
+    JsonI18NBundlerProvider(String bundleName, int maximumSize, long expirationSeconds) {
+        super(bundleName, maximumSize, expirationSeconds)
     }
 
     @Override
     I18NBundle newBundle(String bundleName, Locale locale) {
-        return new I18NBundleSkeleton(bundleName, locale, getMissingKeyBehaviour()) {
-            volatile Properties _bundle;
+        return new JsonI18NBundle(bundleName, locale, missingKeyBehaviour, load(locale))
+    }
 
-            @Override
-            public List<String> getKeys() { getBundle().stringPropertyNames() as List }
-
-            @Override
-            public boolean contains(String key) { getBundle().containsKey(key); }
-
-            @Override
-            String doGetValue(String key) { getBundle().getProperty(key); }
-
-            private Properties getBundle() {
-                if (_bundle != null) return _bundle
-                if (JsonI18NBundlerProvider.this.cache) {
-                    _bundle = load();
-                    return _bundle;
-                } else {
-                    return load();
-                }
-            }
-
-            private Properties load() {
-                Properties all = new Properties();
-                load(bundleName, all, "");
-                String str = locale.toString();
-                if (str.length() >= 2)
-                    load(bundleName, all, str.substring(0, 2));
-                if (str.length() >= 5)
-                    load(bundleName, all, str.substring(0, 5));
-                return all;
-            }
-
-
-        };
-
+    private Properties load(Locale locale) {
+        Properties all = new Properties();
+        load(bundleName, all, "");
+        String str = locale.toString();
+        if (str.length() >= 2)
+            load(bundleName, all, str.substring(0, 2));
+        if (str.length() >= 5)
+            load(bundleName, all, str.substring(0, 5));
+        return all;
     }
 
     String loadAsjson(Resource resource) { resource.getText() }

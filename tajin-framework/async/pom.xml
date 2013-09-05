@@ -35,6 +35,18 @@
             <groupId>com.ovea.tajin.framework</groupId>
             <artifactId>tajin-core</artifactId>
         </dependency>
+
+        <dependency>
+            <groupId>org.sonatype.sisu</groupId>
+            <artifactId>sisu-guice</artifactId>
+            <scope>provided</scope>
+        </dependency>
+
+        <dependency>
+            <groupId>junit</groupId>
+            <artifactId>junit-dep</artifactId>
+            <scope>test</scope>
+        </dependency>
     </dependencies>
 
 </project>

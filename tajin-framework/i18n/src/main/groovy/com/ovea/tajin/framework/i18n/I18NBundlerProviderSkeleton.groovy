@@ -15,32 +15,46 @@
  */
 package com.ovea.tajin.framework.i18n
 
-import java.util.concurrent.ConcurrentHashMap
-import java.util.concurrent.ConcurrentMap
+import com.google.common.cache.*
+import com.google.common.util.concurrent.UncheckedExecutionException
+
+import java.util.concurrent.TimeUnit
 
 /**
  * @author Mathieu Carbou (mathieu.carbou@gmail.com)
  */
 public abstract class I18NBundlerProviderSkeleton implements I18NBundlerProvider {
 
-    private final ConcurrentMap<Locale, I18NBundle> bundles = new ConcurrentHashMap<Locale, I18NBundle>();
-    private final String bundleName;
+    private final LoadingCache<Locale, I18NBundle> cache
 
-    boolean cache = true;
+    final String bundleName;
     MissingKeyBehaviour missingKeyBehaviour = MissingKeyBehaviour.THROW_EXCEPTION;
 
-    protected I18NBundlerProviderSkeleton(String bundleName) {
+    protected I18NBundlerProviderSkeleton(String bundleName, int maximumSize, long expirationSeconds) {
         this.bundleName = bundleName.startsWith("/") ? bundleName.substring(1) : bundleName;
+        CacheBuilder builder = CacheBuilder.newBuilder()
+        if (maximumSize >= 0) builder.maximumSize(maximumSize)
+        if (expirationSeconds >= 0) builder.expireAfterWrite(expirationSeconds, TimeUnit.SECONDS)
+        this.cache = builder.removalListener(new RemovalListener() {
+            @Override
+            void onRemoval(RemovalNotification notification) {
+                if (notification.value instanceof PropertyI18NBundle) {
+                    ResourceBundle.clearCache(((PropertyI18NBundle) notification.value).loader)
+                }
+            }
+        }).build(new CacheLoader<Locale, I18NBundle>() {
+            @Override
+            I18NBundle load(Locale key) throws Exception { newBundle(bundleName, key) }
+        })
     }
 
     @Override
     public final I18NBundle getBundle(Locale locale) {
-        I18NBundle bundle = bundles.get(locale);
-        if (bundle == null) {
-            bundles.putIfAbsent(locale, newBundle(bundleName, locale));
-            bundle = bundles.get(locale);
+        try {
+            cache.get(locale)
+        } catch (UncheckedExecutionException e) {
+            throw e.cause
         }
-        return bundle;
     }
 
     @Override

@@ -19,12 +19,29 @@ package com.ovea.tajin.framework.i18n
  * @author Mathieu Carbou (mathieu.carbou@gmail.com)
  * @date 2013-09-05
  */
-class JsI18NService extends JsonI18NService {
-    @Override
-    I18NBundlerProvider newProvider(String bundleName) {
-        JsI18NBundlerProvider service = new JsI18NBundlerProvider(bundleName)
-        service.cache = this.cache
-        service.missingKeyBehaviour = this.missingKeyBehaviour
-        return service
+class PropertyI18NBundle extends I18NBundleSkeleton {
+    final ResourceBundle bundle
+    final URLClassLoader loader
+
+    PropertyI18NBundle(String bundleName, Locale locale, MissingKeyBehaviour missingKeyBehaviour, ResourceBundle bundle, URLClassLoader loader) {
+        super(bundleName, locale, missingKeyBehaviour)
+        this.bundle = bundle
+        this.loader = loader
     }
+
+    @Override
+    List<String> getKeys() { bundle.keys.toList() }
+
+    @Override
+    boolean contains(String key) { bundle.containsKey(key); }
+
+    @Override
+    String doGetValue(String key) throws MissingKeyException {
+        try {
+            return getBundle().getString(key);
+        } catch (MissingResourceException ignored) {
+            return null;
+        }
+    }
+
 }

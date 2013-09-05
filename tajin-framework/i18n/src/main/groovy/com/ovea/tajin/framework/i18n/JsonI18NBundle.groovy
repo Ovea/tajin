@@ -13,23 +13,27 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package com.ovea.tajin.framework.async
+package com.ovea.tajin.framework.i18n
 
 /**
- * Dispatcher inyerface used to send events
- *
  * @author Mathieu Carbou (mathieu.carbou@gmail.com)
  * @date 2013-09-05
  */
-public interface Dispatcher {
+class JsonI18NBundle extends I18NBundleSkeleton {
+    final Properties properties
 
-    /**
-     * Broadcast an event to all subscribers subscribed to this event.
-     * Events are delivered in order but the order subscribers may be called is not necessary the order they registered.
-     * Broadcasting is an in-memory process and delivery is not garanteed in case of crash. If there is no subscriber, the event is lost.
-     *
-     * @param event Event object to broadcast
-     */
-    void broadcast(Object event)
+    JsonI18NBundle(String bundleName, Locale locale, MissingKeyBehaviour missingKeyBehaviour, Properties properties) {
+        super(bundleName, locale, missingKeyBehaviour)
+        this.properties = properties
+    }
+
+    @Override
+    List<String> getKeys() { properties.stringPropertyNames() as List }
+
+    @Override
+    boolean contains(String key) { properties.containsKey(key); }
+
+    @Override
+    String doGetValue(String key) { properties.getProperty(key); }
 
 }

@@ -28,10 +28,8 @@ class I18nTest {
 
     @Test
     void test() throws Exception {
-        I18NService service = new DelegateI18NService()
+        I18NService service = new Default18NService()
         service.missingKeyBehaviour = MissingKeyBehaviour.RETURN_KEY
-
-        Thread.currentThread().contextClassLoader = new URLClassLoader([new File('src/test/data').toURI().toURL()] as URL[], Thread.currentThread().contextClassLoader)
 
         [
             service.getBundleProvider('bundle.properties'),
@@ -45,14 +43,15 @@ class I18nTest {
             assert provider.getBundle(Locale.US).getValue('msg1', ['mat', 'dave']) == 'message1 from mat to dave'
             assert provider.getBundle(Locale.US).getValue('msg2', ['mat', 'dave']) == 'message2 from mat to dave'
             assert provider.getBundle(Locale.US).getValue('msg3', ['mat', 'dave']) == 'message3 from mat to dave'
+            assert provider.getBundle(Locale.US).getValue('msg4', ['mat', 'dave']) == '[msg4]'
 
             assert provider.getBundle(Locale.FRANCE).getValue('msg1', ['mat', 'dave']) == 'message1 from mat to dave'
             assert provider.getBundle(Locale.FRANCE).getValue('msg2', ['mat', 'dave']) == 'message2 fr from mat to dave'
-            assert provider.getBundle(Locale.FRANCE).getValue('msg3', ['mat', 'dave']) == 'message3 fr from mat to dave'
+            assert provider.getBundle(Locale.FRANCE).getValue('msg4', ['mat', 'dave']) == '[msg4]'
 
             assert provider.getBundle(Locale.CANADA_FRENCH).getValue('msg1', ['mat', 'dave']) == 'message1 from mat to dave'
             assert provider.getBundle(Locale.CANADA_FRENCH).getValue('msg2', ['mat', 'dave']) == 'message2 fr from mat to dave'
-            assert provider.getBundle(Locale.CANADA_FRENCH).getValue('msg3', ['mat', 'dave']) == 'message3 fr CA from mat to dave'
+            assert provider.getBundle(Locale.CANADA_FRENCH).getValue('msg4', ['mat', 'dave']) == '[msg4]'
         }
     }
 
