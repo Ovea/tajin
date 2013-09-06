@@ -13,12 +13,8 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package com.ovea.tajin.framework.i18n
-/**
- * @author Mathieu Carbou (mathieu.carbou@gmail.com)
- */
-class MissingKeyException extends RuntimeException {
-    public MissingKeyException(String bundleName, Locale locale, String key) {
-        super("Missing key '" + key + "' in bundle '" + bundleName + "' for locale '" + locale + "'");
-    }
+package com.ovea.tajin.framework.i18nL10n
+
+public interface I18NBundlerProvider {
+    I18NBundle getBundle(Locale locale);
 }

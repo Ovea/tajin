@@ -13,7 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package com.ovea.tajin.framework.i18n
+package com.ovea.tajin.framework.i18nL10n
 
 import java.lang.annotation.Retention
 import java.lang.annotation.Target

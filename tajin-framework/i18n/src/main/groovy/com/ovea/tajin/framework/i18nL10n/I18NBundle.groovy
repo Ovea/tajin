@@ -13,10 +13,14 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package com.ovea.tajin.framework.i18n
+package com.ovea.tajin.framework.i18nL10n
 
-public enum MissingKeyBehaviour {
-    THROW_EXCEPTION,
-    RETURN_NULL,
-    RETURN_KEY
+interface I18NBundle {
+    List<String> getKeys();
+
+    boolean contains(String key);
+
+    String getValue(String key, List params) throws MissingKeyException;
+
+    String getValue(String key) throws MissingKeyException;
 }

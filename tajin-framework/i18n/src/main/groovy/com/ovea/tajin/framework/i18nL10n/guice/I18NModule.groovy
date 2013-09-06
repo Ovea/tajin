@@ -13,7 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package com.ovea.tajin.framework.i18n.guice
+package com.ovea.tajin.framework.i18nL10n.guice
 
 import com.google.inject.AbstractModule
 import com.google.inject.MembersInjector
@@ -23,7 +23,7 @@ import com.google.inject.matcher.Matchers
 import com.google.inject.spi.TypeEncounter
 import com.google.inject.spi.TypeListener
 import com.ovea.tajin.framework.core.Settings
-import com.ovea.tajin.framework.i18n.*
+import com.ovea.tajin.framework.i18nL10n.*
 
 import javax.inject.Provider
 import java.lang.reflect.Field

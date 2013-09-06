@@ -13,7 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package com.ovea.tajin.framework.i18n
+package com.ovea.tajin.framework.i18nL10n
 
 public class PropertyI18NBundlerProvider extends I18NBundlerProviderSkeleton {
 

@@ -13,35 +13,27 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package com.ovea.tajin.framework.i18n
+package com.ovea.tajin.framework.i18nL10n
 
 /**
  * @author Mathieu Carbou (mathieu.carbou@gmail.com)
  * @date 2013-09-05
  */
-class PropertyI18NBundle extends I18NBundleSkeleton {
-    final ResourceBundle bundle
-    final URLClassLoader loader
+class JsonI18NBundle extends I18NBundleSkeleton {
+    final Properties properties
 
-    PropertyI18NBundle(String bundleName, Locale locale, MissingKeyBehaviour missingKeyBehaviour, ResourceBundle bundle, URLClassLoader loader) {
+    JsonI18NBundle(String bundleName, Locale locale, MissingKeyBehaviour missingKeyBehaviour, Properties properties) {
         super(bundleName, locale, missingKeyBehaviour)
-        this.bundle = bundle
-        this.loader = loader
+        this.properties = properties
     }
 
     @Override
-    List<String> getKeys() { bundle.keys.toList() }
+    List<String> getKeys() { properties.stringPropertyNames() as List }
 
     @Override
-    boolean contains(String key) { bundle.containsKey(key); }
+    boolean contains(String key) { properties.containsKey(key); }
 
     @Override
-    String doGetValue(String key) throws MissingKeyException {
-        try {
-            return getBundle().getString(key);
-        } catch (MissingResourceException ignored) {
-            return null;
-        }
-    }
+    String doGetValue(String key) { properties.getProperty(key); }
 
 }

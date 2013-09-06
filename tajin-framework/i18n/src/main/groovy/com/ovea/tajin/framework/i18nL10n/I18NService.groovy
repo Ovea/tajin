@@ -13,8 +13,8 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package com.ovea.tajin.framework.i18n
+package com.ovea.tajin.framework.i18nL10n;
 
-public interface I18NBundlerProvider {
-    I18NBundle getBundle(Locale locale);
+public interface I18NService {
+    I18NBundlerProvider getBundleProvider(String bundleName);
 }
