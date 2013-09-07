@@ -20,11 +20,11 @@ package com.ovea.tajin.framework.async
  * @date 2013-06-06
  */
 interface JobRepository {
-    void insert(ScheduledJobTriggeredEvent job)
+    void insert(TriggeredScheduledJob job)
 
-    void update(ScheduledJobTriggeredEvent job)
+    void update(TriggeredScheduledJob job)
 
-    void delete(List<ScheduledJobTriggeredEvent> jobs)
+    void delete(List<TriggeredScheduledJob> jobs)
 
-    List<ScheduledJobTriggeredEvent> listPendingJobs()
+    List<TriggeredScheduledJob> listPendingJobs()
 }

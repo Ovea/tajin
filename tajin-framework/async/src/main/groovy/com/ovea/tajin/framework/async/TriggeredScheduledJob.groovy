@@ -25,14 +25,14 @@ import groovy.transform.ToString
  */
 @ToString(includeNames = true)
 @EqualsAndHashCode(includes = ['id'])
-class ScheduledJobTriggeredEvent {
+class TriggeredScheduledJob {
 
     /**
      * ID, auto-generated if not set
      */
     String id = Uuid.newUUID
 
-    ScheduledJobEvent source
+    ScheduledJob source
 
     /**
      * Current retry count
@@ -46,19 +46,6 @@ class ScheduledJobTriggeredEvent {
 
     Date nextTry
 
-    boolean completed
+    Date completionDate
 
-    Throwable failure
-
-    transient Map<String, Closure<?>> callbacks = [:]
-
-    void completed() {
-        completed = true
-        callbacks?.oncomplete?.call()
-    }
-
-    void failed(Throwable e) {
-        failure = e
-        callbacks?.onerror?.call(e)
-    }
 }

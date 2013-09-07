@@ -41,15 +41,18 @@ class ConfiguredEventBus implements Dispatcher {
 
     int minPoolSize = 0
     int maxPoolSize = 100
+    boolean enabled = true
 
     @Inject
     void setSettings(Settings settings) {
         this.minPoolSize = settings.getInt('tajin.async.dispatcher.minPoolSize', minPoolSize)
         this.maxPoolSize = settings.getInt('tajin.async.dispatcher.maxPoolSize', maxPoolSize)
+        this.enabled = settings.getBoolean('tajin.async.dispatcher.enabled', enabled)
     }
 
     @PostConstruct
     void init() {
+        if (!enabled) return
         executorService = new ThreadPoolExecutor(
             minPoolSize, maxPoolSize,
             1L, TimeUnit.MINUTES,

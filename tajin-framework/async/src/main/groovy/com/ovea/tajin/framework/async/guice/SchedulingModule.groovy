@@ -13,22 +13,25 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package com.ovea.tajin.framework.async
+package com.ovea.tajin.framework.async.guice
 
-import groovy.transform.ToString
+import com.google.inject.AbstractModule
+import com.ovea.tajin.framework.async.DefaultJobScheduler
+import com.ovea.tajin.framework.async.JobListener
+import com.ovea.tajin.framework.async.JobRepository
+import com.ovea.tajin.framework.async.JobScheduler
+import com.ovea.tajin.framework.core.Settings
 
 /**
  * @author Mathieu Carbou (mathieu.carbou@gmail.com)
- * @date 2013-06-06
+ * @date 2013-09-05
  */
-@ToString(includeNames = true)
-class ScheduledJobCanceledEvent {
-    /**
-     * Job ids to cancel
-     */
-    final List<String> ids
-
-    ScheduledJobCanceledEvent(List<String> ids) {
-        this.ids = ids ?: []
+class SchedulingModule extends AbstractModule {
+    @Override
+    protected void configure() {
+        requireBinding(Settings)
+        requireBinding(JobRepository)
+        requireBinding(JobListener)
+        bind(JobScheduler).to(DefaultJobScheduler)
     }
 }

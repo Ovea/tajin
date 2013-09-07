@@ -15,8 +15,6 @@
  */
 package com.ovea.tajin.framework.async
 
-import com.google.common.eventbus.AllowConcurrentEvents
-import com.google.common.eventbus.Subscribe
 import com.google.common.util.concurrent.ThreadFactoryBuilder
 import com.mycila.jmx.JmxSelfNaming
 import com.mycila.jmx.annotation.JmxBean
@@ -44,17 +42,15 @@ class DefaultJobScheduler implements JobScheduler, JmxSelfNaming {
     private static final Logger LOGGER = Logger.getLogger(DefaultJobScheduler.simpleName)
     private static final AtomicLong INSTANCES = new AtomicLong(-1)
 
-    private final ConcurrentHashMap<ScheduledJobTriggeredEvent, ScheduledFuture<?>> scheduledJobs = new ConcurrentHashMap<>()
+    private final ConcurrentHashMap<TriggeredScheduledJob, ScheduledFuture<?>> scheduledJobs = new ConcurrentHashMap<>()
 
     private ScheduledExecutorService executorService
 
-    @Inject
-    JobRepository repository = new EmptyJobRepository()
-
-    @Inject
-    Dispatcher dispatcher
+    @Inject JobRepository repository = new EmptyJobRepository()
+    @Inject JobListener listener = new EmptyJobListener()
 
     int poolSize = Runtime.runtime.availableProcessors() * 2
+    boolean enabled = true
 
     DefaultJobScheduler() {
         INSTANCES.incrementAndGet()
@@ -63,10 +59,12 @@ class DefaultJobScheduler implements JobScheduler, JmxSelfNaming {
     @Inject
     void setSettings(Settings settings) {
         this.poolSize = settings.getInt('tajin.async.scheduler.poolSize', poolSize)
+        this.enabled = settings.getBoolean('tajin.async.scheduler.enabled', enabled)
     }
 
     @PostConstruct
     void init() {
+        if (!enabled) return
         this.executorService = new ScheduledThreadPoolExecutor(
             poolSize,
             new ThreadFactoryBuilder()
@@ -103,11 +101,9 @@ class DefaultJobScheduler implements JobScheduler, JmxSelfNaming {
     }
 
     @Override
-    @Subscribe
-    @AllowConcurrentEvents
-    void cancel(ScheduledJobCanceledEvent e) {
-        if (e.ids) {
-            def entries = scheduledJobs.find { k, v -> k.id in e.ids }
+    void cancel(List<String> ids) {
+        if (ids) {
+            def entries = scheduledJobs.find { k, v -> k.id in ids }
             entries.each {
                 it.value.cancel(false)
                 scheduledJobs.remove(it.key)
@@ -117,12 +113,10 @@ class DefaultJobScheduler implements JobScheduler, JmxSelfNaming {
     }
 
     @Override
-    @Subscribe
-    @AllowConcurrentEvents
-    void schedule(ScheduledJobEvent e) {
+    void schedule(ScheduledJob e) {
         if (!e.name) throw new IllegalArgumentException('Missing jobName')
         if (!e.startDate) throw new IllegalArgumentException('Missing time')
-        ScheduledJobTriggeredEvent job = new ScheduledJobTriggeredEvent(
+        TriggeredScheduledJob job = new TriggeredScheduledJob(
             source: e,
             nextTry: e.startDate
         )
@@ -146,38 +140,34 @@ class DefaultJobScheduler implements JobScheduler, JmxSelfNaming {
     }
 
     private class JobRunner implements Runnable {
-        final ScheduledJobTriggeredEvent job
+        final TriggeredScheduledJob job
 
-        JobRunner(ScheduledJobTriggeredEvent job) {
+        JobRunner(TriggeredScheduledJob job) {
             this.job = job
         }
 
         @Override
         final void run() {
-            nRunning.incrementAndGet()
-            job.callbacks = [
-                oncomplete: {
-                    scheduledJobs.remove(job)
-                    nRunning.decrementAndGet()
-                    nRan.incrementAndGet()
-                    onComplete()
-                },
-                onerror: { Throwable err ->
-                    scheduledJobs.remove(job)
-                    nFailed.incrementAndGet()
-                    job.currentRetry++
-                    job.lastRetried = new Date()
-                    onFailure()
-                    if (retryable) {
-                        job.nextTry = new Date(System.currentTimeMillis() + job.source.retryDelaySecs * 1000)
-                        doSchedule this
-                    }
-                    nRunning.decrementAndGet()
-                    nRan.incrementAndGet()
-                    LOGGER.log(Level.SEVERE, "Job ${job.source.name} with ID ${job.id} has been rescheduled at ${job.nextTry} due to a failure: ${err.message}. Job detail: ${job}", err)
+            try {
+                nRunning.incrementAndGet()
+                listener.onJobTriggered(job)
+                scheduledJobs.remove(job)
+                job.completionDate = new Date()
+                onComplete()
+            } catch (err) {
+                scheduledJobs.remove(job)
+                nFailed.incrementAndGet()
+                job.currentRetry++
+                onFailure()
+                if (retryable) {
+                    job.nextTry = new Date(System.currentTimeMillis() + job.source.retryDelaySecs * 1000)
+                    doSchedule this
                 }
-            ]
-            dispatcher.broadcast(job)
+                LOGGER.log(Level.SEVERE, "Job ${job.source.name} with ID ${job.id} has been rescheduled at ${job.nextTry} due to a failure: ${err.message}. Job detail: ${job}", err)
+            } finally {
+                nRunning.decrementAndGet()
+                nRan.incrementAndGet()
+            }
         }
 
         void onComplete() {}
@@ -188,7 +178,7 @@ class DefaultJobScheduler implements JobScheduler, JmxSelfNaming {
     }
 
     private class PersistentJobRunner extends JobRunner {
-        PersistentJobRunner(ScheduledJobTriggeredEvent job) {
+        PersistentJobRunner(TriggeredScheduledJob job) {
             super(job)
         }
 
@@ -199,7 +189,7 @@ class DefaultJobScheduler implements JobScheduler, JmxSelfNaming {
         void onFailure() { repository.update(job) }
 
         @Override
-        boolean isRetryable() { job.source.maxRetry == ScheduledJobEvent.INFINITE_RETRY || job.currentRetry < job.source.maxRetry }
+        boolean isRetryable() { job.source.maxRetry == ScheduledJob.INFINITE_RETRY || job.currentRetry < job.source.maxRetry }
     }
 
     // stats

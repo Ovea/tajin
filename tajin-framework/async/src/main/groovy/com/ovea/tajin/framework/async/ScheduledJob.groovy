@@ -24,7 +24,7 @@ import groovy.transform.ToString
  */
 @Immutable
 @ToString(includeNames = true, excludes = ['data'])
-class ScheduledJobEvent {
+class ScheduledJob {
 
     static final int INFINITE_RETRY = -1
 

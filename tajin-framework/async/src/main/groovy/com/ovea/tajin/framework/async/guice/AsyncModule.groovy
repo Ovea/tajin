@@ -21,7 +21,8 @@ import com.google.inject.matcher.Matchers
 import com.google.inject.spi.InjectionListener
 import com.google.inject.spi.TypeEncounter
 import com.google.inject.spi.TypeListener
-import com.ovea.tajin.framework.async.*
+import com.ovea.tajin.framework.async.ConfiguredEventBus
+import com.ovea.tajin.framework.async.Dispatcher
 import com.ovea.tajin.framework.core.Settings
 
 import javax.inject.Provider
@@ -31,25 +32,21 @@ import javax.inject.Provider
  * @date 2013-09-05
  */
 class AsyncModule extends AbstractModule {
-
     @Override
     protected void configure() {
         requireBinding(Settings)
-        requireBinding(JobRepository)
-
         bind(Dispatcher).to(ConfiguredEventBus)
-        bind(JobScheduler).to(DefaultJobScheduler)
-
         bindListener(Matchers.any(), new TypeListener() {
             @Override
             public <I> void hear(TypeLiteral<I> type, TypeEncounter<I> encounter) {
                 if (type.rawType.getMethods().find { it.isAnnotationPresent(Subscribe) }) {
                     Provider<Injector> i = encounter.getProvider(Injector)
                     Provider<ConfiguredEventBus> e = encounter.getProvider(ConfiguredEventBus)
+                    Provider<Settings> s = encounter.getProvider(Settings)
                     encounter.register(new InjectionListener<Object>() {
                         @Override
                         void afterInjection(Object injectee) {
-                            if (!Scopes.isSingleton(i.get().getBinding(Key.get(type)))) {
+                            if (s.get().getBoolean('tajin.async.dispatcher.enabled', true) && !Scopes.isSingleton(i.get().getBinding(Key.get(type)))) {
                                 throw new IllegalStateException("Cannot register object " + injectee.class + " containing @Subscribe methods to EventBus because it is not registered as a singleton")
                             }
                             e.get().register(injectee)
@@ -59,5 +56,4 @@ class AsyncModule extends AbstractModule {
             }
         })
     }
-
 }

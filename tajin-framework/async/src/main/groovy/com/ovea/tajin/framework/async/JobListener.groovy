@@ -17,26 +17,8 @@ package com.ovea.tajin.framework.async
 
 /**
  * @author Mathieu Carbou (mathieu.carbou@gmail.com)
- * @date 2013-09-06
+ * @date 2013-09-07
  */
- class EmptyJobRepository implements JobRepository {
-     @Override
-     void delete(List<TriggeredScheduledJob> jobs) {
-
-     }
-
-     @Override
-     void insert(TriggeredScheduledJob job) {
-
-     }
-
-     @Override
-     void update(TriggeredScheduledJob job) {
-
-     }
-
-     @Override
-     List<TriggeredScheduledJob> listPendingJobs() {
-         return []
-     }
- }
+interface JobListener {
+    void onJobTriggered(TriggeredScheduledJob e)
+}

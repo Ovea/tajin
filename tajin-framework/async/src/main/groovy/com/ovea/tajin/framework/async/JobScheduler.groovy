@@ -21,8 +21,8 @@ package com.ovea.tajin.framework.async
  */
 interface JobScheduler {
 
-    void schedule(ScheduledJobEvent e)
+    void schedule(ScheduledJob e)
 
-    void cancel(ScheduledJobCanceledEvent e)
+    void cancel(List<String> ids)
 
 }
