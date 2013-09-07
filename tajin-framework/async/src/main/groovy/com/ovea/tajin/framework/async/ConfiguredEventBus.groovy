@@ -18,8 +18,11 @@ package com.ovea.tajin.framework.async
 import com.google.common.eventbus.AsyncEventBus
 import com.google.common.eventbus.EventBus
 import com.google.common.util.concurrent.ThreadFactoryBuilder
+import com.ovea.tajin.framework.core.Settings
 
+import javax.annotation.PostConstruct
 import javax.annotation.PreDestroy
+import javax.inject.Inject
 import java.util.concurrent.*
 import java.util.logging.Level
 import java.util.logging.Logger
@@ -28,26 +31,25 @@ import java.util.logging.Logger
  * @author Mathieu Carbou (mathieu.carbou@gmail.com)
  * @date 2013-09-05
  */
+@javax.inject.Singleton
 class ConfiguredEventBus implements Dispatcher {
 
     private static final Logger LOGGER = Logger.getLogger(ConfiguredEventBus.name)
 
-    private final ExecutorService executorService
-    private final EventBus eventBus
+    private ExecutorService executorService
+    private EventBus eventBus
 
-    ConfiguredEventBus(Executor executor) {
-        // executor managed elsewhere
-        this.executorService = null
-        this.eventBus = new AsyncEventBus(executor)
+    int minPoolSize = 0
+    int maxPoolSize = 100
+
+    @Inject
+    void setSettings(Settings settings) {
+        this.minPoolSize = settings.getInt('tajin.async.dispatcher.minPoolSize', minPoolSize)
+        this.maxPoolSize = settings.getInt('tajin.async.dispatcher.maxPoolSize', maxPoolSize)
     }
 
-    ConfiguredEventBus(ExecutorService executorService) {
-        // executor managed elsewhere
-        this.executorService = null
-        this.eventBus = new AsyncEventBus(executorService)
-    }
-
-    ConfiguredEventBus(int minPoolSize, int maxPoolSize) {
+    @PostConstruct
+    void init() {
         executorService = new ThreadPoolExecutor(
             minPoolSize, maxPoolSize,
             1L, TimeUnit.MINUTES,
@@ -72,25 +74,27 @@ class ConfiguredEventBus implements Dispatcher {
         eventBus = new AsyncEventBus(executorService)
     }
 
+    @PreDestroy
+    void shutdown() {
+        executorService.shutdown()
+        try {
+            executorService.awaitTermination(30, TimeUnit.SECONDS)
+        } catch (e) {
+            LOGGER.log(Level.SEVERE, 'Unable to terminate after 30 seconds', e)
+        }
+    }
+
     void register(Object o) {
         LOGGER.info('+subscriber ' + o.class.name)
         eventBus.register(o)
     }
 
     void unregister(Object o) {
-        LOGGER.info('+subscriber ' + o.class.name)
+        LOGGER.info('-subscriber ' + o.class.name)
         eventBus.unregister(o)
     }
 
     @Override
     void broadcast(Object event) { eventBus.post(event) }
-
-    @PreDestroy
-    void shutdown() {
-        if (executorService) {
-            executorService.shutdown()
-            executorService.awaitTermination(1, TimeUnit.MINUTES)
-        }
-    }
 
 }

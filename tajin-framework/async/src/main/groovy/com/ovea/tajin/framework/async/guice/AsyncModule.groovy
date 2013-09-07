@@ -21,8 +21,7 @@ import com.google.inject.matcher.Matchers
 import com.google.inject.spi.InjectionListener
 import com.google.inject.spi.TypeEncounter
 import com.google.inject.spi.TypeListener
-import com.ovea.tajin.framework.async.ConfiguredEventBus
-import com.ovea.tajin.framework.async.Dispatcher
+import com.ovea.tajin.framework.async.*
 import com.ovea.tajin.framework.core.Settings
 
 import javax.inject.Provider
@@ -36,8 +35,10 @@ class AsyncModule extends AbstractModule {
     @Override
     protected void configure() {
         requireBinding(Settings)
+        requireBinding(JobRepository)
 
         bind(Dispatcher).to(ConfiguredEventBus)
+        bind(JobScheduler).to(DefaultJobScheduler)
 
         bindListener(Matchers.any(), new TypeListener() {
             @Override
@@ -57,15 +58,6 @@ class AsyncModule extends AbstractModule {
                 }
             }
         })
-    }
-
-    @Provides
-    @javax.inject.Singleton
-    ConfiguredEventBus getConfiguredEventBus(Settings settings) {
-        return new ConfiguredEventBus(
-            settings.getInt('tajin.async.dispatcher.minPoolSize', 0),
-            settings.getInt('tajin.async.dispatcher.maxPoolSize', 100)
-        )
     }
 
 }

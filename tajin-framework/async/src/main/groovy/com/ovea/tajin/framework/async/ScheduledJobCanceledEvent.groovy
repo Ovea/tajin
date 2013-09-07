@@ -13,23 +13,22 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package com.ovea.tajin.framework.scheduling
+package com.ovea.tajin.framework.async
 
-import com.ovea.tajin.framework.core.Uuid
 import groovy.transform.ToString
 
 /**
  * @author Mathieu Carbou (mathieu.carbou@gmail.com)
  * @date 2013-06-06
  */
-@ToString(includes = ['id', 'name', 'start', 'retry'])
-class Job {
-    String id = Uuid.generate()
-    Date createdDate = new Date()
-    Date updatedDate = createdDate
-    Date start = createdDate
-    String name
-    Date end
-    int retry
-    Map<String, ?> data = [:]
+@ToString(includeNames = true)
+class ScheduledJobCanceledEvent {
+    /**
+     * Job ids to cancel
+     */
+    final List<String> ids
+
+    ScheduledJobCanceledEvent(List<String> ids) {
+        this.ids = ids ?: []
+    }
 }

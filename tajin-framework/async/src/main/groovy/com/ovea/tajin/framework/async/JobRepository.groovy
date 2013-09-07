@@ -13,14 +13,18 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package com.ovea.tajin.framework.scheduling
+package com.ovea.tajin.framework.async
 
 /**
  * @author Mathieu Carbou (mathieu.carbou@gmail.com)
  * @date 2013-06-06
  */
 interface JobRepository {
-    void save(Job job)
-    void delete(Collection<Job> jobs)
-    List<Job> listPendingJobs()
+    void insert(ScheduledJobTriggeredEvent job)
+
+    void update(ScheduledJobTriggeredEvent job)
+
+    void delete(List<ScheduledJobTriggeredEvent> jobs)
+
+    List<ScheduledJobTriggeredEvent> listPendingJobs()
 }
