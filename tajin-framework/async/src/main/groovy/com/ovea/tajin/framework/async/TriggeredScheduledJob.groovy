@@ -42,7 +42,7 @@ class TriggeredScheduledJob {
     /**
      * Date of last retry
      */
-    Date lastRetried
+    Date lastTry
 
     Date nextTry
 

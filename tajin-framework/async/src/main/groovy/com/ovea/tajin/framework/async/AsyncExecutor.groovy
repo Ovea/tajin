@@ -13,25 +13,19 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package com.ovea.tajin.framework.async.guice
+package com.ovea.tajin.framework.async
 
-import com.google.inject.AbstractModule
-import com.ovea.tajin.framework.async.DefaultJobScheduler
-import com.ovea.tajin.framework.async.JobListener
-import com.ovea.tajin.framework.async.JobRepository
-import com.ovea.tajin.framework.async.JobScheduler
-import com.ovea.tajin.framework.core.Settings
+import javax.inject.Qualifier
+import java.lang.annotation.ElementType
+import java.lang.annotation.Retention
+import java.lang.annotation.RetentionPolicy
+import java.lang.annotation.Target
 
 /**
  * @author Mathieu Carbou (mathieu.carbou@gmail.com)
- * @date 2013-09-05
+ * @date 2013-09-07
  */
-class SchedulingModule extends AbstractModule {
-    @Override
-    protected void configure() {
-        requireBinding(Settings)
-        requireBinding(JobRepository)
-        requireBinding(JobListener)
-        bind(JobScheduler).to(DefaultJobScheduler)
-    }
-}
+@Retention(RetentionPolicy.RUNTIME)
+@Target([ElementType.FIELD, ElementType.PARAMETER, ElementType.METHOD])
+@Qualifier
+public @interface AsyncExecutor {}

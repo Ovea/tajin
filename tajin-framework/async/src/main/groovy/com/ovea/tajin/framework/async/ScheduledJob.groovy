@@ -15,14 +15,12 @@
  */
 package com.ovea.tajin.framework.async
 
-import groovy.transform.Immutable
 import groovy.transform.ToString
 
 /**
  * @author Mathieu Carbou (mathieu.carbou@gmail.com)
  * @date 2013-06-06
  */
-@Immutable
 @ToString(includeNames = true, excludes = ['data'])
 class ScheduledJob {
 

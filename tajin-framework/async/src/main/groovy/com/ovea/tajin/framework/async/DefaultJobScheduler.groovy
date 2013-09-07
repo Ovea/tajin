@@ -26,7 +26,14 @@ import javax.annotation.PreDestroy
 import javax.inject.Inject
 import javax.management.MalformedObjectNameException
 import javax.management.ObjectName
-import java.util.concurrent.*
+import java.util.concurrent.ConcurrentHashMap
+import java.util.concurrent.ExecutionException
+import java.util.concurrent.Executor
+import java.util.concurrent.Future
+import java.util.concurrent.FutureTask
+import java.util.concurrent.ScheduledExecutorService
+import java.util.concurrent.ScheduledThreadPoolExecutor
+import java.util.concurrent.TimeUnit
 import java.util.concurrent.atomic.AtomicLong
 import java.util.logging.Level
 import java.util.logging.Logger
@@ -42,43 +49,43 @@ class DefaultJobScheduler implements JobScheduler, JmxSelfNaming {
     private static final Logger LOGGER = Logger.getLogger(DefaultJobScheduler.simpleName)
     private static final AtomicLong INSTANCES = new AtomicLong(-1)
 
-    private final ConcurrentHashMap<TriggeredScheduledJob, ScheduledFuture<?>> scheduledJobs = new ConcurrentHashMap<>()
+    private final ConcurrentHashMap<TriggeredScheduledJob, Future<?>> scheduledJobs = new ConcurrentHashMap<>()
 
     private ScheduledExecutorService executorService
 
     @Inject JobRepository repository = new EmptyJobRepository()
     @Inject JobListener listener = new EmptyJobListener()
-
-    int poolSize = Runtime.runtime.availableProcessors() * 2
-    boolean enabled = true
+    @Inject Settings settings
+    @Inject @AsyncExecutor Executor fallbackExecutor
 
     DefaultJobScheduler() {
         INSTANCES.incrementAndGet()
     }
 
-    @Inject
-    void setSettings(Settings settings) {
-        this.poolSize = settings.getInt('tajin.async.scheduler.poolSize', poolSize)
-        this.enabled = settings.getBoolean('tajin.async.scheduler.enabled', enabled)
-    }
-
     @PostConstruct
     void init() {
-        if (!enabled) return
-        this.executorService = new ScheduledThreadPoolExecutor(
-            poolSize,
-            new ThreadFactoryBuilder()
-                .setDaemon(false)
-                .setNameFormat("${DefaultJobScheduler.simpleName}-thread-%d")
-                .setUncaughtExceptionHandler(new Thread.UncaughtExceptionHandler() {
-                @Override
-                void uncaughtException(Thread t, Throwable e) {
-                    LOGGER.log(Level.SEVERE, "UncaughtException in ${Dispatcher.simpleName} thread '${t.name}': ${e.message}", e)
-                }
-            }).build()
-        )
-        repository?.listPendingJobs()?.findAll { it.currentRetry <= it.source.maxRetry }?.each {
-            doSchedule(new PersistentJobRunner(it))
+        boolean enabled = settings.getBoolean('tajin.async.scheduler.enabled', true)
+        if (enabled) {
+            int poolSize = settings.getInt('tajin.async.scheduler.poolSize', 2 * Runtime.runtime.availableProcessors())
+            if (poolSize <= 0) throw new IllegalArgumentException("Invalid pool size: " + poolSize + ". 'tajin.async.scheduler.poolSize' must be greater than 0.")
+            this.executorService = new ScheduledThreadPoolExecutor(
+                poolSize,
+                new ThreadFactoryBuilder()
+                    .setDaemon(false)
+                    .setNameFormat("${JobScheduler.simpleName}-thread-%d")
+                    .setUncaughtExceptionHandler(new Thread.UncaughtExceptionHandler() {
+                    @Override
+                    void uncaughtException(Thread t, Throwable e) {
+                        LOGGER.log(Level.SEVERE, "UncaughtException in ${Dispatcher.simpleName} thread '${t.name}': ${e.message}", e)
+                    }
+                }).build()
+            ).with {
+                it.removeOnCancelPolicy = true
+                return it
+            }
+            repository?.listPendingJobs()?.findAll { it.currentRetry <= it.source.maxRetry }?.each {
+                doSchedule(new PersistentJobRunner(it))
+            }
         }
     }
 
@@ -129,14 +136,24 @@ class DefaultJobScheduler implements JobScheduler, JmxSelfNaming {
     }
 
     private void doSchedule(JobRunner jobRunner) {
-        if (!executorService.shutdown && !executorService.terminated) {
-            long diff = Math.max(0, jobRunner.job.nextTry.time - System.currentTimeMillis())
-            LOGGER.fine("Scheduling: ${jobRunner.job} in ${diff / 1000}s")
-            ScheduledFuture<?> future = executorService.schedule(jobRunner, diff, TimeUnit.MILLISECONDS)
-            scheduledJobs.put(jobRunner.job, future)
-        } else {
-            throw new IllegalStateException('Job Scheduler is closing or closed and cannot accept new job. Job ' + jobRunner.job + ' will be executed at next startup.')
+        long diff = Math.max(0, jobRunner.job.nextTry.time - System.currentTimeMillis())
+        LOGGER.fine("Scheduling: ${jobRunner.job} in ${diff / 1000}s")
+        FutureTask<?> future = new FutureTask(jobRunner, null) {
+            @Override
+            protected void done() {
+                try {
+                    get()
+                } catch (ExecutionException e) {
+                    throw e.cause
+                }
+            }
         }
+        if (diff == 0 && fallbackExecutor) {
+            fallbackExecutor.execute(future)
+        } else {
+            executorService.schedule(future, diff, TimeUnit.MILLISECONDS)
+        }
+        scheduledJobs.put(jobRunner.job, future)
     }
 
     private class JobRunner implements Runnable {
@@ -158,12 +175,26 @@ class DefaultJobScheduler implements JobScheduler, JmxSelfNaming {
                 scheduledJobs.remove(job)
                 nFailed.incrementAndGet()
                 job.currentRetry++
-                onFailure()
+                job.lastTry = new Date()
                 if (retryable) {
                     job.nextTry = new Date(System.currentTimeMillis() + job.source.retryDelaySecs * 1000)
+                    try {
+                        onFailure()
+                    } catch (err2) {
+                        LOGGER.log(Level.SEVERE, "Job ${job.source.name} with ID ${job.id} has been rescheduled at ${job.nextTry} due to a failure: ${err2.message}. Job detail: ${job}", err2)
+                        throw err2
+                    }
                     doSchedule this
+                } else {
+                    try {
+                        onFailure()
+                    } catch (err2) {
+                        LOGGER.log(Level.SEVERE, "Job ${job.source.name} with ID ${job.id} has been rescheduled at ${job.nextTry} due to a failure: ${err2.message}. Job detail: ${job}", err2)
+                        throw err2
+                    }
                 }
-                LOGGER.log(Level.SEVERE, "Job ${job.source.name} with ID ${job.id} has been rescheduled at ${job.nextTry} due to a failure: ${err.message}. Job detail: ${job}", err)
+                //LOGGER.log(Level.SEVERE, "Job ${job.source.name} with ID ${job.id} has been rescheduled at ${job.nextTry} due to a failure: ${err.message}. Job detail: ${job}", err)
+                throw err
             } finally {
                 nRunning.decrementAndGet()
                 nRan.incrementAndGet()

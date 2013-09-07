@@ -15,16 +15,11 @@
  */
 package com.ovea.tajin.framework.async
 
-import com.google.common.eventbus.AsyncEventBus
-import com.google.common.eventbus.EventBus
-import com.google.common.util.concurrent.ThreadFactoryBuilder
 import com.ovea.tajin.framework.core.Settings
 
 import javax.annotation.PostConstruct
-import javax.annotation.PreDestroy
 import javax.inject.Inject
-import java.util.concurrent.*
-import java.util.logging.Level
+import java.util.concurrent.Executor
 import java.util.logging.Logger
 
 /**
@@ -36,54 +31,15 @@ class ConfiguredEventBus implements Dispatcher {
 
     private static final Logger LOGGER = Logger.getLogger(ConfiguredEventBus.name)
 
-    private ExecutorService executorService
+    @Inject @AsyncExecutor Executor executor
+    @Inject Settings settings
+
     private EventBus eventBus
-
-    int minPoolSize = 0
-    int maxPoolSize = 100
-    boolean enabled = true
-
-    @Inject
-    void setSettings(Settings settings) {
-        this.minPoolSize = settings.getInt('tajin.async.dispatcher.minPoolSize', minPoolSize)
-        this.maxPoolSize = settings.getInt('tajin.async.dispatcher.maxPoolSize', maxPoolSize)
-        this.enabled = settings.getBoolean('tajin.async.dispatcher.enabled', enabled)
-    }
 
     @PostConstruct
     void init() {
-        if (!enabled) return
-        executorService = new ThreadPoolExecutor(
-            minPoolSize, maxPoolSize,
-            1L, TimeUnit.MINUTES,
-            new SynchronousQueue<Runnable>(),
-            new ThreadFactoryBuilder()
-                .setDaemon(false)
-                .setNameFormat("${Dispatcher.simpleName}-thread-%d")
-                .setUncaughtExceptionHandler(new Thread.UncaughtExceptionHandler() {
-                @Override
-                void uncaughtException(Thread t, Throwable e) {
-                    LOGGER.log(Level.SEVERE, "UncaughtException in ${Dispatcher.simpleName} thread '${t.name}': ${e.message}", e)
-                }
-            }).build(),
-            new RejectedExecutionHandler() {
-                @Override
-                void rejectedExecution(Runnable r, ThreadPoolExecutor executor) {
-                    // if the task cannot go within the pool, just run it in the current thread
-                    r.run()
-                }
-            }
-        )
-        eventBus = new AsyncEventBus(executorService)
-    }
-
-    @PreDestroy
-    void shutdown() {
-        executorService.shutdown()
-        try {
-            executorService.awaitTermination(30, TimeUnit.SECONDS)
-        } catch (e) {
-            LOGGER.log(Level.SEVERE, 'Unable to terminate after 30 seconds', e)
+        if (settings.getBoolean('tajin.async.dispatcher.enabled', true)) {
+            eventBus = new AsyncEventBus(executor)
         }
     }
 

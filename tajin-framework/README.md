@@ -51,10 +51,14 @@ Adds asynchronous Event support in your project. This module contains a `Dispatc
 
 __Settings__
 
+ - `tajin.async.dispatcher.enabled`: Specify if you want to activate or not async feature
+    - Default: `true`
  - `tajin.async.dispatcher.minPoolSize`: Specify the minimum pool size for async events
     - Default: `0`
  - `tajin.async.dispatcher.maxPoolSize`: Specify the maximum pool size for async events. If the pool size is reached, events will be dispatched on the same thread firing them.
-    - Default: `100`
+    - Default: `10 * <cpu count>`
+ - `tajin.async.scheduler.enabled`: Specify if you want to activate or not scheduling feature
+    - Default: `true`
  - `tajin.async.scheduler.poolSize`: Specify the pool size for scheduled tasks
     - Default: `2 * <cpu count>`
 
