@@ -43,7 +43,7 @@
         <module>core</module>
         <module>i18n</module>
         <module>async</module>
-        
+
         <!--<module>groovy</module>-->
         <!--<module>templating</module>-->
 
@@ -169,6 +169,12 @@
                 <groupId>com.mycila</groupId>
                 <artifactId>mycila-jmx</artifactId>
                 <version>1.1.ga</version>
+                <exclusions>
+                    <exclusion>
+                        <groupId>org.sonatype.sisu</groupId>
+                        <artifactId>sisu-guice</artifactId>
+                    </exclusion>
+                </exclusions>
             </dependency>
 
             <!-- tools -->

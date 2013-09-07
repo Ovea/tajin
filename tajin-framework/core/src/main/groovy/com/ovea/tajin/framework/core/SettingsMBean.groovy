@@ -13,24 +13,24 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package com.ovea.tajin.framework.util
+package com.ovea.tajin.framework.core
 
 import com.mycila.jmx.annotation.JmxBean
 import com.mycila.jmx.annotation.JmxMethod
 import com.mycila.jmx.annotation.JmxProperty
 
-import javax.inject.Inject
-
 /**
  * @author Mathieu Carbou (mathieu.carbou@gmail.com)
  * @date 2013-06-19
  */
-@javax.inject.Singleton
-@JmxBean('com.ovea.tajin:type=PropertySettings,name=main')
-class PropertySettingsMBean {
+@JmxBean('com.ovea.tajin:type=Settings,name=main')
+class SettingsMBean {
 
-    @Inject
-    PropertySettings settings
+    final Settings settings
+
+    SettingsMBean(Settings settings) {
+        this.settings = settings
+    }
 
     @JmxMethod
     void set(String key, String value) { settings.properties.setProperty(key, value) }
@@ -41,6 +41,6 @@ class PropertySettingsMBean {
     void unset(String key) { settings.properties.remove(key) }
 
     @JmxProperty
-    Map<String,String> getProperties() { new TreeMap<String, String>(settings.properties) }
+    Map<String, String> getProperties() { new TreeMap<String, String>(settings.properties) }
 
 }

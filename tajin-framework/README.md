@@ -55,6 +55,8 @@ __Settings__
     - Default: `0`
  - `tajin.async.dispatcher.maxPoolSize`: Specify the maximum pool size for async events. If the pool size is reached, events will be dispatched on the same thread firing them.
     - Default: `100`
+ - `tajin.async.scheduler.poolSize`: Specify the pool size for scheduled tasks
+    - Default: `2 * <cpu count>`
 
 ### tajin-all ###
 
