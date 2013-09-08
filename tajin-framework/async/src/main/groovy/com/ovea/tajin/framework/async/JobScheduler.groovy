@@ -23,6 +23,6 @@ interface JobScheduler {
 
     void schedule(ScheduledJob e)
 
-    void cancel(List<String> ids)
+    void cancel(Collection<String> ids)
 
 }

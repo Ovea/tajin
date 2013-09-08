@@ -16,17 +16,16 @@
 package com.ovea.tajin.framework.async
 
 import com.google.common.util.concurrent.ThreadFactoryBuilder
-import com.mycila.jmx.JmxSelfNaming
 import com.mycila.jmx.annotation.JmxBean
+import com.mycila.jmx.annotation.JmxMethod
 import com.mycila.jmx.annotation.JmxProperty
 import com.ovea.tajin.framework.core.Settings
 
 import javax.annotation.PostConstruct
 import javax.annotation.PreDestroy
 import javax.inject.Inject
-import javax.management.MalformedObjectNameException
-import javax.management.ObjectName
 import java.util.concurrent.ConcurrentHashMap
+import java.util.concurrent.ConcurrentMap
 import java.util.concurrent.ExecutionException
 import java.util.concurrent.Executor
 import java.util.concurrent.Future
@@ -42,25 +41,21 @@ import java.util.logging.Logger
  * @author Mathieu Carbou (mathieu.carbou@gmail.com)
  * @date 2013-06-06
  */
-@JmxBean
+@JmxBean('com.ovea.tajin:type=JobScheduler,name=main')
 @javax.inject.Singleton
-class DefaultJobScheduler implements JobScheduler, JmxSelfNaming {
+class DefaultJobScheduler implements JobScheduler {
 
-    private static final Logger LOGGER = Logger.getLogger(DefaultJobScheduler.simpleName)
-    private static final AtomicLong INSTANCES = new AtomicLong(-1)
+    private static final Logger LOGGER = Logger.getLogger(JobScheduler.simpleName)
 
-    private final ConcurrentHashMap<TriggeredScheduledJob, Future<?>> scheduledJobs = new ConcurrentHashMap<>()
+    private final ConcurrentMap<String, Bucket> scheduledJobs = new ConcurrentHashMap<>()
 
     private ScheduledExecutorService executorService
 
     @Inject JobRepository repository = new EmptyJobRepository()
     @Inject JobListener listener = new EmptyJobListener()
     @Inject Settings settings
-    @Inject @AsyncExecutor Executor fallbackExecutor
-
-    DefaultJobScheduler() {
-        INSTANCES.incrementAndGet()
-    }
+    @Inject
+    @AsyncExecutor Executor fallbackExecutor
 
     @PostConstruct
     void init() {
@@ -83,8 +78,16 @@ class DefaultJobScheduler implements JobScheduler, JmxSelfNaming {
                 it.removeOnCancelPolicy = true
                 return it
             }
-            repository?.listPendingJobs()?.findAll { it.currentRetry <= it.source.maxRetry }?.each {
-                doSchedule(new PersistentJobRunner(it))
+            List<TriggeredScheduledJob> deletions = []
+            repository?.listPendingJobs()?.each {
+                if (it.retryable) {
+                    doSchedule(new PersistentJobRunner(it))
+                } else {
+                    deletions << it
+                }
+            }
+            if (deletions) {
+                repository.delete(deletions)
             }
         }
     }
@@ -92,30 +95,28 @@ class DefaultJobScheduler implements JobScheduler, JmxSelfNaming {
     @PreDestroy
     void shutdown() {
         while (scheduledJobs) {
-            scheduledJobs.keySet().each { scheduledJobs.remove(it)?.cancel(false) }
+            cancel(scheduledJobs.keySet())
         }
         executorService.shutdown()
         try {
             executorService.awaitTermination(30, TimeUnit.SECONDS)
-        } catch (e) {
+        } catch (Throwable e) {
             LOGGER.log(Level.SEVERE, 'Unable to terminate after 30 seconds', e)
         }
     }
 
     @Override
-    ObjectName getObjectName() throws MalformedObjectNameException {
-        return new ObjectName("com.ovea.tajin:type=${getClass().simpleName},name=${INSTANCES.get()}")
-    }
-
-    @Override
-    void cancel(List<String> ids) {
+    void cancel(Collection<String> ids) {
         if (ids) {
-            def entries = scheduledJobs.find { k, v -> k.id in ids }
-            entries.each {
-                it.value.cancel(false)
-                scheduledJobs.remove(it.key)
+            List<TriggeredScheduledJob> jobs = []
+            ids.each { String id ->
+                Bucket b = scheduledJobs.remove(id)
+                if (b) {
+                    jobs << b.job
+                    b.future.cancel(false)
+                }
             }
-            repository.delete(entries.collect { it.key })
+            repository.delete(jobs)
         }
     }
 
@@ -138,22 +139,32 @@ class DefaultJobScheduler implements JobScheduler, JmxSelfNaming {
     private void doSchedule(JobRunner jobRunner) {
         long diff = Math.max(0, jobRunner.job.nextTry.time - System.currentTimeMillis())
         LOGGER.fine("Scheduling: ${jobRunner.job} in ${diff / 1000}s")
-        FutureTask<?> future = new FutureTask(jobRunner, null) {
-            @Override
-            protected void done() {
-                try {
-                    get()
-                } catch (ExecutionException e) {
-                    throw e.cause
+        if (diff == 0 && fallbackExecutor) {
+            FutureTask<?> future = new FutureTask(jobRunner, null) {
+                @Override
+                protected void done() {
+                    try {
+                        get()
+                    } catch (ExecutionException e) {
+                        throw e.cause
+                    }
                 }
             }
-        }
-        if (diff == 0 && fallbackExecutor) {
+            scheduledJobs.put(jobRunner.job.id, new Bucket(
+                job: jobRunner.job,
+                future: future
+            ))
             fallbackExecutor.execute(future)
         } else {
-            executorService.schedule(future, diff, TimeUnit.MILLISECONDS)
+            Future<?> future = executorService.schedule(jobRunner, diff, TimeUnit.MILLISECONDS)
+            if (!future.done) {
+                scheduledJobs.put(jobRunner.job.id, new Bucket(
+                    job: jobRunner.job,
+                    future: future
+                ))
+            }
         }
-        scheduledJobs.put(jobRunner.job, future)
+
     }
 
     private class JobRunner implements Runnable {
@@ -168,32 +179,22 @@ class DefaultJobScheduler implements JobScheduler, JmxSelfNaming {
             try {
                 nRunning.incrementAndGet()
                 listener.onJobTriggered(job)
-                scheduledJobs.remove(job)
+                scheduledJobs.remove(job.id)
                 job.completionDate = new Date()
                 onComplete()
-            } catch (err) {
-                scheduledJobs.remove(job)
+            } catch (Throwable err) {
+                scheduledJobs.remove(job.id)
                 nFailed.incrementAndGet()
                 job.currentRetry++
                 job.lastTry = new Date()
-                if (retryable) {
-                    job.nextTry = new Date(System.currentTimeMillis() + job.source.retryDelaySecs * 1000)
-                    try {
-                        onFailure()
-                    } catch (err2) {
-                        LOGGER.log(Level.SEVERE, "Job ${job.source.name} with ID ${job.id} has been rescheduled at ${job.nextTry} due to a failure: ${err2.message}. Job detail: ${job}", err2)
-                        throw err2
-                    }
+                job.nextTry = new Date(System.currentTimeMillis() + job.source.retryDelaySecs * 1000)
+                onFailure()
+                listener.onJobFailure(job, err)
+                if (job.retryable) {
                     doSchedule this
                 } else {
-                    try {
-                        onFailure()
-                    } catch (err2) {
-                        LOGGER.log(Level.SEVERE, "Job ${job.source.name} with ID ${job.id} has been rescheduled at ${job.nextTry} due to a failure: ${err2.message}. Job detail: ${job}", err2)
-                        throw err2
-                    }
+                    onAbandon()
                 }
-                //LOGGER.log(Level.SEVERE, "Job ${job.source.name} with ID ${job.id} has been rescheduled at ${job.nextTry} due to a failure: ${err.message}. Job detail: ${job}", err)
                 throw err
             } finally {
                 nRunning.decrementAndGet()
@@ -205,7 +206,8 @@ class DefaultJobScheduler implements JobScheduler, JmxSelfNaming {
 
         void onFailure() {}
 
-        boolean isRetryable() { false }
+        void onAbandon() {}
+
     }
 
     private class PersistentJobRunner extends JobRunner {
@@ -217,10 +219,30 @@ class DefaultJobScheduler implements JobScheduler, JmxSelfNaming {
         void onComplete() { repository.update(job) }
 
         @Override
-        void onFailure() { repository.update(job) }
+        void onFailure() {
+            try {
+                repository.update(job)
+            } catch (Throwable err) {
+                LOGGER.log(Level.SEVERE, err.message, err)
+                throw err
+            }
+        }
 
         @Override
-        boolean isRetryable() { job.source.maxRetry == ScheduledJob.INFINITE_RETRY || job.currentRetry < job.source.maxRetry }
+        void onAbandon() {
+            try {
+                repository.delete([job])
+            } catch (Throwable err) {
+                LOGGER.log(Level.SEVERE, err.message, err)
+                throw err
+            }
+        }
+
+    }
+
+    static final class Bucket {
+        TriggeredScheduledJob job
+        Future<?> future
     }
 
     // stats
@@ -242,9 +264,15 @@ class DefaultJobScheduler implements JobScheduler, JmxSelfNaming {
     long getFailedCount() { nFailed.get() }
 
     @JmxProperty
-    Collection<String> getScheduledJobs() {
+    Collection<String> getScheduledJobInfos() {
         long now = System.currentTimeMillis()
-        scheduledJobs.collect { k, v -> "${k.id} ${k.source.name} in ${Math.max(0, k.source.startDate.time - now) / 1000}s" as String }
+        return scheduledJobs.collect { k, v -> "${k} ${v.job.source.name} at ${v.job.nextTry}" as String }
     }
+
+    @JmxProperty
+    Collection<String> getScheduledJobIds() { scheduledJobs.collect { k, v -> k } }
+
+    @JmxMethod
+    void cancel(String jobId) { cancel([jobId]) }
 
 }

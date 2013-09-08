@@ -15,6 +15,8 @@
  */
 package com.ovea.tajin.framework.async
 
+import com.ovea.tajin.framework.async.guava.AsyncEventBus
+import com.ovea.tajin.framework.async.guava.EventBus
 import com.ovea.tajin.framework.core.Settings
 
 import javax.annotation.PostConstruct
@@ -29,7 +31,7 @@ import java.util.logging.Logger
 @javax.inject.Singleton
 class ConfiguredEventBus implements Dispatcher {
 
-    private static final Logger LOGGER = Logger.getLogger(ConfiguredEventBus.name)
+    private static final Logger LOGGER = Logger.getLogger(Dispatcher.name)
 
     @Inject @AsyncExecutor Executor executor
     @Inject Settings settings

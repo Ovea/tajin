@@ -20,5 +20,6 @@ package com.ovea.tajin.framework.async
  * @date 2013-09-07
  */
 interface JobListener {
-    void onJobTriggered(TriggeredScheduledJob e)
+    void onJobTriggered(TriggeredScheduledJob job)
+    void onJobFailure(TriggeredScheduledJob job, Throwable err)
 }

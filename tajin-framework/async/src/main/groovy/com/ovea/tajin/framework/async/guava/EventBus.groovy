@@ -1,5 +1,5 @@
-/**
- * Copyright (C) 2011 Ovea <dev@ovea.com>
+/*
+ * Copyright (C) 2007 The Guava Authors
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -13,7 +13,8 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package com.ovea.tajin.framework.async
+
+package com.ovea.tajin.framework.async.guava
 
 import com.google.common.annotations.Beta
 import com.google.common.annotations.VisibleForTesting
@@ -49,14 +50,14 @@ import static com.google.common.base.Preconditions.checkNotNull
  * To receive events, an object should:<ol>
  * <li>Expose a public method, known as the <i>event handler</i>, which accepts
  *     a single argument of the type of event desired;</li>
- * <li>Mark it with a {@link Subscribe} annotation;</li>
- * <li>Pass itself to an EventBus instance's {@link #register(Object)} method.
+ * <li>Mark it with a {@link com.google.common.eventbus.Subscribe} annotation;</li>
+ * <li>Pass itself to an EventBus instance's {@link EventBus#register(Object)} method.
  *     </li>
  * </ol>
  *
  * <h2>Posting Events</h2>
  * To post an event, simply provide the event object to the
- * {@link #post(Object)} method.  The EventBus instance will determine the type
+ * {@link EventBus#post(Object)} method.  The EventBus instance will determine the type
  * of event and route it to all registered listeners.
  *
  * <p>Events are routed based on their type &mdash; an event will be delivered
@@ -76,6 +77,12 @@ import static com.google.common.base.Preconditions.checkNotNull
  * catch and log the exception.  This is rarely the right solution for error
  * handling and should not be relied upon; it is intended solely to help find
  * problems during development.
+ *
+ * <p>The EventBus guarantees that it will not call a handler method from
+ * multiple threads simultaneously, unless the method explicitly allows it by
+ * bearing the {@link com.google.common.eventbus.AllowConcurrentEvents} annotation.  If this annotation is
+ * not present, handler methods need not worry about being reentrant, unless
+ * also called from outside the EventBus.
  *
  * <h2>Dead Events</h2>
  * If an event is posted, but no registered handlers can accept it, it is

@@ -1,5 +1,5 @@
-/**
- * Copyright (C) 2011 Ovea <dev@ovea.com>
+/*
+ * Copyright (C) 2007 The Guava Authors
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -13,7 +13,8 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package com.ovea.tajin.framework.async
+
+package com.ovea.tajin.framework.async.guava
 
 import com.google.common.base.Preconditions
 
@@ -82,7 +83,8 @@ class EventHandler {
     @Override
     public int hashCode() {
         final int PRIME = 31;
-        return (PRIME + method.hashCode()) * PRIME + System.identityHashCode(target);
+        return (PRIME + method.hashCode()) * PRIME
+        +System.identityHashCode(target);
     }
 
     @Override

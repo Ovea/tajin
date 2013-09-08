@@ -30,6 +30,20 @@
     <packaging>jar</packaging>
     <name>Tajin :: Framework :: Async</name>
 
+    <build>
+        <plugins>
+            <plugin>
+                <groupId>com.mycila</groupId>
+                <artifactId>license-maven-plugin</artifactId>
+                <configuration>
+                    <excludes>
+                        <exclude>src/main/groovy/com/ovea/tajin/framework/async/guava/**</exclude>
+                    </excludes>
+                </configuration>
+            </plugin>
+        </plugins>
+    </build>
+
     <dependencies>
         <dependency>
             <groupId>com.ovea.tajin.framework</groupId>

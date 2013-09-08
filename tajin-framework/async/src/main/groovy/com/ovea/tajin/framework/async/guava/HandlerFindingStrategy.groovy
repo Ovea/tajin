@@ -1,5 +1,5 @@
-/**
- * Copyright (C) 2011 Ovea <dev@ovea.com>
+/*
+ * Copyright (C) 2007 The Guava Authors
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -13,7 +13,8 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package com.ovea.tajin.framework.async;
+
+package com.ovea.tajin.framework.async.guava;
 
 import com.google.common.collect.Multimap;
 
@@ -25,17 +26,17 @@ import com.google.common.collect.Multimap;
  */
 interface HandlerFindingStrategy {
 
-  /**
-   * Finds all suitable event handler methods in {@code source}, organizes them
-   * by the type of event they handle, and wraps them in {@link EventHandler} instances.
-   *
-   * @param source  object whose handlers are desired.
-   * @return EventHandler objects for each handler method, organized by event
-   *         type.
-   *
-   * @throws IllegalArgumentException if {@code source} is not appropriate for
-   *         this strategy (in ways that this interface does not define).
-   */
-  Multimap<Class<?>, EventHandler> findAllHandlers(Object source);
+    /**
+     * Finds all suitable event handler methods in {@code source}, organizes them
+     * by the type of event they handle, and wraps them in {@link EventHandler} instances.
+     *
+     * @param source object whose handlers are desired.
+     * @return EventHandler objects for each handler method, organized by event
+     *         type.
+     *
+     * @throws IllegalArgumentException if {@code source} is not appropriate for
+     *         this strategy (in ways that this interface does not define).
+     */
+    Multimap<Class<?>, EventHandler> findAllHandlers(Object source);
 
 }

@@ -24,7 +24,7 @@ interface JobRepository {
 
     void update(TriggeredScheduledJob job)
 
-    void delete(List<TriggeredScheduledJob> jobs)
+    void delete(Collection<TriggeredScheduledJob> jobs)
 
-    List<TriggeredScheduledJob> listPendingJobs()
+    Collection<TriggeredScheduledJob> listPendingJobs()
 }

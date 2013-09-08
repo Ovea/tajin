@@ -21,7 +21,7 @@ package com.ovea.tajin.framework.async
  */
  class EmptyJobRepository implements JobRepository {
      @Override
-     void delete(List<TriggeredScheduledJob> jobs) {
+     void delete(Collection<TriggeredScheduledJob> jobs) {
 
      }
 
@@ -36,7 +36,7 @@ package com.ovea.tajin.framework.async
      }
 
      @Override
-     List<TriggeredScheduledJob> listPendingJobs() {
+     Collection<TriggeredScheduledJob> listPendingJobs() {
          return []
      }
  }

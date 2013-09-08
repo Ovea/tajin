@@ -15,6 +15,7 @@
  */
 package com.ovea.tajin.framework.async.guice
 
+import com.google.common.eventbus.Subscribe
 import com.google.common.util.concurrent.ThreadFactoryBuilder
 import com.google.inject.AbstractModule
 import com.google.inject.Injector
@@ -32,7 +33,6 @@ import com.ovea.tajin.framework.async.Dispatcher
 import com.ovea.tajin.framework.async.JobListener
 import com.ovea.tajin.framework.async.JobRepository
 import com.ovea.tajin.framework.async.JobScheduler
-import com.ovea.tajin.framework.async.Subscribe
 import com.ovea.tajin.framework.core.Settings
 
 import javax.annotation.PreDestroy
@@ -138,7 +138,7 @@ class AsyncModule extends AbstractModule {
                 executorService.shutdown()
                 try {
                     executorService.awaitTermination(30, TimeUnit.SECONDS)
-                } catch (e) {
+                } catch (Throwable e) {
                     LOGGER.log(Level.SEVERE, 'Unable to terminate after 30 seconds', e)
                 }
             }

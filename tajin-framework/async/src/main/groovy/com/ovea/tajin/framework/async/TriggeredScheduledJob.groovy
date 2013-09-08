@@ -16,7 +16,6 @@
 package com.ovea.tajin.framework.async
 
 import com.ovea.tajin.framework.core.Uuid
-import groovy.transform.EqualsAndHashCode
 import groovy.transform.ToString
 
 /**
@@ -24,7 +23,6 @@ import groovy.transform.ToString
  * @date 2013-06-06
  */
 @ToString(includeNames = true)
-@EqualsAndHashCode(includes = ['id'])
 class TriggeredScheduledJob {
 
     /**
@@ -48,4 +46,21 @@ class TriggeredScheduledJob {
 
     Date completionDate
 
+    boolean isRetryable() { completionDate == null && (source.maxRetry == ScheduledJob.INFINITE_RETRY || currentRetry < source.maxRetry) }
+
+    void preventReschedule() {
+        completionDate = new Date()
+    }
+
+    @Override
+    boolean equals(o) {
+        if (this.is(o)) return true
+        if (getClass() != o.class) return false
+        TriggeredScheduledJob that = (TriggeredScheduledJob) o
+        if (id != that.id) return false
+        return true
+    }
+
+    @Override
+    int hashCode() { id.hashCode() }
 }

@@ -23,4 +23,9 @@ package com.ovea.tajin.framework.async
      @Override
      void onJobTriggered(TriggeredScheduledJob e) {
      }
+
+     @Override
+     void onJobFailure(TriggeredScheduledJob job, Throwable err) {
+
+     }
  }
