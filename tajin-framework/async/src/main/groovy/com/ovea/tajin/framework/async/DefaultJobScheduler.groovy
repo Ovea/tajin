@@ -87,6 +87,7 @@ class DefaultJobScheduler implements JobScheduler {
                 }
             }
             if (deletions) {
+                LOGGER.log(Level.WARNING, "Removing un-retryable jobs: " + deletions.collect { it.id })
                 repository.delete(deletions)
             }
         }
