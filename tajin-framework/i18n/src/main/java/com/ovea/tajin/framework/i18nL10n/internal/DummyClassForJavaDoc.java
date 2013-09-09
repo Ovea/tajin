@@ -13,7 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package com.ovea.tajin.internal;
+package com.ovea.tajin.framework.i18nL10n.internal;
 
 /**
  * @author Mathieu Carbou (mathieu.carbou@gmail.com)
