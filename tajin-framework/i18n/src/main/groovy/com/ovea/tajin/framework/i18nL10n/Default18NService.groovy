@@ -19,11 +19,16 @@ import com.google.common.cache.CacheBuilder
 import com.google.common.cache.CacheLoader
 import com.google.common.cache.LoadingCache
 import com.google.common.util.concurrent.UncheckedExecutionException
+import com.ovea.tajin.framework.core.Settings
+
+import javax.inject.Inject
+import java.util.concurrent.ExecutionException
 
 /**
  * @author Mathieu Carbou (mathieu.carbou@gmail.com)
  * @date 2013-08-12
  */
+@javax.inject.Singleton
 class Default18NService implements I18NService {
 
     int maximumSize = 100
@@ -47,12 +52,21 @@ class Default18NService implements I18NService {
         }
     })
 
+    @Inject
+    void setSettings(Settings settings) {
+        expirationSeconds = settings.getLong('tajin.i18n.cache.expirationSeconds', expirationSeconds)
+        maximumSize = settings.getLong('tajin.i18n.cache.maximumSize', maximumSize)
+        missingKeyBehaviour = settings.getEnum(MissingKeyBehaviour, 'tajin.i18n.miss', missingKeyBehaviour)
+    }
+
     @Override
     public I18NBundlerProvider getBundleProvider(String bundleName) {
         bundleName = bundleName.startsWith("/") ? bundleName.substring(1) : bundleName;
         try {
             return providers.get(bundleName)
         } catch (UncheckedExecutionException e) {
+            throw e.cause
+        } catch (ExecutionException e) {
             throw e.cause
         }
     }

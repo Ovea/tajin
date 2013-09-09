@@ -17,24 +17,24 @@ package com.ovea.tajin.framework.i18nL10n.guice
 
 import com.google.inject.AbstractModule
 import com.google.inject.MembersInjector
-import com.google.inject.Provides
 import com.google.inject.TypeLiteral
 import com.google.inject.matcher.Matchers
 import com.google.inject.spi.TypeEncounter
 import com.google.inject.spi.TypeListener
 import com.ovea.tajin.framework.core.Settings
-import com.ovea.tajin.framework.i18nL10n.*
+import com.ovea.tajin.framework.i18nL10n.Bundle
+import com.ovea.tajin.framework.i18nL10n.BundleInjector
+import com.ovea.tajin.framework.i18nL10n.Default18NService
+import com.ovea.tajin.framework.i18nL10n.I18NService
 
 import javax.inject.Provider
 import java.lang.reflect.Field
 
 class I18NModule extends AbstractModule {
-
     @Override
     protected void configure() {
-
         requireBinding(Settings)
-
+        bind(I18NService).to(Default18NService)
         bindListener(Matchers.any(), new TypeListener() {
             @Override
             def <I> void hear(TypeLiteral<I> type, TypeEncounter<I> encounter) {
@@ -55,19 +55,4 @@ class I18NModule extends AbstractModule {
             }
         })
     }
-
-    @Provides
-    @javax.inject.Singleton
-    I18NService getI18NService(Settings settings) {
-        return new Default18NService(
-            expirationSeconds: settings.getLong('tajin.i18n.cache.expirationSeconds', 3600),
-            maximumSize: settings.getLong('tajin.i18n.cache.maximumSize', 100),
-            missingKeyBehaviour: settings.getEnum(MissingKeyBehaviour, 'tajin.i18n.miss', MissingKeyBehaviour.THROW_EXCEPTION)
-        )
-    }
-
-    @Provides
-    @javax.inject.Singleton
-    BundleInjector getBundleInjector(I18NService i18NService) { new BundleInjector(i18NService) }
-
 }

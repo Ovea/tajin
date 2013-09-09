@@ -18,6 +18,7 @@ package com.ovea.tajin.framework.i18nL10n
 import com.google.common.cache.*
 import com.google.common.util.concurrent.UncheckedExecutionException
 
+import java.util.concurrent.ExecutionException
 import java.util.concurrent.TimeUnit
 
 /**
@@ -53,6 +54,8 @@ public abstract class I18NBundlerProviderSkeleton implements I18NBundlerProvider
         try {
             cache.get(locale)
         } catch (UncheckedExecutionException e) {
+            throw e.cause
+        } catch (ExecutionException e) {
             throw e.cause
         }
     }

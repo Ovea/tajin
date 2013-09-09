@@ -15,6 +15,7 @@
  */
 package com.ovea.tajin.framework.i18nL10n
 
+import javax.inject.Inject
 import java.lang.reflect.Field
 
 /**
@@ -25,6 +26,7 @@ class BundleInjector {
 
     final I18NService i18NService
 
+    @Inject
     BundleInjector(I18NService i18NService) {
         this.i18NService = i18NService
     }
@@ -40,12 +42,12 @@ class BundleInjector {
 
     void inject(Object instance, List<Field> fields) {
         for (Field field : fields) {
-            Bundle annotation = field.getAnnotation(Bundle.class);
-            I18NBundlerProvider service = i18NService.getBundleProvider(annotation.value());
             if (!field.getType().isAssignableFrom(I18NBundlerProvider.class))
                 throw new IllegalStateException("Field " + field + " must be of type " + I18NBundlerProvider.class.getName());
             if (!field.isAccessible())
                 field.setAccessible(true);
+            Bundle annotation = field.getAnnotation(Bundle.class);
+            I18NBundlerProvider service = i18NService.getBundleProvider(annotation.value());
             try {
                 field.set(instance, service);
             } catch (IllegalAccessException e) {

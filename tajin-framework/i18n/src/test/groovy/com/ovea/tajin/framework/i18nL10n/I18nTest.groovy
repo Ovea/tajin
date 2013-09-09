@@ -15,6 +15,10 @@
  */
 package com.ovea.tajin.framework.i18nL10n
 
+import com.google.inject.AbstractModule
+import com.google.inject.Guice
+import com.google.inject.Stage
+import com.mycila.guice.ext.service.ServiceModule
 import org.junit.Test
 import org.junit.runner.RunWith
 import org.junit.runners.JUnit4
@@ -26,8 +30,19 @@ import org.junit.runners.JUnit4
 @RunWith(JUnit4)
 class I18nTest {
 
+    @Bundle('classpath:bundle.js')
+    I18NBundlerProvider i18n
+
     @Test
     void test() throws Exception {
+        Guice.createInjector(Stage.PRODUCTION, new ServiceModule(), new AbstractModule() {
+            @Override
+            protected void configure() {
+                requestInjection(I18nTest.this)
+            }
+        })
+        assert i18n
+
         I18NService service = new Default18NService()
         service.missingKeyBehaviour = MissingKeyBehaviour.RETURN_KEY
 
@@ -52,16 +67,6 @@ class I18nTest {
             assert provider.getBundle(Locale.CANADA_FRENCH).getValue('msg1', ['mat', 'dave']) == 'message1 from mat to dave'
             assert provider.getBundle(Locale.CANADA_FRENCH).getValue('msg2', ['mat', 'dave']) == 'message2 fr from mat to dave'
             assert provider.getBundle(Locale.CANADA_FRENCH).getValue('msg4', ['mat', 'dave']) == '[msg4]'
-        }
-    }
-
-    static class MyClass {
-
-        @Bundle('classpath:bundle.js')
-        I18NBundlerProvider i18n
-
-        void aMethod() {
-            i18n.getBundle(Locale.CANADA_FRENCH).getValue('mykey', ['10', 'seconds'])
         }
     }
 
