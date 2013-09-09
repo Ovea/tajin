@@ -27,9 +27,9 @@ class TemplatingTest {
             }
         })
         assert merger
-        assert merger.merge(Locale.US, [liked: 'you']) == ''
-        assert merger.merge(Locale.FRANCE, [liked: 'toi']) == ''
-        assert merger.merge(Locale.CANADA_FRENCH, [liked: 'ti']) == ''
+        assert merger.merge(Locale.US, [liked: 'you']) == 'i like you'
+        assert merger.merge(Locale.FRANCE, [liked: 'toi']) == 'j\'aime toi'
+        assert merger.merge(Locale.CANADA_FRENCH, [liked: 'ti']) == 'je capote sur ti'
     }
 
 }

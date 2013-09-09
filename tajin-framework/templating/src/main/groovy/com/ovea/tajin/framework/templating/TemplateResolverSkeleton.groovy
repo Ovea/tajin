@@ -76,7 +76,7 @@ abstract class TemplateResolverSkeleton implements TemplateResolver {
                     templateName.replace(pos, pos + locales[prev].length(), locales[i]);
                     Resource tmpl = tryPath(templateName.toString());
                     if (tmpl != null) {
-                        return compiler.compile(tmpl);
+                        return TemplateResolverSkeleton.this.getCompiler().compile(tmpl);
                     }
                     i++
                     prev = (2 + i) % 3
