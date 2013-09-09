@@ -67,9 +67,9 @@ final class Settings {
         return this;
     }
 
-    public File getPath(String key) { new File(getRequired(key)); }
+    public File getFile(String key) { new File(getRequired(key)); }
 
-    public File getPath(String key, File fallback) {
+    public File getFile(String key, File fallback) {
         String v = resolve(key);
         return v == null ? fallback : new File(v);
     }

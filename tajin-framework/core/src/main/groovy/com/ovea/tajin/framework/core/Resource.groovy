@@ -90,9 +90,13 @@ abstract class Resource {
         return new ClassPathResource(classloader, pattern)
     }
 
+    static Resource parse(String pattern) { parse(pattern, new File('.'), Thread.currentThread().contextClassLoader) }
+
     static Resource parse(String pattern, ClassLoader classLoader) { parse(pattern, new File('.'), classLoader) }
 
-    static Resource parse(String pattern, File webapp = new File('.'), ClassLoader classLoader = Thread.currentThread().contextClassLoader) {
+    static Resource parse(String pattern, File baseDir) { parse(pattern, baseDir, Thread.currentThread().contextClassLoader) }
+
+    static Resource parse(String pattern, File webapp, ClassLoader classLoader) {
         if (!pattern)
             throw new IllegalArgumentException("Missing parameter")
         if (pattern.startsWith("classpath:") && !pattern.startsWith("classpath://"))
