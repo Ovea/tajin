@@ -17,15 +17,9 @@ package com.ovea.tajin.framework.app
 
 import com.google.inject.Injector
 import com.google.inject.Provider
-import com.google.inject.matcher.Matchers
 import com.google.inject.servlet.RequestScoped
 import com.google.inject.servlet.ServletModule
 import com.mycila.guice.ext.web.HttpContextFilter
-import com.ovea.tajin.framework.i18n.I18NHandler
-import com.ovea.tajin.framework.i18n.I18NService
-import com.ovea.tajin.framework.i18n.I18NServiceFactory
-import com.ovea.tajin.framework.i18n.JsonI18NServiceFactory
-import com.ovea.tajin.framework.scheduling.SchedulingModule
 import com.ovea.tajin.framework.security.TokenBuilder
 import com.ovea.tajin.framework.support.guice.WebBinder
 import com.ovea.tajin.framework.support.jersey.AuditResourceFilterFactory
@@ -36,13 +30,15 @@ import com.ovea.tajin.framework.support.shiro.GuiceShiroFilter
 import com.ovea.tajin.framework.support.shiro.MemoryCacheManager
 import com.ovea.tajin.framework.support.shiro.SecurityFilter
 import com.ovea.tajin.framework.support.shiro.VersionedRememberMeManager
-import com.ovea.tajin.framework.template.*
 import com.ovea.tajin.framework.util.PropertySettings
 import com.ovea.tajin.framework.util.PropertySettingsMBean
 import com.ovea.tajin.framework.web.CookieCleaner
 import com.ovea.tajin.framework.web.CookieLocaleManager
 import com.ovea.tajin.framework.web.PerfLog
+import com.sun.jersey.api.core.DefaultResourceConfig
+import com.sun.jersey.api.core.ResourceConfig
 import com.sun.jersey.guice.spi.container.servlet.GuiceContainer
+import com.sun.jersey.spi.container.servlet.WebConfig
 import org.apache.shiro.SecurityUtils
 import org.apache.shiro.authc.pam.FirstSuccessfulStrategy
 import org.apache.shiro.authc.pam.ModularRealmAuthenticator
@@ -60,6 +56,7 @@ import org.slf4j.Logger
 import org.slf4j.LoggerFactory
 
 import javax.inject.Inject
+import javax.servlet.ServletException
 
 /**
  * @author Mathieu Carbou (mathieu.carbou@gmail.com)
@@ -92,51 +89,6 @@ class InternalWebModule extends ServletModule {
                 TokenBuilder get() { new TokenBuilder(Hex.decode(key)) }
             }).in(javax.inject.Singleton)
         }
-
-        // bind schedueler if needed
-        if (settings.getBoolean('scheduling.enabled', false)) {
-            LOGGER.info(" + JobScheduler support")
-            install(new SchedulingModule())
-        }
-
-        // setup groovy templating system
-        LOGGER.info(" + @Template support")
-        bind(TemplateCompiler).toProvider(new Provider<TemplateCompiler>() {
-            @Override
-            TemplateCompiler get() {
-                TemplateCompiler compiler = new GroovyTemplateCompiler()
-                if (settings.getBoolean('template.cache', true)) {
-                    compiler = new CachingTemplateCompiler(compiler)
-                }
-                return compiler
-            }
-        }).in(javax.inject.Singleton)
-        bind(TemplateResolver).toProvider(new Provider<TemplateResolver>() {
-            @Inject TemplateCompiler compiler
-
-            @Override
-            TemplateResolver get() {
-                TemplateResolver resolver = new ResourceTemplateResolver(compiler)
-                if (settings.getBoolean('template.cache', true)) {
-                    resolver = new CachingTemplateResolver(resolver)
-                }
-                return resolver
-            }
-        }).in(javax.inject.Singleton)
-        binder().bindListener(Matchers.any(), new TmplHandler());
-
-        // setup i18n
-        LOGGER.info(" + @Bundle support (i18n)")
-        bind(I18NServiceFactory).toProvider(new Provider<I18NServiceFactory>() {
-            @Override
-            I18NServiceFactory get() {
-                JsonI18NServiceFactory factory = new JsonI18NServiceFactory()
-                factory.debug = !settings.getBoolean('i18n.cache', true)
-                factory.missingKeyBehaviour = settings.getEnum(I18NService.MissingKeyBehaviour, 'i18n.miss', I18NService.MissingKeyBehaviour.RETURN_KEY)
-                return factory
-            }
-        }).in(javax.inject.Singleton)
-        binder().bindListener(Matchers.any(), new I18NHandler());
 
         // bind filters
         bind(GuiceContainer).in(javax.inject.Singleton)
@@ -218,14 +170,16 @@ class InternalWebModule extends ServletModule {
         bind(RootPath)
         def initParams = [:]
         if (settings.getBoolean('output.gzip', false)) {
-            initParams << ["com.sun.jersey.spi.container.ContainerResponseFilters": GzipEncoder.name]
+            initParams << [(ResourceConfig.PROPERTY_CONTAINER_RESPONSE_FILTERS): GzipEncoder.name]
         }
         if (secured) {
-            initParams << ["com.sun.jersey.spi.container.ResourceFilters": "${AuditResourceFilterFactory.name};${SecurityResourceFilterFactory.name};${PermissionResourceFilterFactory.name}" as String]
+            initParams << [(ResourceConfig.PROPERTY_RESOURCE_FILTER_FACTORIES): "${AuditResourceFilterFactory.name};${SecurityResourceFilterFactory.name};${PermissionResourceFilterFactory.name}" as String]
         } else {
-            initParams << ["com.sun.jersey.spi.container.ResourceFilters": "${AuditResourceFilterFactory.name}" as String]
+            initParams << [((ResourceConfig.PROPERTY_RESOURCE_FILTER_FACTORIES)): "${AuditResourceFilterFactory.name}" as String]
         }
-        serve("/*").with(GuiceContainer, initParams)
+        serve("/*").with(JerseyContainer, initParams)
+
+        bind(ResourceConfig).to(DefaultResourceConfig).in(javax.inject.Singleton)
 
         // configure discovered applications
         WebBinder webBinder = new WebBinder(binder())
@@ -233,6 +187,24 @@ class InternalWebModule extends ServletModule {
             LOGGER.info("Configuring application: ${it.class.simpleName}")
             it.onInit(webBinder, settings)
             bind(it.class).toInstance(it)
+        }
+
+    }
+
+    @javax.inject.Singleton
+    static class JerseyContainer extends GuiceContainer {
+
+        @Inject
+        Provider<ResourceConfig> config
+
+        @Inject
+        JerseyContainer(Injector injector) {
+            super(injector)
+        }
+
+        @Override
+        protected ResourceConfig getDefaultResourceConfig(Map<String, Object> props, WebConfig webConfig) throws ServletException {
+            return config.get()
         }
 
     }
