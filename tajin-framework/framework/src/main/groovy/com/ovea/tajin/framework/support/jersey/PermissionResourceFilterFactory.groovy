@@ -18,20 +18,21 @@ package com.ovea.tajin.framework.support.jersey
 import com.sun.jersey.api.core.HttpContext
 import com.sun.jersey.api.model.AbstractMethod
 import com.sun.jersey.api.model.AbstractResourceMethod
-import com.sun.jersey.spi.container.*
+import com.sun.jersey.spi.container.ContainerRequest
+import com.sun.jersey.spi.container.ContainerRequestFilter
+import com.sun.jersey.spi.container.ContainerResponseFilter
+import com.sun.jersey.spi.container.ResourceFilter
+import com.sun.jersey.spi.container.ResourceFilterFactory
 import org.apache.shiro.SecurityUtils
 
 import javax.ws.rs.WebApplicationException
 import javax.ws.rs.core.Context
 import javax.ws.rs.core.Response
-import java.util.regex.Pattern
 
 /**
  * @author Mathieu Carbou (mathieu.carbou@gmail.com)
  */
 public final class PermissionResourceFilterFactory implements ResourceFilterFactory {
-
-    private static final Pattern VARS = Pattern.compile('\\{\\w+\\}')
 
     private final HttpContext context;
 

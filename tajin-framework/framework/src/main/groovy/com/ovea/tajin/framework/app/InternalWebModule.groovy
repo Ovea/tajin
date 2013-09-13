@@ -22,7 +22,10 @@ import com.google.inject.servlet.ServletModule
 import com.mycila.guice.ext.web.HttpContextFilter
 import com.ovea.tajin.framework.security.TokenBuilder
 import com.ovea.tajin.framework.support.guice.WebBinder
-import com.ovea.tajin.framework.support.jersey.*
+import com.ovea.tajin.framework.support.jersey.AuditResourceFilterFactory
+import com.ovea.tajin.framework.support.jersey.JSONP
+import com.ovea.tajin.framework.support.jersey.PermissionResourceFilterFactory
+import com.ovea.tajin.framework.support.jersey.SecurityResourceFilterFactory
 import com.ovea.tajin.framework.support.shiro.GuiceShiroFilter
 import com.ovea.tajin.framework.support.shiro.MemoryCacheManager
 import com.ovea.tajin.framework.support.shiro.SecurityFilter
@@ -34,15 +37,10 @@ import com.ovea.tajin.framework.web.CookieLocaleManager
 import com.ovea.tajin.framework.web.PerfLog
 import com.sun.jersey.api.core.DefaultResourceConfig
 import com.sun.jersey.api.core.ResourceConfig
-import com.sun.jersey.api.model.AbstractResource
-import com.sun.jersey.api.model.AbstractSubResourceMethod
 import com.sun.jersey.guice.JerseyServletModule
 import com.sun.jersey.guice.spi.container.servlet.GuiceContainer
-import com.sun.jersey.server.impl.application.WebApplicationImpl
-import com.sun.jersey.server.impl.model.ResourceUriRules
 import com.sun.jersey.spi.container.WebApplication
 import com.sun.jersey.spi.container.servlet.WebConfig
-import com.sun.jersey.spi.inject.Errors
 import org.apache.shiro.SecurityUtils
 import org.apache.shiro.authc.pam.FirstSuccessfulStrategy
 import org.apache.shiro.authc.pam.ModularRealmAuthenticator
@@ -61,7 +59,6 @@ import org.slf4j.LoggerFactory
 
 import javax.inject.Inject
 import javax.servlet.ServletException
-import javax.ws.rs.HttpMethod
 
 /**
  * @author Mathieu Carbou (mathieu.carbou@gmail.com)
@@ -173,21 +170,19 @@ class InternalWebModule extends ServletModule {
 
         // setup REST API
         install(new JerseyServletModule())
+        bind(ResourceConfig).to(DefaultResourceConfig).in(javax.inject.Singleton)
         bind(RootPath)
-        def initParams = [:]
-        if (settings.getBoolean('output.gzip', false)) {
-            initParams << [(ResourceConfig.PROPERTY_CONTAINER_RESPONSE_FILTERS): [GzipEncoder, /*JSONPFilter*/].name.join(';')]
-        } else {
-            initParams << [(ResourceConfig.PROPERTY_CONTAINER_RESPONSE_FILTERS): [/*JSONPFilter*/].name.join(';')]
-        }
+        def initParams = [
+            (ResourceConfig.PROPERTY_CONTAINER_REQUEST_FILTERS): [JSONP.RequestFilter].name.join(';'),
+            (ResourceConfig.PROPERTY_CONTAINER_RESPONSE_FILTERS): [JSONP.ResponseFilter].name.join(';'),
+            ((ResourceConfig.PROPERTY_RESOURCE_FILTER_FACTORIES)): [AuditResourceFilterFactory]*.name.join(';')
+        ]
         if (secured) {
-            initParams << [(ResourceConfig.PROPERTY_RESOURCE_FILTER_FACTORIES): [AuditResourceFilterFactory, SecurityResourceFilterFactory, PermissionResourceFilterFactory]*.name.join(';')]
-        } else {
-            initParams << [((ResourceConfig.PROPERTY_RESOURCE_FILTER_FACTORIES)): [AuditResourceFilterFactory]*.name.join(';')]
+            initParams << [
+                (ResourceConfig.PROPERTY_RESOURCE_FILTER_FACTORIES): [AuditResourceFilterFactory, SecurityResourceFilterFactory, PermissionResourceFilterFactory]*.name.join(';')
+            ]
         }
         serve("/*").with(JerseyContainer, initParams)
-
-        bind(ResourceConfig).to(DefaultResourceConfig).in(javax.inject.Singleton)
 
         // configure discovered applications
         WebBinder webBinder = new WebBinder(binder())
@@ -218,7 +213,7 @@ class InternalWebModule extends ServletModule {
         @Override
         protected void initiate(ResourceConfig config, WebApplication webapp) {
             super.initiate(config, webapp)
-            WebApplicationImpl w = (WebApplication) webapp
+            /*WebApplicationImpl w = (WebApplication) webapp
             w.@rulesMap.clear()
             w.@abstractRootResources.each { AbstractResource ar ->
                 List<AbstractSubResourceMethod> newGets = []
@@ -237,13 +232,13 @@ class InternalWebModule extends ServletModule {
                 }
                 ar.subResourceMethods.addAll(newGets)
                 w.@rulesMap.put(ar.resourceClass, Errors.processWithErrors({ w.newResourceUriRules(ar) } as Errors.Closure<ResourceUriRules>).rules)
-            }
+            }*/
         }
     }
 
-    static boolean hasJSONP(AbstractSubResourceMethod am) {
+    /*static boolean hasJSONP(AbstractSubResourceMethod am) {
         JSONP annotation = am.getAnnotation(JSONP)
         return annotation != null || am.resource.getAnnotation(JSONP)
-    }
+    }*/
 
 }
