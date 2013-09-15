@@ -72,7 +72,7 @@ public final class Jsr250FilterFactory extends RolesAllowedResourceFilterFactory
                         return request
                 }
             }
-            throw new WebApplicationException(Response.Status.FORBIDDEN)
+            throw new WebApplicationException(new IllegalStateException('Invalid role'), Response.Status.FORBIDDEN)
         }
     }
 

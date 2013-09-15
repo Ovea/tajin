@@ -68,7 +68,7 @@ public final class PermissionFilterFactory implements ResourceFilterFactory {
             permissions.each { String perm ->
                 ctx.each { String k, String v -> perm = perm.replace('{' + k + '}', v) }
                 if (!SecurityUtils.subject.isPermitted(perm)) {
-                    throw new WebApplicationException(Response.Status.FORBIDDEN)
+                    throw new WebApplicationException(new IllegalStateException('Invalid permissions'), Response.Status.FORBIDDEN)
                 }
             }
             return request
