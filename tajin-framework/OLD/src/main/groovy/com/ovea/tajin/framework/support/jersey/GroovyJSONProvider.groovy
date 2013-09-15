@@ -76,7 +76,9 @@ class GroovyJSONProvider extends AbstractMessageReaderWriterProvider<Object> {
                 new JsonBuilder(t).writeTo(writer);
             }
             writer.flush();
-        } catch (Exception e) {
+        } catch (EOFException ignored) {
+            // do nothing: output stream closed by clients
+        }catch (Exception e) {
             throw new WebApplicationException(new Exception("Error writing JSON Type " + type.simpleName, e), 500)
         }
     }
