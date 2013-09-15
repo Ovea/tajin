@@ -23,7 +23,7 @@ import com.mycila.guice.ext.web.HttpContextFilter
 import com.ovea.tajin.framework.security.TokenBuilder
 import com.ovea.tajin.framework.support.guice.WebBinder
 import com.ovea.tajin.framework.support.jersey.AuditFilterFactory
-import com.ovea.tajin.framework.support.jersey.ExtendedJsendFilterFactory
+import com.ovea.tajin.framework.support.jersey.ExtendedJsend
 import com.ovea.tajin.framework.support.jersey.JSONP
 import com.ovea.tajin.framework.support.jersey.Jsr250FilterFactory
 import com.ovea.tajin.framework.support.jersey.PermissionFilterFactory
@@ -171,14 +171,15 @@ class InternalWebModule extends ServletModule {
         // setup REST API
         install(new JerseyServletModule())
         bind(ResourceConfig).to(DefaultResourceConfig).in(javax.inject.Singleton)
+        bind(ExtendedJsend.ExceptionMapper)
         def initParams = [
             (ResourceConfig.PROPERTY_CONTAINER_REQUEST_FILTERS): [JSONP.RequestFilter].name.join(';'),
-            (ResourceConfig.PROPERTY_CONTAINER_RESPONSE_FILTERS): [JSONP.ResponseFilter].name.join(';'),
-            ((ResourceConfig.PROPERTY_RESOURCE_FILTER_FACTORIES)): [AuditFilterFactory, ExtendedJsendFilterFactory]*.name.join(';')
+            (ResourceConfig.PROPERTY_CONTAINER_RESPONSE_FILTERS): [ExtendedJsend.ResponseFilter, JSONP.ResponseFilter].name.join(';'),
+            ((ResourceConfig.PROPERTY_RESOURCE_FILTER_FACTORIES)): [AuditFilterFactory, ExtendedJsend]*.name.join(';')
         ]
         if (secured) {
             initParams << [
-                (ResourceConfig.PROPERTY_RESOURCE_FILTER_FACTORIES): [AuditFilterFactory, Jsr250FilterFactory, PermissionFilterFactory, ExtendedJsendFilterFactory]*.name.join(';')
+                (ResourceConfig.PROPERTY_RESOURCE_FILTER_FACTORIES): [AuditFilterFactory, Jsr250FilterFactory, PermissionFilterFactory, ExtendedJsend.FilterFactory]*.name.join(';')
             ]
         }
         serve("/*").with(JerseyContainer, initParams)
