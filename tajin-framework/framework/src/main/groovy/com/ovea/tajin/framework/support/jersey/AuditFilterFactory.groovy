@@ -16,7 +16,11 @@
 package com.ovea.tajin.framework.support.jersey
 
 import com.sun.jersey.api.model.AbstractMethod
-import com.sun.jersey.spi.container.*
+import com.sun.jersey.spi.container.ContainerRequest
+import com.sun.jersey.spi.container.ContainerRequestFilter
+import com.sun.jersey.spi.container.ContainerResponseFilter
+import com.sun.jersey.spi.container.ResourceFilter
+import com.sun.jersey.spi.container.ResourceFilterFactory
 
 import java.util.logging.Logger
 
@@ -24,9 +28,9 @@ import java.util.logging.Logger
  * @author Mathieu Carbou (mathieu.carbou@gmail.com)
  * @date 2013-05-08
  */
-class AuditResourceFilterFactory implements ResourceFilterFactory {
+class AuditFilterFactory implements ResourceFilterFactory {
 
-    private static final Logger LOGGER = Logger.getLogger(AuditResourceFilterFactory.name);
+    private static final Logger LOGGER = Logger.getLogger(AuditFilterFactory.name);
 
     private class ResourceMethodFilter implements ResourceFilter, ContainerRequestFilter {
 

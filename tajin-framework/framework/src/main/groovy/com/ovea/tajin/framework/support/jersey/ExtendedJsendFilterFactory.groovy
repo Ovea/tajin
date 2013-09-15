@@ -13,7 +13,7 @@ import com.sun.jersey.spi.container.ResourceFilterFactory
  * @author Mathieu Carbou (mathieu.carbou@gmail.com)
  * @date 2013-09-11
  */
-class ExtendedJsendResponseFilterFactory implements ResourceFilterFactory {
+class ExtendedJsendFilterFactory implements ResourceFilterFactory {
 
     @Override
     List<ResourceFilter> create(AbstractMethod am) {
@@ -23,13 +23,9 @@ class ExtendedJsendResponseFilterFactory implements ResourceFilterFactory {
     static class ExtendedJsendResponseFilter implements ResourceFilter, ContainerResponseFilter {
 
         final AbstractResourceMethod am
-        final String method
-        final boolean producesJSON
 
         protected ExtendedJsendResponseFilterFactory(AbstractResourceMethod arm) {
             this.am = arm
-            this.method = am.httpMethod.toUpperCase()
-            this.producesJSON = arm.supportedOutputTypes.empty || arm.supportedOutputTypes.find { it.toString().startsWith('application/json') }
         }
 
         @Override
@@ -39,16 +35,17 @@ class ExtendedJsendResponseFilterFactory implements ResourceFilterFactory {
 
         @Override
         public ContainerResponseFilter getResponseFilter() {
-            return null
+            return this
         }
 
         @Override
         ContainerResponse filter(ContainerRequest request, ContainerResponse response) {
+            println 'HELLO'
             return response
         }
 
         @Override
-        String toString() { "Meta(${am.method.declaringClass.simpleName}#${am.method.name})" }
+        String toString() { "${getClass().simpleName}(${am.method.declaringClass.simpleName}#${am.method.name})" }
 
     }
 }

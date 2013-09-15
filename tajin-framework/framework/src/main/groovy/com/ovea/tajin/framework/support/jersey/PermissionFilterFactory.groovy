@@ -32,11 +32,11 @@ import javax.ws.rs.core.Response
 /**
  * @author Mathieu Carbou (mathieu.carbou@gmail.com)
  */
-public final class PermissionResourceFilterFactory implements ResourceFilterFactory {
+public final class PermissionFilterFactory implements ResourceFilterFactory {
 
     private final HttpContext context;
 
-    public PermissionResourceFilterFactory(@Context HttpContext hc) {
+    public PermissionFilterFactory(@Context HttpContext hc) {
         this.context = hc;
     }
 

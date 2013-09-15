@@ -33,7 +33,7 @@ import javax.ws.rs.core.SecurityContext
 /**
  * @author Mathieu Carbou (mathieu.carbou@gmail.com)
  */
-public final class SecurityResourceFilterFactory extends RolesAllowedResourceFilterFactory {
+public final class Jsr250FilterFactory extends RolesAllowedResourceFilterFactory {
 
     @Context SecurityContext sc
 
