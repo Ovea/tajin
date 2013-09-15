@@ -73,7 +73,7 @@ class JSONP {
         @Override
         ContainerResponse filter(ContainerRequest request, ContainerResponse response) {
             String cb = request.queryParameters.getFirst(callbackParam)
-            if (cb) {
+            if (cb && (response.entity == null || response.mediaType == null || response.mediaType.toString().startsWith(MediaType.APPLICATION_JSON))) {
                 response.response = Response
                     .status(Response.Status.OK)
                     .entity("${cb}(${Json.stringify(response.entity)});" as String)
