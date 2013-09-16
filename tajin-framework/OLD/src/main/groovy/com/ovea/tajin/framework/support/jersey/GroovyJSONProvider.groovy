@@ -34,7 +34,7 @@ class GroovyJSONProvider extends AbstractMessageReaderWriterProvider<Object> {
     private static boolean isSupported(MediaType m) { m.type == 'application' && m.subtype.endsWith("json") }
 
     private static List<Class<?>> SUPPORTED_PARAM_TYPES = [Object, Map, List, Collection]
-    private static List<Class<?>> SUPPORTED_RETURN_TYPES = [Map, List, JsonBuilder, JsonSupport]
+    private static List<Class<?>> SUPPORTED_RETURN_TYPES = [Map, List, JsonBuilder]
 
     @Override
     boolean isReadable(Class<?> type, Type genericType, Annotation[] annotations, MediaType mediaType) {
@@ -69,8 +69,6 @@ class GroovyJSONProvider extends AbstractMessageReaderWriterProvider<Object> {
                 ((JsonBuilder) t).writeTo(writer);
             } else if (t instanceof Map || t instanceof List || type.array) {
                 new JsonBuilder(t).writeTo(writer);
-            } else if (t instanceof JsonSupport) {
-                new JsonBuilder(((JsonSupport) t).json).writeTo(writer);
             } else {
                 // we hope the object is not complex
                 new JsonBuilder(t).writeTo(writer);

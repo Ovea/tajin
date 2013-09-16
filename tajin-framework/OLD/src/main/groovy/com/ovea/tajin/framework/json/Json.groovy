@@ -15,7 +15,6 @@
  */
 package com.ovea.tajin.framework.json
 
-import com.ovea.tajin.framework.support.jersey.JsonSupport
 import groovy.json.JsonBuilder
 import groovy.json.JsonSlurper
 
@@ -26,7 +25,6 @@ import groovy.json.JsonSlurper
 class Json {
     static String stringify(o, boolean pretty = false) {
         if (o instanceof JsonBuilder) return pretty ? ((JsonBuilder) o).toPrettyString() : ((JsonBuilder) o).toString()
-        if (o instanceof JsonSupport) return stringify(new JsonBuilder(((JsonSupport) o).json), pretty)
         return stringify(new JsonBuilder(o), pretty)
     }
 
