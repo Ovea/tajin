@@ -32,11 +32,11 @@ import javax.ws.rs.core.Response
 /**
  * @author Mathieu Carbou (mathieu.carbou@gmail.com)
  */
-public final class PermissionResourceFilterFactory implements ResourceFilterFactory {
+public final class PermissionFilterFactory implements ResourceFilterFactory {
 
     private final HttpContext context;
 
-    public PermissionResourceFilterFactory(@Context HttpContext hc) {
+    public PermissionFilterFactory(@Context HttpContext hc) {
         this.context = hc;
     }
 
@@ -68,7 +68,7 @@ public final class PermissionResourceFilterFactory implements ResourceFilterFact
             permissions.each { String perm ->
                 ctx.each { String k, String v -> perm = perm.replace('{' + k + '}', v) }
                 if (!SecurityUtils.subject.isPermitted(perm)) {
-                    throw new WebApplicationException(Response.Status.FORBIDDEN)
+                    throw new WebApplicationException(new IllegalStateException('Invalid permissions'), Response.Status.FORBIDDEN)
                 }
             }
             return request

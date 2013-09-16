@@ -23,6 +23,7 @@ import com.sun.jersey.spi.container.ContainerResponse
 import com.sun.jersey.spi.container.ContainerResponseFilter
 
 import javax.ws.rs.HttpMethod
+import javax.ws.rs.core.HttpHeaders
 import javax.ws.rs.core.MediaType
 import javax.ws.rs.core.Response
 
@@ -57,7 +58,7 @@ class JSONP {
                 request.setEntity(Map, Map, null, MediaType.APPLICATION_JSON_TYPE, null, data)
                 InBoundHeaders headers = new InBoundHeaders()
                 request.getRequestHeaders().each { k, v -> v.each { headers.add(k, it) } }
-                headers.putSingle('Content-Type', MediaType.APPLICATION_JSON)
+                headers.putSingle(HttpHeaders.CONTENT_TYPE, MediaType.APPLICATION_JSON)
                 request.headers = headers
             }
             return request
@@ -73,11 +74,11 @@ class JSONP {
         @Override
         ContainerResponse filter(ContainerRequest request, ContainerResponse response) {
             String cb = request.queryParameters.getFirst(callbackParam)
-            if (cb) {
+            if (cb && (response.entity == null || response.mediaType == null || response.mediaType.toString().startsWith(MediaType.APPLICATION_JSON))) {
                 response.response = Response
                     .status(Response.Status.OK)
-                    .entity("${cb}(${Json.stringify(response.entity)});" as String)
                     .type('application/javascript; charset=UTF-8')
+                    .entity("${cb}(${Json.stringify(response.entity)});" as String)
                     .build()
             }
             return response
