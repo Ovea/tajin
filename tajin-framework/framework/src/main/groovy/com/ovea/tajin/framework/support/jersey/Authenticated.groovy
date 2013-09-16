@@ -20,8 +20,11 @@ import java.lang.annotation.Retention
 import java.lang.annotation.RetentionPolicy
 import java.lang.annotation.Target
 
+/**
+ * Mark a resource requiring authentication. If not authenticated, throws a 401 error and allow the client to authenticate back with a http basic auth
+ */
 @Target([ElementType.METHOD, ElementType.TYPE])
 @Retention(RetentionPolicy.RUNTIME)
-public @interface Permissions {
-    String[] value() default []
+public @interface Authenticated {
+    boolean allowRemembered() default true
 }

@@ -37,17 +37,47 @@ public final class Jsr250FilterFactory extends RolesAllowedResourceFilterFactory
 
     @Context SecurityContext sc
 
-    private class Filter implements ResourceFilter, ContainerRequestFilter {
+    @Override
+    public List<ResourceFilter> create(AbstractMethod am) {
+        // DenyAll on the method take precedence over RolesAllowed and PermitAll
+        if (am.isAnnotationPresent(DenyAll))
+            return Collections.<ResourceFilter> singletonList(new Jsr250Filter())
+
+        // RolesAllowed on the method takes precedence over PermitAll
+        if (am.isAnnotationPresent(RolesAllowed))
+            return Collections.<ResourceFilter> singletonList(new Jsr250Filter(am.getAnnotation(RolesAllowed).value()))
+
+        // PermitAll takes precedence over RolesAllowed on the class
+        if (am.isAnnotationPresent(PermitAll))
+            return null
+
+        // DenyAll on the class takes precedence over other below
+        if (am.getResource().isAnnotationPresent(DenyAll))
+            return Collections.<ResourceFilter> singletonList(new Jsr250Filter())
+
+        // RolesAllowed on the class takes precedence over PermitAll
+        if (am.getResource().isAnnotationPresent(RolesAllowed))
+            return Collections.<ResourceFilter> singletonList(new Jsr250Filter(am.getResource().getAnnotation(RolesAllowed).value()))
+
+        // Then check if we must permit
+        if (am.getResource().isAnnotationPresent(PermitAll))
+            return null
+
+        // deny by default if no annotation is present
+        return Collections.<ResourceFilter> singletonList(new Jsr250Filter())
+    }
+
+    class Jsr250Filter implements ResourceFilter, ContainerRequestFilter {
 
         private final boolean denyAll
         private final String[] rolesAllowed
 
-        protected Filter() {
+        protected Jsr250Filter() {
             this.denyAll = true
             this.rolesAllowed = new String[0]
         }
 
-        protected Filter(String[] rolesAllowed) {
+        protected Jsr250Filter(String[] rolesAllowed) {
             this.denyAll = false
             this.rolesAllowed = (rolesAllowed != null) ? rolesAllowed : []
         }
@@ -76,33 +106,4 @@ public final class Jsr250FilterFactory extends RolesAllowedResourceFilterFactory
         }
     }
 
-    @Override
-    public List<ResourceFilter> create(AbstractMethod am) {
-        // DenyAll on the method take precedence over RolesAllowed and PermitAll
-        if (am.isAnnotationPresent(DenyAll))
-            return Collections.<ResourceFilter> singletonList(new Filter())
-
-        // RolesAllowed on the method takes precedence over PermitAll
-        if (am.isAnnotationPresent(RolesAllowed))
-            return Collections.<ResourceFilter> singletonList(new Filter(am.getAnnotation(RolesAllowed).value()))
-
-        // PermitAll takes precedence over RolesAllowed on the class
-        if (am.isAnnotationPresent(PermitAll))
-            return null
-
-        // DenyAll on the class takes precedence over other below
-        if (am.getResource().isAnnotationPresent(DenyAll))
-            return Collections.<ResourceFilter> singletonList(new Filter())
-
-        // RolesAllowed on the class takes precedence over PermitAll
-        if (am.getResource().isAnnotationPresent(RolesAllowed))
-            return Collections.<ResourceFilter> singletonList(new Filter(am.getResource().getAnnotation(RolesAllowed).value()))
-
-        // Then check if we must permit
-        if (am.getResource().isAnnotationPresent(PermitAll))
-            return null
-
-        // deny by default if not annotation is present
-        return Collections.<ResourceFilter> singletonList(new Filter())
-    }
 }

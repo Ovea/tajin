@@ -1,12 +1,7 @@
 package com.ovea.tajin.framework.support.jersey
 
 import com.sun.jersey.api.model.AbstractMethod
-import com.sun.jersey.spi.container.ContainerRequest
-import com.sun.jersey.spi.container.ContainerRequestFilter
-import com.sun.jersey.spi.container.ContainerResponse
-import com.sun.jersey.spi.container.ContainerResponseFilter
-import com.sun.jersey.spi.container.ResourceFilter
-import com.sun.jersey.spi.container.ResourceFilterFactory
+import com.sun.jersey.spi.container.*
 
 import javax.ws.rs.WebApplicationException
 import javax.ws.rs.core.HttpHeaders
@@ -65,7 +60,7 @@ class ExtendedJsend {
                 || isWrapped(response.response)) {
                 return response
             }
-            response.response = wrapResponsee(response.status, null, response.response.entity, deprecated)
+            response.response = wrapResponse(response.response, null, deprecated)
             return response
         }
     }
@@ -78,10 +73,10 @@ class ExtendedJsend {
             if (e instanceof WebApplicationException) {
                 Response response = ((WebApplicationException) e).response
                 String ct = response.metadata.getFirst(HttpHeaders.CONTENT_TYPE)
-                return ct == null || ct.startsWith(MediaType.APPLICATION_JSON) ? wrapResponsee(response.status, e.cause, response.entity) : response
+                return ct == null || ct.startsWith(MediaType.APPLICATION_JSON) ? wrapResponse(response, e.cause) : response
             }
             LOGGER.log(Level.SEVERE, "Internal Server Error (500): " + e.message, e)
-            return wrapResponsee(Response.Status.INTERNAL_SERVER_ERROR.statusCode, e)
+            return wrapResponse(Response.status(Response.Status.INTERNAL_SERVER_ERROR).build(), e)
         }
     }
 
@@ -98,16 +93,17 @@ class ExtendedJsend {
 
     static boolean isWrapped(Response response) { response.entity instanceof Map && response.entity.meta?.status != null }
 
-    static Response wrapResponsee(int status, Throwable e = null, Object data = null, boolean deprecated = false) {
+    static Response wrapResponse(Response response, Throwable e = null, boolean deprecated = false) {
         Map entity = [
             meta: [
-                status: status
+                status: response.status
             ]
         ]
-        boolean error = getFamily(status) in [Family.CLIENT_ERROR, Family.SERVER_ERROR]
+        boolean error = getFamily(response.status) in [Family.CLIENT_ERROR, Family.SERVER_ERROR]
+        Object data = response.entity
         if (error || e != null || deprecated) {
             entity.error = [
-                type: ERROR_TYPES.get(status) ?: (deprecated ? 'deprecated' : 'other')
+                type: ERROR_TYPES.get(response.status) ?: (deprecated ? 'deprecated' : 'other')
             ]
             if (e != null) {
                 entity.error.message = e.class.name + ': ' + e.message ?: '<no description>'
@@ -115,11 +111,11 @@ class ExtendedJsend {
             if (data != null && (error || e != null)) {
                 entity.error.data = data
             }
-        } else if (!error && e == null && (status == Response.Status.OK.statusCode || data != null)) {
+        } else if (!error && e == null && (response.status == Response.Status.OK.statusCode || data != null)) {
             entity.data = data
         }
-        return Response
-            .status(status == Response.Status.NO_CONTENT.statusCode ? Response.Status.OK.statusCode : status)
+        return Response.fromResponse(response)
+            .status(response.status == Response.Status.NO_CONTENT.statusCode ? Response.Status.OK.statusCode : response.status)
             .type(MediaType.APPLICATION_JSON_TYPE)
             .entity(entity)
             .build()
