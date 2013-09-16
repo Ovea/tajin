@@ -86,9 +86,12 @@ public final class AuthenticatedFilterFactory implements ResourceFilterFactory {
                 }
             }
             if (t || !(SecurityUtils.subject.authenticated || SecurityUtils.subject.remembered && authenticated.allowRemembered())) {
-                Response r = Response.status(Response.Status.UNAUTHORIZED).header(AUTHENTICATE_HEADER, "${HttpServletRequest.BASIC_AUTH} realm=\"${request.baseUri}\"").build()
-                if (t) throw new WebApplicationException(t, r)
-                else throw new WebApplicationException(r)
+                Response.ResponseBuilder builder = Response.status(Response.Status.UNAUTHORIZED)
+                if(authenticated.askAuthenticate()) {
+                    builder.header(AUTHENTICATE_HEADER, "${HttpServletRequest.BASIC_AUTH} realm=\"${request.baseUri}\"")
+                }
+                if (t) throw new WebApplicationException(t, builder.build())
+                else throw new WebApplicationException(builder.build())
             }
             return request
         }
