@@ -63,8 +63,8 @@ public final class Jsr250FilterFactory extends RolesAllowedResourceFilterFactory
         if (am.getResource().isAnnotationPresent(PermitAll))
             return null
 
-        // deny by default if no annotation is present
-        return Collections.<ResourceFilter> singletonList(new Jsr250Filter())
+        // allow by default if no annotation is present
+        return null
     }
 
     class Jsr250Filter implements ResourceFilter, ContainerRequestFilter {
@@ -96,6 +96,11 @@ public final class Jsr250FilterFactory extends RolesAllowedResourceFilterFactory
         // ContainerRequestFilter
         @Override
         public ContainerRequest filter(ContainerRequest request) {
+            // anonymous ? just pass
+            if(request.userPrincipal == null) {
+                return request
+            }
+            // authenticated ? then check roles
             if (!denyAll) {
                 for (String role : rolesAllowed) {
                     if (sc.isUserInRole(role))
