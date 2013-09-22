@@ -15,6 +15,7 @@
  */
 package com.ovea.tajin.framework.support.jersey
 
+import com.ovea.tajin.framework.util.PropertySettings
 import com.sun.jersey.api.core.HttpContext
 import com.sun.jersey.api.model.AbstractMethod
 import com.sun.jersey.api.model.AbstractResourceMethod
@@ -25,6 +26,7 @@ import com.sun.jersey.spi.container.ResourceFilter
 import com.sun.jersey.spi.container.ResourceFilterFactory
 import org.apache.shiro.SecurityUtils
 
+import javax.inject.Inject
 import javax.ws.rs.WebApplicationException
 import javax.ws.rs.core.Context
 import javax.ws.rs.core.Response
@@ -32,12 +34,37 @@ import javax.ws.rs.core.Response
 /**
  * @author Mathieu Carbou (mathieu.carbou@gmail.com)
  */
-public final class PermissionFilterFactory implements ResourceFilterFactory {
+public class PermissionFilterFactory implements ResourceFilterFactory {
 
-    private final HttpContext context;
+    @Context
+    HttpContext hc
 
-    public PermissionFilterFactory(@Context HttpContext hc) {
-        this.context = hc;
+    @Inject
+    PropertySettings settings
+
+    @Override
+    public List<ResourceFilter> create(AbstractMethod am) {
+        if (settings.getBoolean('security.enabled', false)) {
+            if (am.isAnnotationPresent(Permissions)) {
+                Collection<String> permissions = am.getAnnotation(Permissions).value() as List
+                Collection<String> vars = new TreeSet<>()
+                for (String p : permissions) {
+                    int s = p.indexOf('{')
+                    while (s != -1) {
+                        int e = p.indexOf('}', s + 1)
+                        vars << p.substring(s + 1, e)
+                        s = p.indexOf('{', e + 1)
+                    }
+                }
+                if (((AbstractResourceMethod) am).parameters.collect { it.sourceName }.containsAll(vars)) {
+                    return [new Filter(am.getAnnotation(Permissions).value(), vars)]
+                }
+                throw new IllegalArgumentException('Bad permissions: ' + permissions + ' for method ' + am)
+
+            }
+            return []
+        }
+        return []
     }
 
     private class Filter implements ResourceFilter, ContainerRequestFilter {
@@ -75,25 +102,4 @@ public final class PermissionFilterFactory implements ResourceFilterFactory {
         }
     }
 
-    @Override
-    public List<ResourceFilter> create(AbstractMethod am) {
-        if (am.isAnnotationPresent(Permissions)) {
-            Collection<String> permissions = am.getAnnotation(Permissions).value() as List
-            Collection<String> vars = new TreeSet<>()
-            for (String p : permissions) {
-                int s = p.indexOf('{')
-                while (s != -1) {
-                    int e = p.indexOf('}', s + 1)
-                    vars << p.substring(s + 1, e)
-                    s = p.indexOf('{', e + 1)
-                }
-            }
-            if (((AbstractResourceMethod) am).parameters.collect { it.sourceName }.containsAll(vars)) {
-                return Collections.<ResourceFilter> singletonList(new Filter(am.getAnnotation(Permissions).value(), vars))
-            }
-            throw new IllegalArgumentException('Bad permissions: ' + permissions + ' for method ' + am)
-
-        }
-        return null
-    }
 }

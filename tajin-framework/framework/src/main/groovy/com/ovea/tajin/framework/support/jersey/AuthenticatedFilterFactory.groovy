@@ -15,14 +15,20 @@
  */
 package com.ovea.tajin.framework.support.jersey
 
+import com.ovea.tajin.framework.util.PropertySettings
 import com.sun.jersey.api.model.AbstractMethod
-import com.sun.jersey.spi.container.*
+import com.sun.jersey.spi.container.ContainerRequest
+import com.sun.jersey.spi.container.ContainerRequestFilter
+import com.sun.jersey.spi.container.ContainerResponseFilter
+import com.sun.jersey.spi.container.ResourceFilter
+import com.sun.jersey.spi.container.ResourceFilterFactory
 import org.apache.shiro.SecurityUtils
 import org.apache.shiro.authc.AuthenticationException
 import org.apache.shiro.authc.UsernamePasswordToken
 import org.apache.shiro.authc.pam.UnsupportedTokenException
 import org.apache.shiro.codec.Base64
 
+import javax.inject.Inject
 import javax.servlet.http.HttpServletRequest
 import javax.ws.rs.WebApplicationException
 import javax.ws.rs.core.Context
@@ -31,7 +37,7 @@ import javax.ws.rs.core.Response
 /**
  * @author Mathieu Carbou (mathieu.carbou@gmail.com)
  */
-public final class AuthenticatedFilterFactory implements ResourceFilterFactory {
+public class AuthenticatedFilterFactory implements ResourceFilterFactory {
 
     /**
      * HTTP Authorization header, equal to <code>Authorization</code>
@@ -46,13 +52,19 @@ public final class AuthenticatedFilterFactory implements ResourceFilterFactory {
     @Context
     HttpServletRequest httpServletRequest
 
+    @Inject
+    PropertySettings settings
+
     @Override
     public List<ResourceFilter> create(AbstractMethod am) {
-        Authenticated authenticated = am.getAnnotation(Authenticated)
-        if (!authenticated) {
-            authenticated = am.resource.getAnnotation(Authenticated)
+        if (settings.getBoolean('security.enabled', false)) {
+            Authenticated authenticated = am.getAnnotation(Authenticated)
+            if (!authenticated) {
+                authenticated = am.resource.getAnnotation(Authenticated)
+            }
+            return authenticated ? [new AuthenticatedFilter(authenticated)] : []
         }
-        return authenticated ? [new AuthenticatedFilter(authenticated)] : []
+        return []
     }
 
     class AuthenticatedFilter implements ResourceFilter, ContainerRequestFilter {
@@ -87,7 +99,7 @@ public final class AuthenticatedFilterFactory implements ResourceFilterFactory {
             }
             if (t || !(SecurityUtils.subject.authenticated || SecurityUtils.subject.remembered && authenticated.allowRemembered())) {
                 Response.ResponseBuilder builder = Response.status(Response.Status.UNAUTHORIZED)
-                if(authenticated.askAuthenticate()) {
+                if (authenticated.askAuthenticate()) {
                     builder.header(AUTHENTICATE_HEADER, "${HttpServletRequest.BASIC_AUTH} realm=\"${request.baseUri}\"")
                 }
                 if (t) throw new WebApplicationException(t, builder.build())
