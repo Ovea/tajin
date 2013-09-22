@@ -17,7 +17,7 @@ package com.ovea.tajin.framework.support.jersey
 
 import com.ovea.tajin.framework.util.PropertySettings
 import com.sun.jersey.api.model.AbstractMethod
-import com.sun.jersey.api.model.AbstractSubResourceMethod
+import com.sun.jersey.api.model.AbstractResourceMethod
 import com.sun.jersey.spi.container.ContainerRequest
 import com.sun.jersey.spi.container.ContainerRequestFilter
 import com.sun.jersey.spi.container.ContainerResponseFilter
@@ -43,17 +43,17 @@ public class APIFilterFactory implements ResourceFilterFactory {
     @Override
     public List<ResourceFilter> create(AbstractMethod am) {
         if (settings.getBoolean('tajin.jersey.support.apitoken', false)) {
-            return [new APIFilter((AbstractSubResourceMethod) am)]
+            return [new APIFilter((AbstractResourceMethod) am)]
         }
         return []
     }
 
     class APIFilter implements ResourceFilter, ContainerRequestFilter {
 
-        final AbstractSubResourceMethod asrm
+        final AbstractResourceMethod arm
 
-        APIFilter(AbstractSubResourceMethod asrm) {
-            this.asrm = asrm
+        APIFilter(AbstractResourceMethod arm) {
+            this.arm = arm
         }
 
         @Override

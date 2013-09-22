@@ -37,7 +37,7 @@ import javax.ws.rs.core.Response
 public class PermissionFilterFactory implements ResourceFilterFactory {
 
     @Context
-    HttpContext hc
+    HttpContext context
 
     @Inject
     PropertySettings settings
@@ -67,7 +67,7 @@ public class PermissionFilterFactory implements ResourceFilterFactory {
         return []
     }
 
-    private class Filter implements ResourceFilter, ContainerRequestFilter {
+    class Filter implements ResourceFilter, ContainerRequestFilter {
 
         private final List<String> permissions
         private final Collection<String> vars
