@@ -22,6 +22,7 @@ import com.sun.jersey.spi.container.ContainerRequest
 import com.sun.jersey.spi.container.ContainerRequestFilter
 import com.sun.jersey.spi.container.ContainerResponseFilter
 import com.sun.jersey.spi.container.ResourceFilter
+import org.apache.shiro.authz.UnauthorizedException
 
 import javax.annotation.security.DenyAll
 import javax.annotation.security.PermitAll
@@ -118,7 +119,7 @@ public final class Jsr250FilterFactory extends RolesAllowedResourceFilterFactory
                         return request
                 }
             }
-            throw new WebApplicationException(new IllegalStateException('Invalid role'), Response.Status.FORBIDDEN)
+            throw new WebApplicationException(new UnauthorizedException('Invalid role'), Response.Status.FORBIDDEN)
         }
     }
 

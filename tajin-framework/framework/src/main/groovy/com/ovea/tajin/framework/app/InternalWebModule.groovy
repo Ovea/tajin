@@ -177,6 +177,7 @@ class InternalWebModule extends ServletModule {
         bind(ExtendedJsend.ExceptionMapper)
         requireBinding(APIRepository)
         serve("/*").with(JerseyContainer, [
+            (ResourceConfig.FEATURE_DISABLE_WADL) : 'true',
             (ResourceConfig.PROPERTY_CONTAINER_REQUEST_FILTERS): [JSONP.RequestFilter].name.join(';'),
             (ResourceConfig.PROPERTY_CONTAINER_RESPONSE_FILTERS): [
                 ExtendedJsend.ResponseFilter,

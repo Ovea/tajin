@@ -18,16 +18,25 @@ package com.ovea.tajin.framework.support.jersey
 import com.ovea.tajin.framework.util.PropertySettings
 import com.sun.jersey.api.model.AbstractMethod
 import com.sun.jersey.api.model.AbstractResourceMethod
+import com.sun.jersey.api.model.AbstractSubResourceMethod
+import com.sun.jersey.api.uri.UriTemplateParser
 import com.sun.jersey.spi.container.ContainerRequest
 import com.sun.jersey.spi.container.ContainerRequestFilter
+import com.sun.jersey.spi.container.ContainerResponse
 import com.sun.jersey.spi.container.ContainerResponseFilter
 import com.sun.jersey.spi.container.ResourceFilter
 import com.sun.jersey.spi.container.ResourceFilterFactory
+import org.apache.shiro.authz.UnauthorizedException
 
 import javax.inject.Inject
+import javax.servlet.http.HttpServletRequest
 import javax.ws.rs.WebApplicationException
+import javax.ws.rs.core.Context
 import javax.ws.rs.core.MediaType
 import javax.ws.rs.core.Response
+import java.util.concurrent.ConcurrentHashMap
+import java.util.concurrent.ConcurrentMap
+import java.util.concurrent.atomic.AtomicLong
 
 /**
  * @author Mathieu Carbou (mathieu.carbou@gmail.com)
@@ -40,6 +49,14 @@ public class APIFilterFactory implements ResourceFilterFactory {
     @Inject
     APIRepository repository
 
+    @Context
+    HttpServletRequest rawRequest
+
+    String tokenParam = 'token'
+
+    ConcurrentMap<String, AtomicLong> rateLimitingRemaining = new ConcurrentHashMap<>()
+    ConcurrentMap<String, Date> rateLimitingResetDate = new ConcurrentHashMap<>()
+
     @Override
     public List<ResourceFilter> create(AbstractMethod am) {
         if (settings.getBoolean('tajin.jersey.support.apitoken', false)) {
@@ -48,27 +65,126 @@ public class APIFilterFactory implements ResourceFilterFactory {
         return []
     }
 
-    class APIFilter implements ResourceFilter, ContainerRequestFilter {
+    class APIFilter implements ResourceFilter, ContainerRequestFilter, ContainerResponseFilter {
 
         final AbstractResourceMethod arm
+        final String path
 
         APIFilter(AbstractResourceMethod arm) {
             this.arm = arm
+            String p = arm.resource.path.value
+            if (!p.startsWith('/')) p = '/' + p
+            if (p.endsWith('/')) p = p.substring(0, p.length() - 1)
+            if (this.arm instanceof AbstractSubResourceMethod) {
+                AbstractSubResourceMethod asrm = (AbstractSubResourceMethod) arm
+                String s = asrm.path.value
+                if (s.endsWith('/')) s = s.substring(0, s.length() - 1)
+                if (s.startsWith('/')) p = p + s
+                else p = p + '/' + s
+            }
+            this.path = "${arm.httpMethod} ${new UriTemplateParser(p).normalizedTemplate.replaceAll('\\{\\w+\\}', '?')}"
         }
 
         @Override
         public ContainerRequestFilter getRequestFilter() { return this }
 
         @Override
-        public ContainerResponseFilter getResponseFilter() { return null }
+        public ContainerResponseFilter getResponseFilter() { return this }
+
+        @Override
+        ContainerResponse filter(ContainerRequest request, ContainerResponse response) {
+            String token = request.queryParameters.getFirst(tokenParam)
+            if (token) {
+                APIAccess access = repository.getAPIAccessByToken(token)
+                if (access) {
+                    if (access.rateLimited) {
+                        response.httpHeaders.add('X-RateLimit-Limit', access.rateLimitingLimit as String)
+                        response.httpHeaders.add('X-RateLimit-Remaining', rateLimitingRemaining.get(access.token).get() as String)
+                        response.httpHeaders.add('X-RateLimit-Reset', rateLimitingResetDate.get(access.token).time as String)
+                    }
+                }
+            }
+            return response
+        }
 
         @Override
         public ContainerRequest filter(ContainerRequest request) {
-            APIAccess access = repository.getAPIAccessByToken(request.queryParameters.getFirst('token'))
-            if (access == null) {
-                throw new WebApplicationException(Response.status(Response.Status.BAD_REQUEST).entity([token: 'missing']).type(MediaType.APPLICATION_JSON).build())
+            String token = request.queryParameters.getFirst(tokenParam)
+            if (!token) {
+                throw new WebApplicationException(Response.status(Response.Status.BAD_REQUEST).entity([(tokenParam): 'missing']).type(MediaType.APPLICATION_JSON).build())
             }
-            //TODO MATHIEU: validate token
+
+            APIAccess access = repository.getAPIAccessByToken(token)
+            if (access == null) {
+                throw new WebApplicationException(Response.status(Response.Status.BAD_REQUEST).entity([(tokenParam): 'invalid']).type(MediaType.APPLICATION_JSON).build())
+            }
+
+            if (access.ipRestricted) {
+                if (!(rawRequest.getRemoteAddr() in access.ipRestrictions)) {
+                    throw new WebApplicationException(new UnauthorizedException('IP refused'), Response.Status.FORBIDDEN)
+                }
+            }
+
+            if (access.apiRestricted) {
+                if (!(path in access.apiRestrictions)) {
+                    throw new WebApplicationException(new UnauthorizedException('API Resource access refused'), Response.Status.FORBIDDEN)
+                }
+            }
+
+            if (access.isHeaderRestricted()) {
+                boolean foundInvalidValue = false
+                def found = access.headerRestrictions.find { header, expectedValue ->
+                    String v = request.getHeaderValue(header)
+                    if (v == null) return false
+                    if (expectedValue.startsWith('/')
+                        && expectedValue.endsWith('/')
+                        && v.matches(expectedValue.substring(1, expectedValue.length() - 1)) || v == expectedValue) {
+                        return true
+                    }
+                    if (v != null) foundInvalidValue = true
+                    return false
+                }
+                if (!found) {
+                    throw new WebApplicationException(new UnauthorizedException(foundInvalidValue ? 'Header invalid' : 'Required Header missing'), Response.Status.FORBIDDEN)
+                }
+            }
+
+            if (access.rateLimited) {
+                //TODO MATHIEU: implement properly rate limiting by using external persistence storage for clustering
+                Date now = new Date()
+                Date previousResetDate = rateLimitingResetDate.get(access.token)
+                Date resetDate = previousResetDate
+                if (resetDate == null) {
+                    resetDate = new Date(now.time - 1)
+                }
+                if (resetDate <= now) {
+                    if (access.rateLimitingPeriod == APIAccess.RATE_LIMITING_PERIOD_DAILY) {
+                        resetDate = new Date(now.time + 86400000)
+                    } else if (access.rateLimitingPeriod == APIAccess.RATE_LIMITING_PERIOD_HOURLY) {
+                        resetDate = new Date(now.time + 3600000)
+                    } else if (access.rateLimitingPeriod == APIAccess.RATE_LIMITING_PERIOD_MONTHLY) {
+                        resetDate = new Date(now.time + 2629800000) // 1 month = 365.25/12*24*60*60*1000
+                    }
+                    boolean put = previousResetDate == null ? rateLimitingResetDate.putIfAbsent(access.token, resetDate) == null :  rateLimitingResetDate.replace(access.token, previousResetDate, resetDate)
+                    if (put) {
+                        AtomicLong prev = rateLimitingRemaining.get(access.token)
+                        if (prev == null) {
+                            rateLimitingRemaining.putIfAbsent(access.token, new AtomicLong(access.rateLimitingLimit))
+                        } else {
+                            rateLimitingRemaining.replace(
+                                access.token,
+                                prev,
+                                new AtomicLong(access.rateLimitingLimit))
+                        }
+                    }
+                }
+                long remaining = rateLimitingRemaining.get(access.token).decrementAndGet()
+                if (remaining < 0) {
+                    rateLimitingRemaining.get(access.token).compareAndSet(remaining, 0)
+                    throw new WebApplicationException(new UnauthorizedException('Rate limit reached'), Response.Status.FORBIDDEN)
+                }
+            }
+
             return request
         }
 

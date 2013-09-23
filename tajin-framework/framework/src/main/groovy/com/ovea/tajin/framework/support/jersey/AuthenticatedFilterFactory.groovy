@@ -84,7 +84,7 @@ public class AuthenticatedFilterFactory implements ResourceFilterFactory {
         @Override
         public ContainerRequest filter(ContainerRequest request) {
             String authzHeader = request.getHeaderValue(AUTHORIZATION_HEADER)
-            Throwable t = null
+            boolean authError = false
             if (authzHeader != null && authzHeader.toUpperCase(Locale.ENGLISH).startsWith(HttpServletRequest.BASIC_AUTH)) {
                 UsernamePasswordToken token = buildToken(authzHeader)
                 if (token == null) {
@@ -92,17 +92,17 @@ public class AuthenticatedFilterFactory implements ResourceFilterFactory {
                 } else {
                     try {
                         SecurityUtils.subject.login(token)
-                    } catch (AuthenticationException e) {
-                        t = e
+                    } catch (AuthenticationException ignoed) {
+                        authError = true
                     }
                 }
             }
-            if (t || !(SecurityUtils.subject.authenticated || SecurityUtils.subject.remembered && authenticated.allowRemembered())) {
+            if (authError || !(SecurityUtils.subject.authenticated || SecurityUtils.subject.remembered && authenticated.allowRemembered())) {
                 Response.ResponseBuilder builder = Response.status(Response.Status.UNAUTHORIZED)
                 if (authenticated.askAuthenticate()) {
                     builder.header(AUTHENTICATE_HEADER, "${HttpServletRequest.BASIC_AUTH} realm=\"${request.baseUri}\"")
                 }
-                if (t) throw new WebApplicationException(t, builder.build())
+                if (authError) throw new WebApplicationException(new AuthenticationException('Invalid authentication data'), builder.build())
                 else throw new WebApplicationException(builder.build())
             }
             return request

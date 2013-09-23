@@ -20,14 +20,26 @@ package com.ovea.tajin.framework.support.jersey
  */
 class APIAccess {
 
+    static final long RATE_LIMITING_NO_LIMIT = -1
+    static final String RATE_LIMITING_PERIOD_HOURLY = 'hour'
+    static final String RATE_LIMITING_PERIOD_DAILY = 'day'
+    static final String RATE_LIMITING_PERIOD_MONTHLY = 'month'
+
     String token
     String alias
     APIAccount account
     List<String> ipRestrictions = []
     List<String> apiRestrictions = []
+    Map<String, String> headerRestrictions = [:]
     boolean production = true
     Map<String, ?> options = [:]
 
-    boolean hasRestrictions() { !apiRestrictions.empty }
+    long rateLimitingLimit = RATE_LIMITING_NO_LIMIT
+    String rateLimitingPeriod = RATE_LIMITING_PERIOD_HOURLY
+
+    boolean isApiRestricted() { !apiRestrictions.empty }
+    boolean isIpRestricted() { !ipRestrictions.empty }
+    boolean isRateLimited() { rateLimitingLimit >= 0 }
+    boolean isHeaderRestricted() { !headerRestrictions.isEmpty() }
 
 }

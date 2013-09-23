@@ -25,6 +25,7 @@ import com.sun.jersey.spi.container.ContainerResponseFilter
 import com.sun.jersey.spi.container.ResourceFilter
 import com.sun.jersey.spi.container.ResourceFilterFactory
 import org.apache.shiro.SecurityUtils
+import org.apache.shiro.authz.UnauthorizedException
 
 import javax.inject.Inject
 import javax.ws.rs.WebApplicationException
@@ -60,7 +61,6 @@ public class PermissionFilterFactory implements ResourceFilterFactory {
                     return [new Filter(am.getAnnotation(Permissions).value(), vars)]
                 }
                 throw new IllegalArgumentException('Bad permissions: ' + permissions + ' for method ' + am)
-
             }
             return []
         }
@@ -95,7 +95,7 @@ public class PermissionFilterFactory implements ResourceFilterFactory {
             permissions.each { String perm ->
                 ctx.each { String k, String v -> perm = perm.replace('{' + k + '}', v) }
                 if (!SecurityUtils.subject.isPermitted(perm)) {
-                    throw new WebApplicationException(new IllegalStateException('Invalid permissions'), Response.Status.FORBIDDEN)
+                    throw new WebApplicationException(new UnauthorizedException('Invalid permissions'), Response.Status.FORBIDDEN)
                 }
             }
             return request
