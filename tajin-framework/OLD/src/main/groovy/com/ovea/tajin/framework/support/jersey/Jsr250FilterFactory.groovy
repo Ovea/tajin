@@ -15,16 +15,19 @@
  */
 package com.ovea.tajin.framework.support.jersey
 
+import com.ovea.tajin.framework.util.PropertySettings
 import com.sun.jersey.api.container.filter.RolesAllowedResourceFilterFactory
 import com.sun.jersey.api.model.AbstractMethod
 import com.sun.jersey.spi.container.ContainerRequest
 import com.sun.jersey.spi.container.ContainerRequestFilter
 import com.sun.jersey.spi.container.ContainerResponseFilter
 import com.sun.jersey.spi.container.ResourceFilter
+import org.apache.shiro.authz.UnauthorizedException
 
 import javax.annotation.security.DenyAll
 import javax.annotation.security.PermitAll
 import javax.annotation.security.RolesAllowed
+import javax.inject.Inject
 import javax.ws.rs.WebApplicationException
 import javax.ws.rs.core.Context
 import javax.ws.rs.core.Response
@@ -35,36 +38,45 @@ import javax.ws.rs.core.SecurityContext
  */
 public final class Jsr250FilterFactory extends RolesAllowedResourceFilterFactory {
 
-    @Context SecurityContext sc
+    @Context
+    SecurityContext sc
+
+    @Inject
+    PropertySettings settings
 
     @Override
     public List<ResourceFilter> create(AbstractMethod am) {
-        // DenyAll on the method take precedence over RolesAllowed and PermitAll
-        if (am.isAnnotationPresent(DenyAll))
-            return Collections.<ResourceFilter> singletonList(new Jsr250Filter())
+        if (settings.getBoolean('security.enabled', false)) {
 
-        // RolesAllowed on the method takes precedence over PermitAll
-        if (am.isAnnotationPresent(RolesAllowed))
-            return Collections.<ResourceFilter> singletonList(new Jsr250Filter(am.getAnnotation(RolesAllowed).value()))
+            // DenyAll on the method take precedence over RolesAllowed and PermitAll
+            if (am.isAnnotationPresent(DenyAll))
+                return [new Jsr250Filter()]
 
-        // PermitAll takes precedence over RolesAllowed on the class
-        if (am.isAnnotationPresent(PermitAll))
-            return null
+            // RolesAllowed on the method takes precedence over PermitAll
+            if (am.isAnnotationPresent(RolesAllowed))
+                return [new Jsr250Filter(am.getAnnotation(RolesAllowed).value())]
 
-        // DenyAll on the class takes precedence over other below
-        if (am.getResource().isAnnotationPresent(DenyAll))
-            return Collections.<ResourceFilter> singletonList(new Jsr250Filter())
+            // PermitAll takes precedence over RolesAllowed on the class
+            if (am.isAnnotationPresent(PermitAll))
+                return []
 
-        // RolesAllowed on the class takes precedence over PermitAll
-        if (am.getResource().isAnnotationPresent(RolesAllowed))
-            return Collections.<ResourceFilter> singletonList(new Jsr250Filter(am.getResource().getAnnotation(RolesAllowed).value()))
+            // DenyAll on the class takes precedence over other below
+            if (am.getResource().isAnnotationPresent(DenyAll))
+                return [new Jsr250Filter()]
 
-        // Then check if we must permit
-        if (am.getResource().isAnnotationPresent(PermitAll))
-            return null
+            // RolesAllowed on the class takes precedence over PermitAll
+            if (am.getResource().isAnnotationPresent(RolesAllowed))
+                return [new Jsr250Filter(am.getResource().getAnnotation(RolesAllowed).value())]
 
-        // deny by default if no annotation is present
-        return Collections.<ResourceFilter> singletonList(new Jsr250Filter())
+            // Then check if we must permit
+            if (am.getResource().isAnnotationPresent(PermitAll))
+                return []
+
+            // allow by default if no annotation is present
+            return []
+
+        }
+        return []
     }
 
     class Jsr250Filter implements ResourceFilter, ContainerRequestFilter {
@@ -96,13 +108,18 @@ public final class Jsr250FilterFactory extends RolesAllowedResourceFilterFactory
         // ContainerRequestFilter
         @Override
         public ContainerRequest filter(ContainerRequest request) {
+            // anonymous ? just pass
+            if (request.userPrincipal == null) {
+                return request
+            }
+            // authenticated ? then check roles
             if (!denyAll) {
                 for (String role : rolesAllowed) {
                     if (sc.isUserInRole(role))
                         return request
                 }
             }
-            throw new WebApplicationException(new IllegalStateException('Invalid role'), Response.Status.FORBIDDEN)
+            throw new WebApplicationException(new UnauthorizedException('Invalid role'), Response.Status.FORBIDDEN)
         }
     }
 

@@ -19,7 +19,12 @@ import org.apache.shiro.SecurityUtils
 import org.slf4j.Logger
 import org.slf4j.LoggerFactory
 
-import javax.servlet.*
+import javax.servlet.Filter
+import javax.servlet.FilterChain
+import javax.servlet.FilterConfig
+import javax.servlet.ServletException
+import javax.servlet.ServletRequest
+import javax.servlet.ServletResponse
 import javax.servlet.http.HttpServletRequest
 
 /**
@@ -56,9 +61,9 @@ class PerfLog implements Filter {
             } finally {
                 time = System.currentTimeMillis() - time
                 if (secured) {
-                    LOGGER.info("| ${(time as String).padLeft(5)} | ${req.method.padLeft(6)} | ${req.requestURI} | auth=${SecurityUtils.subject.authenticated ? 1 : 0} | rmb=${SecurityUtils.subject.remembered ? 1 : 0} | ${req.userPrincipal} |")
+                    LOGGER.info("| ${(time as String).padLeft(5)} | ${req.method.padLeft(6)} ${req.requestURI} | auth=${SecurityUtils.subject.authenticated ? 1 : 0} | rmb=${SecurityUtils.subject.remembered ? 1 : 0} | ${req.userPrincipal} |")
                 } else {
-                    LOGGER.info("| ${(time as String).padLeft(5)} | ${req.method.padLeft(6)} | ${req.requestURI} |")
+                    LOGGER.info("| ${(time as String).padLeft(5)} | ${req.method.padLeft(6)} ${req.requestURI} |")
                 }
             }
         }

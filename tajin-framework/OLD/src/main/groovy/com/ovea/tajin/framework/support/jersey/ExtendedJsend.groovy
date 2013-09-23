@@ -16,7 +16,12 @@
 package com.ovea.tajin.framework.support.jersey
 
 import com.sun.jersey.api.model.AbstractMethod
-import com.sun.jersey.spi.container.*
+import com.sun.jersey.spi.container.ContainerRequest
+import com.sun.jersey.spi.container.ContainerRequestFilter
+import com.sun.jersey.spi.container.ContainerResponse
+import com.sun.jersey.spi.container.ContainerResponseFilter
+import com.sun.jersey.spi.container.ResourceFilter
+import com.sun.jersey.spi.container.ResourceFilterFactory
 
 import javax.ws.rs.WebApplicationException
 import javax.ws.rs.core.HttpHeaders
@@ -121,7 +126,7 @@ class ExtendedJsend {
                 type: ERROR_TYPES.get(response.status) ?: (deprecated ? 'deprecated' : 'other')
             ]
             if (e != null) {
-                entity.error.message = e.class.name + ': ' + e.message ?: '<no description>'
+                entity.error.message = e.class.simpleName + ': ' + e.message ?: '<no description>'
             }
             if (data != null && (error || e != null)) {
                 entity.error.data = data
@@ -137,77 +142,3 @@ class ExtendedJsend {
     }
 
 }
-
-/*
-
-404 http://localhost:8081/api/profile/404
-   - exception mapper
-   - resp filter
-405 http://localhost:8081/api/security/login
-   - exception mapper
-   - resp filter
-403 http://localhost:8081/api/restaurants/10Gea1uJJNEQGV-l0dd-nw
-   - exception mapper
-   - filter factory
-   - resp filter
-400 http://localhost:8081/api/security/login?callback=toto&method=POST
-   - filter factory
-   - resp filter
-401 http://localhost:8081/api/security/login?callback=toto&method=POST&email=toto@rr.com&password=password1
-   - exception mapper
-   - filter factory
-   - resp filter
-200 DEPRECATED http://localhost:8081/api/meta/deprecated
-   - filter factory REQUIRED
-   - resp filter
-500 http://localhost:8081/api/meta/throw1
-   - exception mapper REQUIRED
-   - filter factory
-   - resp filter
-500 http://localhost:8081/api/meta/throw2
-   - exception mapper REQUIRED
-   - filter factory
-   - resp filter
-
-   http://localhost:8081/api/meta/throw3
-
-204 no data
-
---
-Responses & Errors
-All responses will look roughly like this:
-
-```
-{
-    "meta": {
-        "status": 200
-    },
-    "error": {
-        "type",
-        "data": {...}
-        "message": "a string"
-    },
-    "data": {...}
-}
-```
-
- - __data__: JSON response, if any
- - __meta__: Meta information about the request and response
-   - __status__: HTTP sattus code. In JSONP, the HTTP status code will always be 200 and `status` will hold the real HTTP status code value
- - __error__: Error section if error:
-   - __type__: error type (see below)
-   - __data__: error details, optional. I.e., for Bad Requests, contains validation errors.
-   - __message__: optional message describing the error. I.e. in case of Internal 500 error, this field could be set.
-
-Here is a list of error `type` and its matching `status` code:
-
- - `401` __authc__: Authentication error.
- - `403` __authz__: Although authentication succeeded, the acting user is not allowed to see this information due to privacy restrictions.
- - `400` __request__: A required parameter was missing or a parameter was malformed. This is also used if the resource ID in the path is incorrect.
- - `404` __notfound__: The requested path does not exist.
- - `405` __method__: The method (GET, PUT, POST, DELETE) set for the request is not allowed for the requested path..
- - `200` __deprecated__: Something about this request is using deprecated functionality, or the response format may be about to change.
- - `500` __server__:     Server is currently experiencing issues. Check [status.guestful.com](http://status.guestful.com) for updates.
---
-
-*/
