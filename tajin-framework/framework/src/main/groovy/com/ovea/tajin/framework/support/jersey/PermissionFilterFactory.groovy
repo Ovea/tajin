@@ -19,11 +19,7 @@ import com.ovea.tajin.framework.util.PropertySettings
 import com.sun.jersey.api.core.HttpContext
 import com.sun.jersey.api.model.AbstractMethod
 import com.sun.jersey.api.model.AbstractResourceMethod
-import com.sun.jersey.spi.container.ContainerRequest
-import com.sun.jersey.spi.container.ContainerRequestFilter
-import com.sun.jersey.spi.container.ContainerResponseFilter
-import com.sun.jersey.spi.container.ResourceFilter
-import com.sun.jersey.spi.container.ResourceFilterFactory
+import com.sun.jersey.spi.container.*
 import org.apache.shiro.SecurityUtils
 import org.apache.shiro.authz.UnauthorizedException
 
@@ -91,6 +87,11 @@ public class PermissionFilterFactory implements ResourceFilterFactory {
         // ContainerRequestFilter
         @Override
         public ContainerRequest filter(ContainerRequest request) {
+            // anonymous ? just pass
+            if (request.userPrincipal == null) {
+                return request
+            }
+            // authenticated ? then check permissions
             Map<String, String> ctx = vars.collectEntries { [(it): context.getUriInfo().getPathParameters().getFirst(it)] }
             permissions.each { String perm ->
                 ctx.each { String k, String v -> perm = perm.replace('{' + k + '}', v) }
