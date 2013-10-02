@@ -30,6 +30,7 @@ class APIToken {
 
     String value = Uuid.generate()
     String alias
+    String account
     boolean production = true
 
     List<String> ipRestrictions = []
