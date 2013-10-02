@@ -19,6 +19,9 @@ import com.google.common.cache.CacheBuilder
 import com.google.common.cache.CacheLoader
 import com.google.common.cache.LoadingCache
 import com.google.common.util.concurrent.UncheckedExecutionException
+import com.mycila.jmx.annotation.JmxBean
+import com.mycila.jmx.annotation.JmxMethod
+import com.mycila.jmx.annotation.JmxProperty
 
 import java.util.concurrent.ExecutionException
 import java.util.concurrent.TimeUnit
@@ -27,38 +30,36 @@ import java.util.concurrent.TimeUnit
  * @author Mathieu Carbou (mathieu.carbou@gmail.com)
  * @date 2013-09-21
  */
+@javax.inject.Singleton
+@JmxBean('com.ovea.tajin:type=CachingAPIRepository,name=main')
 class CachingAPIRepository implements APIRepository {
 
     final APIRepository delegate
-    final LoadingCache<String, APIAccess> accesses
-    final LoadingCache<String, APIAccount> accounts
+    final LoadingCache<String, APIToken> tokens
 
     CachingAPIRepository(APIRepository delegate, long expiration, TimeUnit unit) {
         this.delegate = delegate
-        this.accesses = CacheBuilder
+        this.tokens = CacheBuilder
             .newBuilder()
             .expireAfterWrite(expiration, unit)
-            .build(new CacheLoader<String, APIAccess>() {
+            .build(new CacheLoader<String, APIToken>() {
             @Override
-            APIAccess load(String key) throws Exception {
-                return delegate.getAPIAccessByToken(key)
-            }
-        })
-        this.accounts = CacheBuilder
-            .newBuilder()
-            .expireAfterWrite(expiration, unit)
-            .build(new CacheLoader<String, APIAccount>() {
-            @Override
-            APIAccount load(String key) throws Exception {
-                return delegate.getAPIAccount(key)
+            APIToken load(String key) throws Exception {
+                return delegate.getAPIToken(key)
             }
         })
     }
 
+    @JmxMethod
+    void clearTokenCache() { tokens.invalidateAll() }
+
+    @JmxProperty
+    Collection getCachedTokens() { tokens.asMap().keySet().collect() }
+
     @Override
-    APIAccess getAPIAccessByToken(String token) {
+    APIToken getAPIToken(String token) {
         try {
-            return accesses.get(token)
+            return tokens.get(token)
         } catch (ExecutionException e) {
             throw e.cause
         } catch (UncheckedExecutionException e) {
@@ -66,14 +67,4 @@ class CachingAPIRepository implements APIRepository {
         }
     }
 
-    @Override
-    APIAccount getAPIAccount(String id) {
-        try {
-            return accounts.get(id)
-        } catch (ExecutionException e) {
-            throw e.cause
-        } catch (UncheckedExecutionException e) {
-            throw e.cause
-        }
-    }
 }

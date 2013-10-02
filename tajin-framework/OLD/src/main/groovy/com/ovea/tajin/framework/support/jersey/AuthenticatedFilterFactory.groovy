@@ -29,6 +29,7 @@ import org.apache.shiro.authc.pam.UnsupportedTokenException
 import org.apache.shiro.codec.Base64
 
 import javax.inject.Inject
+import javax.inject.Provider
 import javax.servlet.http.HttpServletRequest
 import javax.ws.rs.WebApplicationException
 import javax.ws.rs.core.Context
@@ -54,6 +55,9 @@ public class AuthenticatedFilterFactory implements ResourceFilterFactory {
 
     @Inject
     PropertySettings settings
+
+    @Inject
+    Provider<APIToken> apiToken
 
     @Override
     public List<ResourceFilter> create(AbstractMethod am) {
@@ -84,28 +88,41 @@ public class AuthenticatedFilterFactory implements ResourceFilterFactory {
         @Override
         public ContainerRequest filter(ContainerRequest request) {
             String authzHeader = request.getHeaderValue(AUTHORIZATION_HEADER)
-            boolean authError = false
             if (authzHeader != null && authzHeader.toUpperCase(Locale.ENGLISH).startsWith(HttpServletRequest.BASIC_AUTH)) {
                 UsernamePasswordToken token = buildToken(authzHeader)
                 if (token == null) {
-                    t = new UnsupportedTokenException('Malformed Basic HTTP Token')
+                    throw buildException(request, new UnsupportedTokenException('Malformed Basic HTTP Token'))
                 } else {
                     try {
                         SecurityUtils.subject.login(token)
-                    } catch (AuthenticationException ignoed) {
-                        authError = true
+                    } catch (AuthenticationException e) {
+                        throw buildException(request, e)
                     }
                 }
             }
-            if (authError || !(SecurityUtils.subject.authenticated || SecurityUtils.subject.remembered && authenticated.allowRemembered())) {
-                Response.ResponseBuilder builder = Response.status(Response.Status.UNAUTHORIZED)
-                if (authenticated.askAuthenticate()) {
-                    builder.header(AUTHENTICATE_HEADER, "${HttpServletRequest.BASIC_AUTH} realm=\"${request.baseUri}\"")
+            if(SecurityUtils.subject.remembered && !authenticated.allowRemembered()) {
+                SecurityUtils.subject.logout()
+                throw buildException(request)
+            }
+            if (SecurityUtils.subject.authenticated || SecurityUtils.subject.remembered) {
+                APIToken token = apiToken.get()
+                if (token && !SecurityUtils.subject.hasRole('api:account:' + token.account)) {
+                    SecurityUtils.subject.logout()
+                    throw buildException(request, new UnsupportedTokenException('Invalid Token'))
                 }
-                if (authError) throw new WebApplicationException(new AuthenticationException('Invalid authentication data'), builder.build())
-                else throw new WebApplicationException(builder.build())
+            } else {
+                throw buildException(request)
             }
             return request
+        }
+
+        private WebApplicationException buildException(ContainerRequest request, Throwable t = null) {
+            Response.ResponseBuilder builder = Response.status(Response.Status.UNAUTHORIZED)
+            if (authenticated.askAuthenticate()) {
+                builder.header(AUTHENTICATE_HEADER, "${HttpServletRequest.BASIC_AUTH} realm=\"${request.baseUri}\"")
+            }
+            if (t) return new WebApplicationException(t, builder.build())
+            return new WebApplicationException(builder.build())
         }
 
         private UsernamePasswordToken buildToken(String authzHeader) {

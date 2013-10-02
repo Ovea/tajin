@@ -29,6 +29,7 @@ import com.sun.jersey.spi.container.ResourceFilterFactory
 import org.apache.shiro.authz.UnauthorizedException
 
 import javax.inject.Inject
+import javax.inject.Provider
 import javax.servlet.http.HttpServletRequest
 import javax.ws.rs.WebApplicationException
 import javax.ws.rs.core.Context
@@ -37,29 +38,31 @@ import javax.ws.rs.core.Response
 import java.util.concurrent.ConcurrentHashMap
 import java.util.concurrent.ConcurrentMap
 import java.util.concurrent.atomic.AtomicLong
+import java.util.logging.Level
+import java.util.logging.Logger
 
 /**
  * @author Mathieu Carbou (mathieu.carbou@gmail.com)
  */
-public class APIFilterFactory implements ResourceFilterFactory {
+public class APITokenFilterFactory implements ResourceFilterFactory {
+
+    private static final Logger LOGGER = Logger.getLogger(APITokenFilterFactory.name);
 
     @Inject
     PropertySettings settings
 
     @Inject
-    APIRepository repository
+    Provider<APIToken> apiToken
 
     @Context
     HttpServletRequest rawRequest
-
-    String tokenParam = 'token'
 
     ConcurrentMap<String, AtomicLong> rateLimitingRemaining = new ConcurrentHashMap<>()
     ConcurrentMap<String, Date> rateLimitingResetDate = new ConcurrentHashMap<>()
 
     @Override
     public List<ResourceFilter> create(AbstractMethod am) {
-        if (settings.getBoolean('tajin.jersey.support.apitoken', false)) {
+        if (settings.getBoolean('tajin.jersey.support.apitoken', true)) {
             return [new APIFilter((AbstractResourceMethod) am)]
         }
         return []
@@ -93,45 +96,67 @@ public class APIFilterFactory implements ResourceFilterFactory {
 
         @Override
         ContainerResponse filter(ContainerRequest request, ContainerResponse response) {
-            String token = request.queryParameters.getFirst(tokenParam)
-            if (token) {
-                APIAccess access = repository.getAPIAccessByToken(token)
-                if (access) {
-                    if (access.rateLimited) {
-                        response.httpHeaders.add('X-RateLimit-Limit', access.rateLimitingLimit as String)
-                        response.httpHeaders.add('X-RateLimit-Remaining', rateLimitingRemaining.get(access.token).get() as String)
-                        response.httpHeaders.add('X-RateLimit-Reset', rateLimitingResetDate.get(access.token).time as String)
-                    }
-                }
+            APIToken access = apiToken.get()
+            if (access && access.rateLimited) {
+                response.httpHeaders.add('X-RateLimit-Limit', access.rateLimitingLimit as String)
+                response.httpHeaders.add('X-RateLimit-Remaining', rateLimitingRemaining.get(access.value).get() as String)
+                response.httpHeaders.add('X-RateLimit-Reset', rateLimitingResetDate.get(access.value).time as String)
             }
             return response
         }
 
         @Override
         public ContainerRequest filter(ContainerRequest request) {
-            String token = request.queryParameters.getFirst(tokenParam)
-            if (!token) {
-                throw new WebApplicationException(Response.status(Response.Status.BAD_REQUEST).entity([(tokenParam): 'missing']).type(MediaType.APPLICATION_JSON).build())
+            APIToken access = apiToken.get()
+            if (!access) {
+                throw new WebApplicationException(Response.status(Response.Status.BAD_REQUEST)
+                    .entity(
+                    [
+                        [
+                            key: APIToken.TOKEN_PARAM,
+                            type: 'invalid'
+                        ]
+                    ])
+                    .type(MediaType.APPLICATION_JSON)
+                    .build())
             }
 
-            APIAccess access = repository.getAPIAccessByToken(token)
-            if (access == null) {
-                throw new WebApplicationException(Response.status(Response.Status.BAD_REQUEST).entity([(tokenParam): 'invalid']).type(MediaType.APPLICATION_JSON).build())
+            if (LOGGER.isLoggable(Level.FINE)) {
+                LOGGER.fine("${path} - ${access}")
             }
 
             if (access.ipRestricted) {
-                if (!(rawRequest.getRemoteAddr() in access.ipRestrictions)) {
+                String ip = rawRequest.remoteAddr
+                if (LOGGER.isLoggable(Level.FINEST)) {
+                    LOGGER.finest("${path} - ${access} | IP Restrictions: Request IP = ${ip}")
+                }
+                if (!(ip in access.ipRestrictions)) {
                     throw new WebApplicationException(new UnauthorizedException('IP refused'), Response.Status.FORBIDDEN)
                 }
             }
 
             if (access.apiRestricted) {
-                if (!(path in access.apiRestrictions)) {
+                if (LOGGER.isLoggable(Level.FINEST)) {
+                    LOGGER.finest("${path} - ${access} | API Restrictions")
+                }
+                def found = access.apiRestrictions.find { r ->
+                    if (r.startsWith('/')
+                        && r.endsWith('/')
+                        && path.matches(r.substring(1, r.length() - 1)) || r == path) {
+                        return true
+                    }
+                    return false
+                }
+                if (!found) {
                     throw new WebApplicationException(new UnauthorizedException('API Resource access refused'), Response.Status.FORBIDDEN)
                 }
             }
 
             if (access.isHeaderRestricted()) {
+                if (LOGGER.isLoggable(Level.FINEST)) {
+                    String hdump = request.requestHeaders.collect { k, v -> "${k}: ${v.join(', ')}" }.join('\n')
+                    LOGGER.finest("${path} - ${access} | Header Restrictions = ${access.headerRestrictions}, Request Headers:\n${hdump}")
+                }
                 boolean foundInvalidValue = false
                 def found = access.headerRestrictions.find { header, expectedValue ->
                     String v = request.getHeaderValue(header)
@@ -151,36 +176,39 @@ public class APIFilterFactory implements ResourceFilterFactory {
 
             if (access.rateLimited) {
                 //TODO MATHIEU: implement properly rate limiting by using external persistence storage for clustering
+                if (LOGGER.isLoggable(Level.FINEST)) {
+                    LOGGER.finest("${path} - ${access} | Rate Limited")
+                }
                 Date now = new Date()
-                Date previousResetDate = rateLimitingResetDate.get(access.token)
+                Date previousResetDate = rateLimitingResetDate.get(access.value)
                 Date resetDate = previousResetDate
                 if (resetDate == null) {
                     resetDate = new Date(now.time - 1)
                 }
                 if (resetDate <= now) {
-                    if (access.rateLimitingPeriod == APIAccess.RATE_LIMITING_PERIOD_DAILY) {
+                    if (access.rateLimitingPeriod == APIToken.RATE_LIMITING_PERIOD_DAILY) {
                         resetDate = new Date(now.time + 86400000)
-                    } else if (access.rateLimitingPeriod == APIAccess.RATE_LIMITING_PERIOD_HOURLY) {
+                    } else if (access.rateLimitingPeriod == APIToken.RATE_LIMITING_PERIOD_HOURLY) {
                         resetDate = new Date(now.time + 3600000)
-                    } else if (access.rateLimitingPeriod == APIAccess.RATE_LIMITING_PERIOD_MONTHLY) {
+                    } else if (access.rateLimitingPeriod == APIToken.RATE_LIMITING_PERIOD_MONTHLY) {
                         resetDate = new Date(now.time + 2629800000) // 1 month = 365.25/12*24*60*60*1000
                     }
-                    boolean put = previousResetDate == null ? rateLimitingResetDate.putIfAbsent(access.token, resetDate) == null :  rateLimitingResetDate.replace(access.token, previousResetDate, resetDate)
+                    boolean put = previousResetDate == null ? rateLimitingResetDate.putIfAbsent(access.value, resetDate) == null : rateLimitingResetDate.replace(access.value, previousResetDate, resetDate)
                     if (put) {
-                        AtomicLong prev = rateLimitingRemaining.get(access.token)
+                        AtomicLong prev = rateLimitingRemaining.get(access.value)
                         if (prev == null) {
-                            rateLimitingRemaining.putIfAbsent(access.token, new AtomicLong(access.rateLimitingLimit))
+                            rateLimitingRemaining.putIfAbsent(access.value, new AtomicLong(access.rateLimitingLimit))
                         } else {
                             rateLimitingRemaining.replace(
-                                access.token,
+                                access.value,
                                 prev,
                                 new AtomicLong(access.rateLimitingLimit))
                         }
                     }
                 }
-                long remaining = rateLimitingRemaining.get(access.token).decrementAndGet()
+                long remaining = rateLimitingRemaining.get(access.value).decrementAndGet()
                 if (remaining < 0) {
-                    rateLimitingRemaining.get(access.token).compareAndSet(remaining, 0)
+                    rateLimitingRemaining.get(access.value).compareAndSet(remaining, 0)
                     throw new WebApplicationException(new UnauthorizedException('Rate limit reached'), Response.Status.FORBIDDEN)
                 }
             }

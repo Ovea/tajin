@@ -48,12 +48,7 @@ class GroovyJSONProvider extends AbstractMessageReaderWriterProvider<Object> {
 
     @Override
     Object readFrom(Class<Object> type, Type genericType, Annotation[] annotations, MediaType mediaType, MultivaluedMap<String, String> httpHeaders, InputStream entityStream) {
-        def o
-        try {
-            o = new JsonSlurper().parseText(readFromAsString(entityStream, mediaType))
-        } catch (e) {
-            throw new WebApplicationException(new Exception("Error creating JSON " + type.simpleName, e), 400)
-        }
+        def o = new JsonSlurper().parseText(readFromAsString(entityStream, mediaType))
         if (type.isInstance(o)) {
             return o
         } else {
@@ -76,8 +71,6 @@ class GroovyJSONProvider extends AbstractMessageReaderWriterProvider<Object> {
             writer.flush();
         } catch (EOFException ignored) {
             // do nothing: output stream closed by clients
-        }catch (Exception e) {
-            throw new WebApplicationException(new Exception("Error writing JSON Type " + type.simpleName, e), 500)
         }
     }
 }

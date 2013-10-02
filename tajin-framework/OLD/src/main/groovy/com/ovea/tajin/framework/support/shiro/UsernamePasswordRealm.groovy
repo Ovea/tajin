@@ -24,8 +24,6 @@ import org.apache.shiro.authz.AuthorizationInfo
 import org.apache.shiro.crypto.hash.Sha512Hash
 import org.apache.shiro.realm.AuthorizingRealm
 import org.apache.shiro.subject.PrincipalCollection
-import org.slf4j.Logger
-import org.slf4j.LoggerFactory
 
 import javax.inject.Inject
 
@@ -34,11 +32,8 @@ import javax.inject.Inject
  */
 class UsernamePasswordRealm extends AuthorizingRealm {
 
-    private static final Logger LOGGER = LoggerFactory.getLogger(UsernamePasswordRealm)
-
     @Inject
     AccountRepository accountRepository
-
 
     @Inject
     UsernamePasswordRealm(PropertySettings settings) {
@@ -54,13 +49,11 @@ class UsernamePasswordRealm extends AuthorizingRealm {
 
     @Override
     protected AuthenticationInfo doGetAuthenticationInfo(AuthenticationToken token) {
-        LOGGER.trace("doGetAuthenticationInfo {}", token)
         return accountRepository.getAuthenticationInfo(token)
     }
 
     @Override
     protected AuthorizationInfo doGetAuthorizationInfo(PrincipalCollection principals) {
-        LOGGER.trace("doGetAuthorizationInfo {}", principals)
         return accountRepository.getAuthorizationInfo(getAvailablePrincipal(principals))
     }
 

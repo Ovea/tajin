@@ -20,6 +20,5 @@ package com.ovea.tajin.framework.support.jersey
  * @date 2013-09-21
  */
 interface APIRepository {
-    APIAccess getAPIAccessByToken(String token)
-    APIAccount getAPIAccount(String id)
+    APIToken getAPIToken(String token)
 }

@@ -22,8 +22,10 @@ import com.google.inject.servlet.ServletModule
 import com.mycila.guice.ext.web.HttpContextFilter
 import com.ovea.tajin.framework.security.TokenBuilder
 import com.ovea.tajin.framework.support.guice.WebBinder
-import com.ovea.tajin.framework.support.jersey.APIFilterFactory
 import com.ovea.tajin.framework.support.jersey.APIRepository
+import com.ovea.tajin.framework.support.jersey.APIToken
+import com.ovea.tajin.framework.support.jersey.APITokenFilterFactory
+import com.ovea.tajin.framework.support.jersey.APITokenProvider
 import com.ovea.tajin.framework.support.jersey.AuditFilterFactory
 import com.ovea.tajin.framework.support.jersey.AuthenticatedFilterFactory
 import com.ovea.tajin.framework.support.jersey.ExtendedJsend
@@ -31,7 +33,7 @@ import com.ovea.tajin.framework.support.jersey.JSONP
 import com.ovea.tajin.framework.support.jersey.Jsr250FilterFactory
 import com.ovea.tajin.framework.support.jersey.PermissionFilterFactory
 import com.ovea.tajin.framework.support.shiro.GuiceShiroFilter
-import com.ovea.tajin.framework.support.shiro.MemoryCacheManager
+import com.ovea.tajin.framework.support.shiro.SecurityCacheManager
 import com.ovea.tajin.framework.support.shiro.SecurityFilter
 import com.ovea.tajin.framework.support.shiro.VersionedRememberMeManager
 import com.ovea.tajin.framework.util.PropertySettings
@@ -152,7 +154,7 @@ class InternalWebModule extends ServletModule {
                         ),
                         authorizer: new ModularRealmAuthorizer(),
                         realms: realms,
-                        cacheManager: settings.getString('security.cache', MemoryCacheManager.name).with { it.trim().length() == 0 ? null : injector.getInstance(Thread.currentThread().contextClassLoader.loadClass(it)) as CacheManager },
+                        cacheManager: settings.getString('security.cache', SecurityCacheManager.name).with { it.trim().length() == 0 ? null : injector.getInstance(Thread.currentThread().contextClassLoader.loadClass(it)) as CacheManager },
                     )
                     SecurityUtils.securityManager = manager
                     return manager
@@ -176,6 +178,8 @@ class InternalWebModule extends ServletModule {
         bind(ResourceConfig).to(DefaultResourceConfig).in(javax.inject.Singleton)
         bind(ExtendedJsend.ExceptionMapper)
         requireBinding(APIRepository)
+        bind(APIToken).toProvider(APITokenProvider).in(RequestScoped)
+
         serve("/*").with(JerseyContainer, [
             (ResourceConfig.FEATURE_DISABLE_WADL) : 'true',
             (ResourceConfig.PROPERTY_CONTAINER_REQUEST_FILTERS): [JSONP.RequestFilter].name.join(';'),
@@ -183,7 +187,7 @@ class InternalWebModule extends ServletModule {
                 ExtendedJsend.ResponseFilter,
                 JSONP.ResponseFilter].name.join(';'),
             (ResourceConfig.PROPERTY_RESOURCE_FILTER_FACTORIES): [
-                APIFilterFactory,
+                APITokenFilterFactory,
                 AuthenticatedFilterFactory,
                 Jsr250FilterFactory,
                 PermissionFilterFactory,
