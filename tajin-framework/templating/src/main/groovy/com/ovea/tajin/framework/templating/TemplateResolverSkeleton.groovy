@@ -81,7 +81,7 @@ abstract class TemplateResolverSkeleton implements TemplateResolver {
                     i++
                     prev = (2 + i) % 3
                 }
-                return NOT_FOUND
+                return TemplateResolverSkeleton.NOT_FOUND
             }
         })
     }
@@ -99,7 +99,7 @@ abstract class TemplateResolverSkeleton implements TemplateResolver {
         } catch (UncheckedExecutionException e) {
             throw e.cause
         }
-        if (template == NOT_FOUND) {
+        if (template == TemplateResolverSkeleton.NOT_FOUND) {
             throw new TemplateResolverException("Template not found: " + path);
         }
         return template
