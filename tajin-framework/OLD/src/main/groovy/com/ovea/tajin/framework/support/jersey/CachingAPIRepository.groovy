@@ -45,7 +45,9 @@ class CachingAPIRepository implements APIRepository {
             .build(new CacheLoader<String, APIToken>() {
             @Override
             APIToken load(String key) throws Exception {
-                return delegate.getAPIToken(key)
+                APIToken token = delegate.getAPIToken(key)
+                if (token) return token
+                throw new NullToken()
             }
         })
     }
@@ -61,10 +63,14 @@ class CachingAPIRepository implements APIRepository {
         try {
             return tokens.get(token)
         } catch (ExecutionException e) {
+            if (e.cause instanceof NullToken) return null
             throw e.cause
         } catch (UncheckedExecutionException e) {
+            if (e.cause instanceof NullToken) return null
             throw e.cause
         }
     }
+
+    private static class NullToken extends Exception {}
 
 }
