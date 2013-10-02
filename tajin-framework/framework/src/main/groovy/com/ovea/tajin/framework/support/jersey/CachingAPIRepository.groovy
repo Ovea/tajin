@@ -45,7 +45,9 @@ class CachingAPIRepository implements APIRepository {
             .build(new CacheLoader<String, APIToken>() {
             @Override
             APIToken load(String key) throws Exception {
-                return delegate.getAPIToken(key)
+                APIToken token = delegate.getAPIToken(key)
+                if (token) return token
+                throw new IllegalArgumentException('Invalid Token: ' + key)
             }
         })
     }
@@ -60,10 +62,10 @@ class CachingAPIRepository implements APIRepository {
     APIToken getAPIToken(String token) {
         try {
             return tokens.get(token)
-        } catch (ExecutionException e) {
-            throw e.cause
-        } catch (UncheckedExecutionException e) {
-            throw e.cause
+        } catch (ExecutionException ignored) {
+            return null
+        } catch (UncheckedExecutionException ignored) {
+            return null
         }
     }
 
