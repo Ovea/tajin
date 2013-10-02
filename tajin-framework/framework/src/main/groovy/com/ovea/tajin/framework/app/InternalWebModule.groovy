@@ -23,7 +23,9 @@ import com.mycila.guice.ext.web.HttpContextFilter
 import com.ovea.tajin.framework.security.TokenBuilder
 import com.ovea.tajin.framework.support.guice.WebBinder
 import com.ovea.tajin.framework.support.jersey.APIRepository
+import com.ovea.tajin.framework.support.jersey.APIToken
 import com.ovea.tajin.framework.support.jersey.APITokenFilterFactory
+import com.ovea.tajin.framework.support.jersey.APITokenProvider
 import com.ovea.tajin.framework.support.jersey.AuditFilterFactory
 import com.ovea.tajin.framework.support.jersey.AuthenticatedFilterFactory
 import com.ovea.tajin.framework.support.jersey.ExtendedJsend
@@ -176,6 +178,8 @@ class InternalWebModule extends ServletModule {
         bind(ResourceConfig).to(DefaultResourceConfig).in(javax.inject.Singleton)
         bind(ExtendedJsend.ExceptionMapper)
         requireBinding(APIRepository)
+        bind(APIToken).toProvider(APITokenProvider).in(RequestScoped)
+
         serve("/*").with(JerseyContainer, [
             (ResourceConfig.FEATURE_DISABLE_WADL) : 'true',
             (ResourceConfig.PROPERTY_CONTAINER_REQUEST_FILTERS): [JSONP.RequestFilter].name.join(';'),

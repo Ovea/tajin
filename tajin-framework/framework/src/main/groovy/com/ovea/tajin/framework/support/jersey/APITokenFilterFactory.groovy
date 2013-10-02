@@ -29,6 +29,7 @@ import com.sun.jersey.spi.container.ResourceFilterFactory
 import org.apache.shiro.authz.UnauthorizedException
 
 import javax.inject.Inject
+import javax.inject.Provider
 import javax.servlet.http.HttpServletRequest
 import javax.ws.rs.WebApplicationException
 import javax.ws.rs.core.Context
@@ -51,12 +52,10 @@ public class APITokenFilterFactory implements ResourceFilterFactory {
     PropertySettings settings
 
     @Inject
-    APIRepository repository
+    Provider<APIToken> apiToken
 
     @Context
     HttpServletRequest rawRequest
-
-    String tokenParam = 'token'
 
     ConcurrentMap<String, AtomicLong> rateLimitingRemaining = new ConcurrentHashMap<>()
     ConcurrentMap<String, Date> rateLimitingResetDate = new ConcurrentHashMap<>()
@@ -97,49 +96,59 @@ public class APITokenFilterFactory implements ResourceFilterFactory {
 
         @Override
         ContainerResponse filter(ContainerRequest request, ContainerResponse response) {
-            String token = request.queryParameters.getFirst(tokenParam)
-            if (token) {
-                APIToken access = repository.getAPIToken(token)
-                if (access) {
-                    if (access.rateLimited) {
-                        response.httpHeaders.add('X-RateLimit-Limit', access.rateLimitingLimit as String)
-                        response.httpHeaders.add('X-RateLimit-Remaining', rateLimitingRemaining.get(access.value).get() as String)
-                        response.httpHeaders.add('X-RateLimit-Reset', rateLimitingResetDate.get(access.value).time as String)
-                    }
-                }
+            APIToken access = apiToken.get()
+            if (access && access.rateLimited) {
+                response.httpHeaders.add('X-RateLimit-Limit', access.rateLimitingLimit as String)
+                response.httpHeaders.add('X-RateLimit-Remaining', rateLimitingRemaining.get(access.value).get() as String)
+                response.httpHeaders.add('X-RateLimit-Reset', rateLimitingResetDate.get(access.value).time as String)
             }
             return response
         }
 
         @Override
         public ContainerRequest filter(ContainerRequest request) {
-            String token = request.queryParameters.getFirst(tokenParam)
-            if (!token) {
-                throw new WebApplicationException(Response.status(Response.Status.BAD_REQUEST).entity([[(tokenParam): 'missing']]).type(MediaType.APPLICATION_JSON).build())
+            APIToken access = apiToken.get()
+            if (!access) {
+                throw new WebApplicationException(Response.status(Response.Status.BAD_REQUEST)
+                    .entity(
+                    [
+                        [
+                            key: APIToken.TOKEN_PARAM,
+                            type: 'invalid'
+                        ]
+                    ])
+                    .type(MediaType.APPLICATION_JSON)
+                    .build())
             }
 
-            APIToken access = repository.getAPIToken(token)
-            if (access == null) {
-                throw new WebApplicationException(Response.status(Response.Status.BAD_REQUEST).entity([[(tokenParam): 'invalid']]).type(MediaType.APPLICATION_JSON).build())
-            }
-
-            if (LOGGER.isLoggable(Level.FINEST)) {
-                LOGGER.finest("${path} - ${access}")
+            if (LOGGER.isLoggable(Level.FINE)) {
+                LOGGER.fine("${path} - ${access}")
             }
 
             if (access.ipRestricted) {
-                if (!(rawRequest.getRemoteAddr() in access.ipRestrictions)) {
+                String ip = rawRequest.remoteAddr
+                if (LOGGER.isLoggable(Level.FINEST)) {
+                    LOGGER.finest("${path} - ${access} | IP Restrictions: Request IP = ${ip}")
+                }
+                if (!(ip in access.ipRestrictions)) {
                     throw new WebApplicationException(new UnauthorizedException('IP refused'), Response.Status.FORBIDDEN)
                 }
             }
 
             if (access.apiRestricted) {
+                if (LOGGER.isLoggable(Level.FINEST)) {
+                    LOGGER.finest("${path} - ${access} | API Restrictions")
+                }
                 if (!(path in access.apiRestrictions)) {
                     throw new WebApplicationException(new UnauthorizedException('API Resource access refused'), Response.Status.FORBIDDEN)
                 }
             }
 
             if (access.isHeaderRestricted()) {
+                if (LOGGER.isLoggable(Level.FINEST)) {
+                    String hdump = request.requestHeaders.collect { k, v -> "${k}: ${v.join(', ')}" }.join('\n')
+                    LOGGER.finest("${path} - ${access} | Header Restrictions = ${access.headerRestrictions}, Request Headers:\n${hdump}")
+                }
                 boolean foundInvalidValue = false
                 def found = access.headerRestrictions.find { header, expectedValue ->
                     String v = request.getHeaderValue(header)
@@ -159,6 +168,9 @@ public class APITokenFilterFactory implements ResourceFilterFactory {
 
             if (access.rateLimited) {
                 //TODO MATHIEU: implement properly rate limiting by using external persistence storage for clustering
+                if (LOGGER.isLoggable(Level.FINEST)) {
+                    LOGGER.finest("${path} - ${access} | Rate Limited")
+                }
                 Date now = new Date()
                 Date previousResetDate = rateLimitingResetDate.get(access.value)
                 Date resetDate = previousResetDate

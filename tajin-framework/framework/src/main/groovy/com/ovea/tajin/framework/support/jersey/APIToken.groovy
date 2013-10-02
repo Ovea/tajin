@@ -23,6 +23,9 @@ import com.ovea.tajin.framework.util.Uuid
  */
 class APIToken {
 
+    static final String TOKEN_PARAM = 'token'
+    static final String TOKEN_HEADER = 'X-Token'
+
     static final long RATE_LIMITING_NO_LIMIT = -1
     static final String RATE_LIMITING_PERIOD_HOURLY = 'hour'
     static final String RATE_LIMITING_PERIOD_DAILY = 'day'
