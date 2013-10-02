@@ -31,7 +31,7 @@ import com.ovea.tajin.framework.support.jersey.JSONP
 import com.ovea.tajin.framework.support.jersey.Jsr250FilterFactory
 import com.ovea.tajin.framework.support.jersey.PermissionFilterFactory
 import com.ovea.tajin.framework.support.shiro.GuiceShiroFilter
-import com.ovea.tajin.framework.support.shiro.MemoryCacheManager
+import com.ovea.tajin.framework.support.shiro.SecurityCacheManager
 import com.ovea.tajin.framework.support.shiro.SecurityFilter
 import com.ovea.tajin.framework.support.shiro.VersionedRememberMeManager
 import com.ovea.tajin.framework.util.PropertySettings
@@ -152,7 +152,7 @@ class InternalWebModule extends ServletModule {
                         ),
                         authorizer: new ModularRealmAuthorizer(),
                         realms: realms,
-                        cacheManager: settings.getString('security.cache', MemoryCacheManager.name).with { it.trim().length() == 0 ? null : injector.getInstance(Thread.currentThread().contextClassLoader.loadClass(it)) as CacheManager },
+                        cacheManager: settings.getString('security.cache', SecurityCacheManager.name).with { it.trim().length() == 0 ? null : injector.getInstance(Thread.currentThread().contextClassLoader.loadClass(it)) as CacheManager },
                     )
                     SecurityUtils.securityManager = manager
                     return manager

@@ -19,6 +19,9 @@ import com.google.common.cache.CacheBuilder
 import com.google.common.cache.CacheLoader
 import com.google.common.cache.LoadingCache
 import com.google.common.util.concurrent.UncheckedExecutionException
+import com.mycila.jmx.annotation.JmxBean
+import com.mycila.jmx.annotation.JmxMethod
+import com.mycila.jmx.annotation.JmxProperty
 
 import java.util.concurrent.ExecutionException
 import java.util.concurrent.TimeUnit
@@ -27,14 +30,16 @@ import java.util.concurrent.TimeUnit
  * @author Mathieu Carbou (mathieu.carbou@gmail.com)
  * @date 2013-09-21
  */
+@javax.inject.Singleton
+@JmxBean('com.ovea.tajin:type=CachingAPIRepository,name=main')
 class CachingAPIRepository implements APIRepository {
 
     final APIRepository delegate
-    final LoadingCache<String, APIToken> accesses
+    final LoadingCache<String, APIToken> tokens
 
     CachingAPIRepository(APIRepository delegate, long expiration, TimeUnit unit) {
         this.delegate = delegate
-        this.accesses = CacheBuilder
+        this.tokens = CacheBuilder
             .newBuilder()
             .expireAfterWrite(expiration, unit)
             .build(new CacheLoader<String, APIToken>() {
@@ -45,10 +50,16 @@ class CachingAPIRepository implements APIRepository {
         })
     }
 
+    @JmxMethod
+    void clearTokenCache() { tokens.invalidateAll() }
+
+    @JmxProperty
+    Collection getCachedTokens() { tokens.asMap().keySet().collect() }
+
     @Override
     APIToken getAPIToken(String token) {
         try {
-            return accesses.get(token)
+            return tokens.get(token)
         } catch (ExecutionException e) {
             throw e.cause
         } catch (UncheckedExecutionException e) {

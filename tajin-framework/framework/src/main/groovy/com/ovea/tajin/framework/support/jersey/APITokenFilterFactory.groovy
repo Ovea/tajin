@@ -37,11 +37,15 @@ import javax.ws.rs.core.Response
 import java.util.concurrent.ConcurrentHashMap
 import java.util.concurrent.ConcurrentMap
 import java.util.concurrent.atomic.AtomicLong
+import java.util.logging.Level
+import java.util.logging.Logger
 
 /**
  * @author Mathieu Carbou (mathieu.carbou@gmail.com)
  */
 public class APITokenFilterFactory implements ResourceFilterFactory {
+
+    private static final Logger LOGGER = Logger.getLogger(APITokenFilterFactory.name);
 
     @Inject
     PropertySettings settings
@@ -119,6 +123,10 @@ public class APITokenFilterFactory implements ResourceFilterFactory {
                 throw new WebApplicationException(Response.status(Response.Status.BAD_REQUEST).entity([[(tokenParam): 'invalid']]).type(MediaType.APPLICATION_JSON).build())
             }
 
+            if (LOGGER.isLoggable(Level.FINEST)) {
+                LOGGER.finest("${path} - ${access}")
+            }
+
             if (access.ipRestricted) {
                 if (!(rawRequest.getRemoteAddr() in access.ipRestrictions)) {
                     throw new WebApplicationException(new UnauthorizedException('IP refused'), Response.Status.FORBIDDEN)
@@ -165,7 +173,7 @@ public class APITokenFilterFactory implements ResourceFilterFactory {
                     } else if (access.rateLimitingPeriod == APIToken.RATE_LIMITING_PERIOD_MONTHLY) {
                         resetDate = new Date(now.time + 2629800000) // 1 month = 365.25/12*24*60*60*1000
                     }
-                    boolean put = previousResetDate == null ? rateLimitingResetDate.putIfAbsent(access.value, resetDate) == null :  rateLimitingResetDate.replace(access.value, previousResetDate, resetDate)
+                    boolean put = previousResetDate == null ? rateLimitingResetDate.putIfAbsent(access.value, resetDate) == null : rateLimitingResetDate.replace(access.value, previousResetDate, resetDate)
                     if (put) {
                         AtomicLong prev = rateLimitingRemaining.get(access.value)
                         if (prev == null) {

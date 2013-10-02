@@ -46,4 +46,6 @@ class APIToken {
     boolean isRateLimited() { rateLimitingLimit >= 0 }
     boolean isHeaderRestricted() { !headerRestrictions.isEmpty() }
 
+    @Override
+    String toString() { "Token: ${value} (${alias})" }
 }
