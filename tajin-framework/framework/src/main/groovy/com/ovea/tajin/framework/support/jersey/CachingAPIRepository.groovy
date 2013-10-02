@@ -47,7 +47,7 @@ class CachingAPIRepository implements APIRepository {
             APIToken load(String key) throws Exception {
                 APIToken token = delegate.getAPIToken(key)
                 if (token) return token
-                throw new IllegalArgumentException('Invalid Token: ' + key)
+                throw new NullToken()
             }
         })
     }
@@ -62,11 +62,15 @@ class CachingAPIRepository implements APIRepository {
     APIToken getAPIToken(String token) {
         try {
             return tokens.get(token)
-        } catch (ExecutionException ignored) {
-            return null
-        } catch (UncheckedExecutionException ignored) {
-            return null
+        } catch (ExecutionException e) {
+            if (e.cause instanceof NullToken) return null
+            throw e.cause
+        } catch (UncheckedExecutionException e) {
+            if (e.cause instanceof NullToken) return null
+            throw e.cause
         }
     }
+
+    private static class NullToken extends Exception {}
 
 }
