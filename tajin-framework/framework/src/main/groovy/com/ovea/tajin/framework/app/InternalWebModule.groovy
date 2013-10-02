@@ -22,8 +22,8 @@ import com.google.inject.servlet.ServletModule
 import com.mycila.guice.ext.web.HttpContextFilter
 import com.ovea.tajin.framework.security.TokenBuilder
 import com.ovea.tajin.framework.support.guice.WebBinder
-import com.ovea.tajin.framework.support.jersey.APIFilterFactory
 import com.ovea.tajin.framework.support.jersey.APIRepository
+import com.ovea.tajin.framework.support.jersey.APITokenFilterFactory
 import com.ovea.tajin.framework.support.jersey.AuditFilterFactory
 import com.ovea.tajin.framework.support.jersey.AuthenticatedFilterFactory
 import com.ovea.tajin.framework.support.jersey.ExtendedJsend
@@ -183,7 +183,7 @@ class InternalWebModule extends ServletModule {
                 ExtendedJsend.ResponseFilter,
                 JSONP.ResponseFilter].name.join(';'),
             (ResourceConfig.PROPERTY_RESOURCE_FILTER_FACTORIES): [
-                APIFilterFactory,
+                APITokenFilterFactory,
                 AuthenticatedFilterFactory,
                 Jsr250FilterFactory,
                 PermissionFilterFactory,

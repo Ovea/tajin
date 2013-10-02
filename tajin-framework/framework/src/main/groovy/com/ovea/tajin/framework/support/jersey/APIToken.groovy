@@ -14,24 +14,28 @@
  * limitations under the License.
  */
 package com.ovea.tajin.framework.support.jersey
+
+import com.ovea.tajin.framework.util.Uuid
+
 /**
  * @author Mathieu Carbou (mathieu.carbou@gmail.com)
  * @date 2013-09-20
  */
-class APIAccess {
+class APIToken {
 
     static final long RATE_LIMITING_NO_LIMIT = -1
     static final String RATE_LIMITING_PERIOD_HOURLY = 'hour'
     static final String RATE_LIMITING_PERIOD_DAILY = 'day'
     static final String RATE_LIMITING_PERIOD_MONTHLY = 'month'
 
-    String token
+    String value = Uuid.generate()
     String alias
-    APIAccount account
+    boolean production = true
+
     List<String> ipRestrictions = []
     List<String> apiRestrictions = []
     Map<String, String> headerRestrictions = [:]
-    boolean production = true
+
     Map<String, ?> options = [:]
 
     long rateLimitingLimit = RATE_LIMITING_NO_LIMIT

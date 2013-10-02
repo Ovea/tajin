@@ -30,33 +30,23 @@ import java.util.concurrent.TimeUnit
 class CachingAPIRepository implements APIRepository {
 
     final APIRepository delegate
-    final LoadingCache<String, APIAccess> accesses
-    final LoadingCache<String, APIAccount> accounts
+    final LoadingCache<String, APIToken> accesses
 
     CachingAPIRepository(APIRepository delegate, long expiration, TimeUnit unit) {
         this.delegate = delegate
         this.accesses = CacheBuilder
             .newBuilder()
             .expireAfterWrite(expiration, unit)
-            .build(new CacheLoader<String, APIAccess>() {
+            .build(new CacheLoader<String, APIToken>() {
             @Override
-            APIAccess load(String key) throws Exception {
-                return delegate.getAPIAccessByToken(key)
-            }
-        })
-        this.accounts = CacheBuilder
-            .newBuilder()
-            .expireAfterWrite(expiration, unit)
-            .build(new CacheLoader<String, APIAccount>() {
-            @Override
-            APIAccount load(String key) throws Exception {
-                return delegate.getAPIAccount(key)
+            APIToken load(String key) throws Exception {
+                return delegate.getAPIToken(key)
             }
         })
     }
 
     @Override
-    APIAccess getAPIAccessByToken(String token) {
+    APIToken getAPIToken(String token) {
         try {
             return accesses.get(token)
         } catch (ExecutionException e) {
@@ -66,14 +56,4 @@ class CachingAPIRepository implements APIRepository {
         }
     }
 
-    @Override
-    APIAccount getAPIAccount(String id) {
-        try {
-            return accounts.get(id)
-        } catch (ExecutionException e) {
-            throw e.cause
-        } catch (UncheckedExecutionException e) {
-            throw e.cause
-        }
-    }
 }
