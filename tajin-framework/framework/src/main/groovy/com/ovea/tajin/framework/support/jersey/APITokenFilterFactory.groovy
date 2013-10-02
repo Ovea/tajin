@@ -139,7 +139,15 @@ public class APITokenFilterFactory implements ResourceFilterFactory {
                 if (LOGGER.isLoggable(Level.FINEST)) {
                     LOGGER.finest("${path} - ${access} | API Restrictions")
                 }
-                if (!(path in access.apiRestrictions)) {
+                def found = access.apiRestrictions.find { r ->
+                    if (r.startsWith('/')
+                        && r.endsWith('/')
+                        && path.matches(r.substring(1, r.length() - 1)) || r == path) {
+                        return true
+                    }
+                    return false
+                }
+                if (!found) {
                     throw new WebApplicationException(new UnauthorizedException('API Resource access refused'), Response.Status.FORBIDDEN)
                 }
             }
