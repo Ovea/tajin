@@ -106,7 +106,8 @@ class InternalWebModule extends ServletModule {
             LOGGER.info(" + CORS support")
             filter('/*').through(CrossOriginFilter, [
                 allowedMethods: 'GET,POST,HEAD,PUT,DELETE',
-                allowedOrigins: origin
+                allowedOrigins: origin,
+                allowedHeaders: settings.getString('cors.allowedHeaders', 'X-Requested-With,Content-Type,Accept,Origin')
             ])
         }
 

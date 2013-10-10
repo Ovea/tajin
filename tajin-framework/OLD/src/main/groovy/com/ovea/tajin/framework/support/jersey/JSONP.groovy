@@ -35,11 +35,12 @@ class JSONP {
 
     private static final METHODS = [HttpMethod.GET, HttpMethod.DELETE, HttpMethod.HEAD, HttpMethod.OPTIONS, HttpMethod.POST, HttpMethod.PUT]
 
-    static class RequestFilter implements ContainerRequestFilter {
+    static String callbackParam = 'callback'
+    static String methodParam = 'method'
 
-        String callbackParam = 'callback'
-        String methodParam = 'method'
-        List<String> ignores = [callbackParam, methodParam, '_']
+    static List<String> ignores = [callbackParam, methodParam, '_', 'token']
+
+    static class RequestFilter implements ContainerRequestFilter {
 
         @Override
         public ContainerRequest filter(ContainerRequest request) {
@@ -66,10 +67,6 @@ class JSONP {
     }
 
     static class ResponseFilter implements ContainerResponseFilter {
-
-        String callbackParam = 'callback'
-        String methodParam = 'method'
-        List<String> ignores = [callbackParam, methodParam, '_']
 
         @Override
         ContainerResponse filter(ContainerRequest request, ContainerResponse response) {
