@@ -98,7 +98,7 @@ class DefaultJobScheduler implements JobScheduler {
     @PreDestroy
     void shutdown() {
         while (scheduledJobs) {
-            cancel(scheduledJobs.keySet())
+            remove(scheduledJobs.keySet(), false)
         }
         executorService.shutdown()
         try {
@@ -109,7 +109,9 @@ class DefaultJobScheduler implements JobScheduler {
     }
 
     @Override
-    void cancel(Collection<String> ids) {
+    void cancel(Collection<String> ids) { remove(ids, true) }
+
+    private void remove(Collection<String> ids, boolean removeAlsoFromDB) {
         if (ids) {
             List<TriggeredScheduledJob> jobs = []
             ids.each { String id ->
@@ -119,7 +121,9 @@ class DefaultJobScheduler implements JobScheduler {
                     b.future.cancel(false)
                 }
             }
-            repository.delete(jobs)
+            if (removeAlsoFromDB) {
+                repository.delete(jobs)
+            }
         }
     }
 
