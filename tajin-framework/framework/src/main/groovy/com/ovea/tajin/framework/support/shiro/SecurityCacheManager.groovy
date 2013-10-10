@@ -42,7 +42,9 @@ class SecurityCacheManager extends AbstractCacheManager {
     final Set<String> names = new ConcurrentSkipListSet<>()
 
     @JmxMethod
-    void clearShiroCaches() { destroy() }
+    void clearShiroCaches() {
+        names.each { getCache(it).clear() }
+    }
 
     @JmxProperty
     Collection<String> getCacheNames() { names }

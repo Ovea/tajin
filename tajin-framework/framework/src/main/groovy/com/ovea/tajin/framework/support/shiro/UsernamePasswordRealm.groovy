@@ -26,6 +26,7 @@ import org.apache.shiro.realm.AuthorizingRealm
 import org.apache.shiro.subject.PrincipalCollection
 
 import javax.inject.Inject
+import java.security.Principal
 
 /**
  * @author Mathieu Carbou (mathieu.carbou@gmail.com)
@@ -55,6 +56,22 @@ class UsernamePasswordRealm extends AuthorizingRealm {
     @Override
     protected AuthorizationInfo doGetAuthorizationInfo(PrincipalCollection principals) {
         return accountRepository.getAuthorizationInfo(getAvailablePrincipal(principals))
+    }
+
+    @Override
+    protected Object getAuthenticationCacheKey(PrincipalCollection principals) {
+        return ((Principal) getAvailablePrincipal(principals)).name
+    }
+
+    @Override
+    protected Object getAuthorizationCacheKey(PrincipalCollection principals) {
+        return ((Principal) getAvailablePrincipal(principals)).name
+    }
+
+    @Override
+    protected Object getAuthenticationCacheKey(AuthenticationToken token) {
+        AuthenticationInfo info = accountRepository.getAuthenticationInfo(token)
+        return getAuthenticationCacheKey(info.principals)
     }
 
 }
