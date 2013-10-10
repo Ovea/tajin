@@ -54,8 +54,10 @@ class DefaultJobScheduler implements JobScheduler {
     @Inject JobRepository repository = new EmptyJobRepository()
     @Inject JobListener listener = new EmptyJobListener()
     @Inject Settings settings
+
     @Inject
-    @AsyncExecutor Executor fallbackExecutor
+    @AsyncExecutor
+    Executor fallbackExecutor
 
     @PostConstruct
     void init() {

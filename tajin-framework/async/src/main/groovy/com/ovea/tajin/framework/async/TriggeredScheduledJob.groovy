@@ -46,7 +46,7 @@ class TriggeredScheduledJob {
 
     Date completionDate
 
-    boolean isRetryable() { completionDate == null && (source.maxRetry == ScheduledJob.INFINITE_RETRY || currentRetry < source.maxRetry) }
+    boolean isRetryable() { lastTry == null || completionDate == null && (source.maxRetry == ScheduledJob.INFINITE_RETRY || currentRetry < source.maxRetry) }
 
     void preventReschedule() {
         completionDate = new Date()
