@@ -23,6 +23,7 @@ import javax.inject.Inject
 /**
  * @author Mathieu Carbou (mathieu.carbou@gmail.com)
  */
+@javax.inject.Singleton
 class PassthroughRealm extends UsernamePasswordRealm {
 
     @Inject

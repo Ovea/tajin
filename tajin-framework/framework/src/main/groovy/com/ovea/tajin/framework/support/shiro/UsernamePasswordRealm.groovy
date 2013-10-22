@@ -31,6 +31,7 @@ import java.security.Principal
 /**
  * @author Mathieu Carbou (mathieu.carbou@gmail.com)
  */
+@javax.inject.Singleton
 class UsernamePasswordRealm extends AuthorizingRealm {
 
     @Inject
