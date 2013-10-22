@@ -41,6 +41,7 @@ import com.ovea.tajin.framework.util.PropertySettingsMBean
 import com.ovea.tajin.framework.web.CookieCleaner
 import com.ovea.tajin.framework.web.CookieLocaleManager
 import com.ovea.tajin.framework.web.PerfLog
+import com.sun.jersey.api.container.filter.PostReplaceFilter
 import com.sun.jersey.api.core.DefaultResourceConfig
 import com.sun.jersey.api.core.ResourceConfig
 import com.sun.jersey.guice.JerseyServletModule
@@ -183,17 +184,22 @@ class InternalWebModule extends ServletModule {
 
         serve("/*").with(JerseyContainer, [
             (ResourceConfig.FEATURE_DISABLE_WADL) : 'true',
-            (ResourceConfig.PROPERTY_CONTAINER_REQUEST_FILTERS): [JSONP.RequestFilter].name.join(';'),
+            (ResourceConfig.PROPERTY_CONTAINER_REQUEST_FILTERS): [
+                JSONP.RequestFilter,
+                PostReplaceFilter
+            ].name.join(';'),
             (ResourceConfig.PROPERTY_CONTAINER_RESPONSE_FILTERS): [
                 ExtendedJsend.ResponseFilter,
-                JSONP.ResponseFilter].name.join(';'),
+                JSONP.ResponseFilter
+            ].name.join(';'),
             (ResourceConfig.PROPERTY_RESOURCE_FILTER_FACTORIES): [
                 APITokenFilterFactory,
                 AuthenticatedFilterFactory,
                 Jsr250FilterFactory,
                 PermissionFilterFactory,
                 AuditFilterFactory,
-                ExtendedJsend.FilterFactory]*.name.join(';')
+                ExtendedJsend.FilterFactory
+            ]*.name.join(';')
         ])
 
         // configure discovered applications

@@ -36,7 +36,7 @@ class JSONP {
     private static final METHODS = [HttpMethod.GET, HttpMethod.DELETE, HttpMethod.HEAD, HttpMethod.OPTIONS, HttpMethod.POST, HttpMethod.PUT]
 
     static String callbackParam = 'callback'
-    static String methodParam = 'method'
+    static String methodParam = '_method'
 
     static List<String> ignores = [callbackParam, methodParam, '_', 'token']
 
@@ -44,6 +44,9 @@ class JSONP {
 
         @Override
         public ContainerRequest filter(ContainerRequest request) {
+            if (!request.method.equalsIgnoreCase("GET")) {
+                return request
+            }
             String cb = request.queryParameters.getFirst(callbackParam)
             if (cb) {
                 String requestedMethod = request.queryParameters.getFirst(methodParam)?.toUpperCase()
