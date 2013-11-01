@@ -101,14 +101,12 @@ public class AuthenticatedFilterFactory implements ResourceFilterFactory {
                 }
             }
             if(SecurityUtils.subject.remembered && !authenticated.allowRemembered()) {
-                SecurityUtils.subject.logout()
-                throw buildException(request)
+                throw buildException(request, new UnsupportedTokenException('RememberMe not allowed'))
             }
             if (SecurityUtils.subject.authenticated || SecurityUtils.subject.remembered) {
                 APIToken token = apiToken.get()
                 if (token && !SecurityUtils.subject.hasRole('api:account:' + token.account)) {
-                    SecurityUtils.subject.logout()
-                    throw buildException(request, new UnsupportedTokenException('Invalid Token'))
+                    throw buildException(request, new UnsupportedTokenException('Access not allowed with this API Token'))
                 }
             } else {
                 throw buildException(request)
