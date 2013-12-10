@@ -23,6 +23,10 @@ interface JobScheduler {
 
     void schedule(ScheduledJob e)
 
+    void refresh(Collection<String> ids)
+
     void cancel(Collection<String> ids)
+
+    void cancel(Collection<String> ids, boolean removeAlsoFromDB)
 
 }
