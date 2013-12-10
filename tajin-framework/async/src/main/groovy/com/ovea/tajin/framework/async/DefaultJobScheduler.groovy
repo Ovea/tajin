@@ -132,7 +132,7 @@ class DefaultJobScheduler implements JobScheduler {
 
     @Override
     void refresh(Collection<String> ids) {
-        cancel(ids)
+        cancel(ids, false)
         repository.load(ids).each {
             if (it.retryable) {
                 doSchedule(new PersistentJobRunner(it))
