@@ -27,4 +27,6 @@ interface JobRepository {
     void delete(Collection<TriggeredScheduledJob> jobs)
 
     Collection<TriggeredScheduledJob> listPendingJobs()
+
+    Collection<TriggeredScheduledJob> load(Collection<String> ids)
 }

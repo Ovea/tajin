@@ -39,4 +39,9 @@ package com.ovea.tajin.framework.async
      Collection<TriggeredScheduledJob> listPendingJobs() {
          return []
      }
+
+     @Override
+     Collection<TriggeredScheduledJob> load(Collection<String> ids) {
+         return []
+     }
  }

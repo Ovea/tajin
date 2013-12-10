@@ -24,6 +24,7 @@ import com.ovea.tajin.framework.core.Settings
 import javax.annotation.PostConstruct
 import javax.annotation.PreDestroy
 import javax.inject.Inject
+import java.util.concurrent.CancellationException
 import java.util.concurrent.ConcurrentHashMap
 import java.util.concurrent.ConcurrentMap
 import java.util.concurrent.ExecutionException
@@ -98,7 +99,7 @@ class DefaultJobScheduler implements JobScheduler {
     @PreDestroy
     void shutdown() {
         while (scheduledJobs) {
-            remove(scheduledJobs.keySet(), false)
+            cancel(scheduledJobs.keySet(), false)
         }
         executorService.shutdown()
         try {
@@ -109,10 +110,12 @@ class DefaultJobScheduler implements JobScheduler {
     }
 
     @Override
-    void cancel(Collection<String> ids) { remove(ids, true) }
+    void cancel(Collection<String> ids) { cancel(ids, true) }
 
-    private void remove(Collection<String> ids, boolean removeAlsoFromDB) {
+    @Override
+    void cancel(Collection<String> ids, boolean removeAlsoFromDB) {
         if (ids) {
+            LOGGER.info('Cancelling jobs ' + ids + ' from memory' + (removeAlsoFromDB ? ' and bd' : ''))
             List<TriggeredScheduledJob> jobs = []
             ids.each { String id ->
                 Bucket b = scheduledJobs.remove(id)
@@ -121,8 +124,18 @@ class DefaultJobScheduler implements JobScheduler {
                     b.future.cancel(false)
                 }
             }
-            if (removeAlsoFromDB) {
+            if (removeAlsoFromDB && jobs) {
                 repository.delete(jobs)
+            }
+        }
+    }
+
+    @Override
+    void refresh(Collection<String> ids) {
+        cancel(ids)
+        repository.load(ids).each {
+            if (it.retryable) {
+                doSchedule(new PersistentJobRunner(it))
             }
         }
     }
@@ -154,6 +167,8 @@ class DefaultJobScheduler implements JobScheduler {
                         get()
                     } catch (ExecutionException e) {
                         throw e.cause
+                    } catch (CancellationException ignored) {
+
                     }
                 }
             }

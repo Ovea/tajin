@@ -62,6 +62,7 @@ class AsyncModule extends AbstractModule {
         requireBinding(JobListener)
 
         bind(Dispatcher).to(ConfiguredEventBus)
+        bind(DefaultJobScheduler)
         bind(JobScheduler).to(DefaultJobScheduler)
         bind(Executor).annotatedWith(AsyncExecutor).toProvider(ExecutorProvider)
 
