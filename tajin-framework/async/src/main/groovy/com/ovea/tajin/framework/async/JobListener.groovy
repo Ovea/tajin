@@ -22,4 +22,5 @@ package com.ovea.tajin.framework.async
 interface JobListener {
     void onJobTriggered(TriggeredScheduledJob job)
     void onJobFailure(TriggeredScheduledJob job, Throwable err)
+    Lock tryLock(TriggeredScheduledJob job)
 }

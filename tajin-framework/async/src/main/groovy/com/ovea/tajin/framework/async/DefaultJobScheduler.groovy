@@ -46,7 +46,7 @@ import java.util.logging.Logger
 @javax.inject.Singleton
 class DefaultJobScheduler implements JobScheduler {
 
-    private static final Logger LOGGER = Logger.getLogger(JobScheduler.simpleName)
+    private static final Logger LOGGER = Logger.getLogger(DefaultJobScheduler.name)
 
     private final ConcurrentMap<String, Bucket> scheduledJobs = new ConcurrentHashMap<>()
 
@@ -158,7 +158,7 @@ class DefaultJobScheduler implements JobScheduler {
 
     private void doSchedule(JobRunner jobRunner) {
         long diff = Math.max(0, jobRunner.job.nextTry.time - System.currentTimeMillis())
-        LOGGER.fine("Scheduling: ${jobRunner.job} in ${diff / 1000}s")
+        LOGGER.info("Scheduling: ${jobRunner.job} in ${diff / 1000}s")
         if (diff == 0 && fallbackExecutor) {
             FutureTask<?> future = new FutureTask(jobRunner, null) {
                 @Override
@@ -198,29 +198,37 @@ class DefaultJobScheduler implements JobScheduler {
 
         @Override
         final void run() {
-            try {
-                nRunning.incrementAndGet()
-                listener.onJobTriggered(job)
-                scheduledJobs.remove(job.id)
-                job.completionDate = new Date()
-                onComplete()
-            } catch (Throwable err) {
-                scheduledJobs.remove(job.id)
-                nFailed.incrementAndGet()
-                job.currentRetry++
-                job.lastTry = new Date()
-                job.nextTry = new Date(System.currentTimeMillis() + job.source.retryDelaySecs * 1000)
-                onFailure()
-                listener.onJobFailure(job, err)
-                if (job.retryable) {
-                    doSchedule this
-                } else {
-                    onAbandon()
+            Lock lock = listener.tryLock(job)
+            if (lock) {
+                LOGGER.info("Lock obtained for job ${job.id}")
+                try {
+                    nRunning.incrementAndGet()
+                    listener.onJobTriggered(job)
+                    scheduledJobs.remove(job.id)
+                    job.completionDate = new Date()
+                    onComplete()
+                } catch (Throwable err) {
+                    scheduledJobs.remove(job.id)
+                    nFailed.incrementAndGet()
+                    job.currentRetry++
+                    job.lastTry = new Date()
+                    job.nextTry = new Date(System.currentTimeMillis() + job.source.retryDelaySecs * 1000)
+                    onFailure()
+                    listener.onJobFailure(job, err)
+                    if (job.retryable) {
+                        doSchedule this
+                    } else {
+                        onAbandon()
+                    }
+                    throw err
+                } finally {
+                    nRunning.decrementAndGet()
+                    nRan.incrementAndGet()
+                    lock.unlock()
                 }
-                throw err
-            } finally {
-                nRunning.decrementAndGet()
-                nRan.incrementAndGet()
+            } else {
+                // remove the job, lock cannot be obtained
+                cancel([job.id], false)
             }
         }
 

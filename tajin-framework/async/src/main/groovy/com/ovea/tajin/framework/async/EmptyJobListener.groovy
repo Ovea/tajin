@@ -28,4 +28,15 @@ package com.ovea.tajin.framework.async
      void onJobFailure(TriggeredScheduledJob job, Throwable err) {
 
      }
+
+     @Override
+     Lock tryLock(TriggeredScheduledJob job) {
+         return new EmptyLock()
+     }
+
+     static class EmptyLock implements Lock {
+         @Override
+         void unlock() {
+         }
+     }
  }
