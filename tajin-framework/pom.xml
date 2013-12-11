@@ -47,8 +47,6 @@
 
         <!--<module>groovy</module>-->
         <!--<module>templating</module>-->
-
-        <module>all</module>
     </modules>
 
     <build>
