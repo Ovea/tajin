@@ -41,6 +41,7 @@ import com.ovea.tajin.framework.util.PropertySettingsMBean
 import com.ovea.tajin.framework.web.CookieCleaner
 import com.ovea.tajin.framework.web.CookieLocaleManager
 import com.ovea.tajin.framework.web.PerfLog
+import com.sun.jersey.api.container.filter.GZIPContentEncodingFilter
 import com.sun.jersey.api.container.filter.PostReplaceFilter
 import com.sun.jersey.api.core.DefaultResourceConfig
 import com.sun.jersey.api.core.ResourceConfig
@@ -183,15 +184,22 @@ class InternalWebModule extends ServletModule {
         bind(APIToken).toProvider(APITokenProvider).in(RequestScoped)
 
         serve("/*").with(JerseyContainer, [
+
             (ResourceConfig.FEATURE_DISABLE_WADL) : 'true',
+
             (ResourceConfig.PROPERTY_CONTAINER_REQUEST_FILTERS): [
+                GZIPContentEncodingFilter,
                 JSONP.RequestFilter,
-                PostReplaceFilter
+                PostReplaceFilter,
+                ExtendedJsend.Filter
             ].name.join(';'),
+
             (ResourceConfig.PROPERTY_CONTAINER_RESPONSE_FILTERS): [
-                ExtendedJsend.ResponseFilter,
-                JSONP.ResponseFilter
+                ExtendedJsend.Filter,
+                JSONP.ResponseFilter,
+                GZIPContentEncodingFilter
             ].name.join(';'),
+
             (ResourceConfig.PROPERTY_RESOURCE_FILTER_FACTORIES): [
                 APITokenFilterFactory,
                 AuthenticatedFilterFactory,
@@ -200,6 +208,7 @@ class InternalWebModule extends ServletModule {
                 AuditFilterFactory,
                 ExtendedJsend.FilterFactory
             ]*.name.join(';')
+
         ])
 
         // configure discovered applications

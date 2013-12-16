@@ -22,6 +22,7 @@ import com.sun.jersey.spi.container.ContainerResponse
 import com.sun.jersey.spi.container.ContainerResponseFilter
 import com.sun.jersey.spi.container.ResourceFilter
 import com.sun.jersey.spi.container.ResourceFilterFactory
+import groovy.transform.Immutable
 
 import javax.ws.rs.WebApplicationException
 import javax.ws.rs.core.HttpHeaders
@@ -38,7 +39,8 @@ import java.util.logging.Logger
  */
 class ExtendedJsend {
 
-    private static final Logger LOGGER = Logger.getLogger(ExceptionMapper.name);
+    private static final Logger LOGGER = Logger.getLogger('UncaughtException');
+    private static final ThreadLocal<RequestInfo> requestInfo = new ThreadLocal<>()
 
     static final Map<Integer, String> ERROR_TYPES = [
         (400): 'request',
@@ -53,31 +55,48 @@ class ExtendedJsend {
         @Override
         List<ResourceFilter> create(AbstractMethod am) {
             if (am.isAnnotationPresent(Deprecated) || am.resource.isAnnotationPresent(Deprecated)) {
-                return [new ResponseFilter(true)]
+                return [new Filter(true)]
             }
             return []
         }
     }
 
-    static class ResponseFilter implements ResourceFilter, ContainerResponseFilter {
+    static class Filter implements ResourceFilter, ContainerResponseFilter, ContainerRequestFilter {
 
         final boolean deprecated
 
-        ResponseFilter() { this(false) }
+        Filter() { this(false) }
 
-        ResponseFilter(boolean deprecated) { this.deprecated = deprecated }
+        Filter(boolean deprecated) { this.deprecated = deprecated }
 
         @Override
-        ContainerRequestFilter getRequestFilter() { return null }
+        ContainerRequestFilter getRequestFilter() { return this }
 
         @Override
         ContainerResponseFilter getResponseFilter() { return this }
+
+        @Override
+        ContainerRequest filter(ContainerRequest request) {
+            if (request.mediaType == null || request.mediaType.toString().startsWith(MediaType.APPLICATION_JSON)) {
+                byte[] data = request.entityInputStream.bytes
+                request.entityInputStream = new ByteArrayInputStream(data)
+                requestInfo.set(new RequestInfo(
+                    method: request.method,
+                    uri: request.requestUri as String,
+                    headers: request.getRequestHeaders().collectEntries { k, v -> [k, v.join(', ')] },
+                    body: new String(data, 'UTF-8'),
+                    user: request.userPrincipal?.name ?: 'public'
+                ))
+            }
+            return request
+        }
 
         @Override
         ContainerResponse filter(ContainerRequest request, ContainerResponse response) {
             if (response.entity != null
                 && !response.mediaType.toString().startsWith(MediaType.APPLICATION_JSON)
                 || isWrapped(response.response)) {
+                requestInfo.remove()
                 return response
             }
             response.response = wrapResponse(response.response, null, deprecated)
@@ -95,7 +114,18 @@ class ExtendedJsend {
                 String ct = response.metadata.getFirst(HttpHeaders.CONTENT_TYPE)
                 return ct == null || ct.startsWith(MediaType.APPLICATION_JSON) ? wrapResponse(response, e.cause) : response
             }
-            LOGGER.log(Level.SEVERE, "Internal Server Error (500): " + e.message, e)
+            // uncaught exception
+            RequestInfo infos = requestInfo.get()
+            if (infos) {
+                LOGGER.log(Level.SEVERE, e.message, new RuntimeException(e.message + """
+${infos.method} ${infos.uri}
+  - User: ${infos.user}
+  - ${infos.headers.collect { k, v -> "${k}: ${v}" }.join('\n  - ')}
+${infos.body ?: ''}""", e))
+                requestInfo.remove()
+            } else {
+                LOGGER.log(Level.SEVERE, e.message, e)
+            }
             return wrapResponse(Response.status(Response.Status.INTERNAL_SERVER_ERROR).build(), e)
         }
     }
@@ -141,4 +171,12 @@ class ExtendedJsend {
             .build()
     }
 
+    @Immutable
+    static class RequestInfo {
+        String method
+        String uri
+        Map headers
+        String body
+        String user
+    }
 }
